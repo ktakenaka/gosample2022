@@ -4,3 +4,6 @@ migrate-new:
 migrate-%:
 	$(eval CMD:= $*)
 	docker-compose run migration $(CMD)
+
+sqlboiler:
+	docker-compose run sqlboiler mysql
