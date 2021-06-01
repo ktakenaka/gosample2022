@@ -1,0 +1,42 @@
+version: "3"
+
+x-var: &DB_USER
+  "gomsx"
+x-var: &DB_PASSWORD
+  "gomsx"
+x-var: &DB_HOST
+  "database"
+x-var: &DB_NAME
+  "gomsx"
+
+services:
+  database:
+    platform: linux/x86_64
+    build:
+      context: ./docker/mysql
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db-data:/var/lib/mysql:delegated
+      - ./docker/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      BIND-ADDRESS: 0.0.0.0
+
+  migration:
+    build:
+      context: ./tools/sqlmigrate
+      dockerfile: Dockerfile
+    volumes:
+      - ./tools/sqlmigrate/dbconfig.yml:/db/dbconfig.yml
+      - ./db/migrations:/db/migrations
+    environment:
+      DB_USER: *DB_USER
+      DB_PASSWORD: *DB_PASSWORD
+      DB_HOST: *DB_HOST
+      DB_NAME: *DB_NAME
+      DB_PORT: 3306
+    depends_on: 
+      - database
