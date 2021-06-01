@@ -1,0 +1,15 @@
+output   = "models"
+wipe     = false
+no-tests = true
+no-hooks = true
+no-rows-affected = true
+no-driver-templates = true
+
+[mysql]
+  dbname    = "gomsx"
+  host      = "database"
+  port      = 3306
+  user      = "gomsx"
+  pass      = "gomsx"
+  sslmode   = "false"
+  blacklist = ["schema_migrations"]

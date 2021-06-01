@@ -1,5 +1,7 @@
 version: "3"
 
+x-var: &ENV
+  "development"
 x-var: &DB_USER
   "gomsx"
 x-var: &DB_PASSWORD
@@ -10,6 +12,26 @@ x-var: &DB_NAME
   "gomsx"
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    tty: true
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/go/src:cached
+    environment:
+      ENV: *ENV
+      DB_USER: *DB_USER
+      DB_PASSWORD: *DB_PASSWORD
+      DB_HOST: *DB_HOST
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "5m"
+
   database:
     platform: linux/x86_64
     build:
@@ -25,6 +47,14 @@ services:
       MYSQL_ROOT_PASSWORD: root
       BIND-ADDRESS: 0.0.0.0
 
+  sqlboiler:
+    build:
+      context: ./tools/sqlboiler
+      dockerfile: Dockerfile
+    volumes:
+      - ./tools/sqlboiler/sqlboiler.toml:/sqlboiler/sqlboiler.toml
+      - ./app/internal/models:/sqlboiler/models
+
   migration:
     build:
       context: ./tools/sqlmigrate
@@ -38,5 +68,3 @@ services:
       DB_HOST: *DB_HOST
       DB_NAME: *DB_NAME
       DB_PORT: 3306
-    depends_on: 
-      - database
