@@ -1,5 +1,5 @@
 output   = "models"
-wipe     = false
+wipe     = true
 no-tests = true
 no-hooks = true
 no-rows-affected = true
