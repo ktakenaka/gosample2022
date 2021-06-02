@@ -121,6 +121,8 @@ type (
 	// PilotSlice is an alias for a slice of pointers to Pilot.
 	// This should generally be used opposed to []Pilot.
 	PilotSlice []*Pilot
+	// PilotHook is the signature for custom Pilot hook methods
+	PilotHook func(context.Context, boil.ContextExecutor, *Pilot) error
 
 	pilotQuery struct {
 		*queries.Query
@@ -148,6 +150,176 @@ var (
 	_ = qmhelper.Where
 )
 
+var pilotBeforeInsertHooks []PilotHook
+var pilotBeforeUpdateHooks []PilotHook
+var pilotBeforeDeleteHooks []PilotHook
+var pilotBeforeUpsertHooks []PilotHook
+
+var pilotAfterInsertHooks []PilotHook
+var pilotAfterSelectHooks []PilotHook
+var pilotAfterUpdateHooks []PilotHook
+var pilotAfterDeleteHooks []PilotHook
+var pilotAfterUpsertHooks []PilotHook
+
+// doBeforeInsertHooks executes all "before insert" hooks.
+func (o *Pilot) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotBeforeInsertHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doBeforeUpdateHooks executes all "before Update" hooks.
+func (o *Pilot) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotBeforeUpdateHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doBeforeDeleteHooks executes all "before Delete" hooks.
+func (o *Pilot) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotBeforeDeleteHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doBeforeUpsertHooks executes all "before Upsert" hooks.
+func (o *Pilot) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotBeforeUpsertHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doAfterInsertHooks executes all "after Insert" hooks.
+func (o *Pilot) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotAfterInsertHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doAfterSelectHooks executes all "after Select" hooks.
+func (o *Pilot) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotAfterSelectHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doAfterUpdateHooks executes all "after Update" hooks.
+func (o *Pilot) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotAfterUpdateHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doAfterDeleteHooks executes all "after Delete" hooks.
+func (o *Pilot) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotAfterDeleteHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// doAfterUpsertHooks executes all "after Upsert" hooks.
+func (o *Pilot) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+	if boil.HooksAreSkipped(ctx) {
+		return nil
+	}
+
+	for _, hook := range pilotAfterUpsertHooks {
+		if err := hook(ctx, exec, o); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// AddPilotHook registers your hook function for all future operations.
+func AddPilotHook(hookPoint boil.HookPoint, pilotHook PilotHook) {
+	switch hookPoint {
+	case boil.BeforeInsertHook:
+		pilotBeforeInsertHooks = append(pilotBeforeInsertHooks, pilotHook)
+	case boil.BeforeUpdateHook:
+		pilotBeforeUpdateHooks = append(pilotBeforeUpdateHooks, pilotHook)
+	case boil.BeforeDeleteHook:
+		pilotBeforeDeleteHooks = append(pilotBeforeDeleteHooks, pilotHook)
+	case boil.BeforeUpsertHook:
+		pilotBeforeUpsertHooks = append(pilotBeforeUpsertHooks, pilotHook)
+	case boil.AfterInsertHook:
+		pilotAfterInsertHooks = append(pilotAfterInsertHooks, pilotHook)
+	case boil.AfterSelectHook:
+		pilotAfterSelectHooks = append(pilotAfterSelectHooks, pilotHook)
+	case boil.AfterUpdateHook:
+		pilotAfterUpdateHooks = append(pilotAfterUpdateHooks, pilotHook)
+	case boil.AfterDeleteHook:
+		pilotAfterDeleteHooks = append(pilotAfterDeleteHooks, pilotHook)
+	case boil.AfterUpsertHook:
+		pilotAfterUpsertHooks = append(pilotAfterUpsertHooks, pilotHook)
+	}
+}
+
 // One returns a single pilot record from the query.
 func (q pilotQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Pilot, error) {
 	o := &Pilot{}
@@ -162,6 +334,10 @@ func (q pilotQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Pilot,
 		return nil, errors.Wrap(err, "models: failed to execute a one query for pilots")
 	}
 
+	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
+		return o, err
+	}
+
 	return o, nil
 }
 
@@ -172,6 +348,14 @@ func (q pilotQuery) All(ctx context.Context, exec boil.ContextExecutor) (PilotSl
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Pilot slice")
+	}
+
+	if len(pilotAfterSelectHooks) != 0 {
+		for _, obj := range o {
+			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
+				return o, err
+			}
+		}
 	}
 
 	return o, nil
@@ -248,6 +432,10 @@ func (o *Pilot) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 	}
 
 	var err error
+
+	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
+		return err
+	}
 
 	nzDefaults := queries.NonZeroDefaultSet(pilotColumnsWithDefault, o)
 
@@ -328,14 +516,17 @@ CacheNoHooks:
 		pilotInsertCacheMut.Unlock()
 	}
 
-	return nil
+	return o.doAfterInsertHooks(ctx, exec)
 }
 
 // Update uses an executor to update the Pilot.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
+	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
+		return 0, err
+	}
 	key := makeCacheKey(columns, nil)
 	pilotUpdateCacheMut.RLock()
 	cache, cached := pilotUpdateCache[key]
@@ -351,7 +542,7 @@ func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return errors.New("models: unable to update pilots, could not build whitelist")
+			return 0, errors.New("models: unable to update pilots, could not build whitelist")
 		}
 
 		cache.query = fmt.Sprintf("UPDATE `pilots` SET %s WHERE %s",
@@ -360,7 +551,7 @@ func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		)
 		cache.valueMapping, err = queries.BindMapping(pilotType, pilotMapping, append(wl, pilotPrimaryKeyColumns...))
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
@@ -371,9 +562,15 @@ func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, values)
 	}
-	_, err = exec.ExecContext(ctx, cache.query, values...)
+	var result sql.Result
+	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update pilots row")
+		return 0, errors.Wrap(err, "models: unable to update pilots row")
+	}
+
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: failed to get rows affected by update for pilots")
 	}
 
 	if !cached {
@@ -382,30 +579,35 @@ func (o *Pilot) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		pilotUpdateCacheMut.Unlock()
 	}
 
-	return nil
+	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q pilotQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (q pilotQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
-	_, err := q.Query.ExecContext(ctx, exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all for pilots")
+		return 0, errors.Wrap(err, "models: unable to update all for pilots")
 	}
 
-	return nil
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for pilots")
+	}
+
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o PilotSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) error {
+func (o PilotSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
-		return nil
+		return 0, nil
 	}
 
 	if len(cols) == 0 {
-		return errors.New("models: update all requires at least one column argument")
+		return 0, errors.New("models: update all requires at least one column argument")
 	}
 
 	colNames := make([]string, len(cols))
@@ -433,19 +635,164 @@ func (o PilotSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, co
 		fmt.Fprintln(writer, sql)
 		fmt.Fprintln(writer, args...)
 	}
-	_, err := exec.ExecContext(ctx, sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to update all in pilot slice")
+		return 0, errors.Wrap(err, "models: unable to update all in pilot slice")
 	}
 
-	return nil
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all pilot")
+	}
+	return rowsAff, nil
+}
+
+var mySQLPilotUniqueColumns = []string{
+	"id",
+}
+
+// Upsert attempts an insert using an executor, and does an update or ignore on conflict.
+// See boil.Columns documentation for how to properly use updateColumns and insertColumns.
+func (o *Pilot) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
+	if o == nil {
+		return errors.New("models: no pilots provided for upsert")
+	}
+
+	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
+		return err
+	}
+
+	nzDefaults := queries.NonZeroDefaultSet(pilotColumnsWithDefault, o)
+	nzUniques := queries.NonZeroDefaultSet(mySQLPilotUniqueColumns, o)
+
+	if len(nzUniques) == 0 {
+		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
+	}
+
+	// Build cache key in-line uglily - mysql vs psql problems
+	buf := strmangle.GetBuffer()
+	buf.WriteString(strconv.Itoa(updateColumns.Kind))
+	for _, c := range updateColumns.Cols {
+		buf.WriteString(c)
+	}
+	buf.WriteByte('.')
+	buf.WriteString(strconv.Itoa(insertColumns.Kind))
+	for _, c := range insertColumns.Cols {
+		buf.WriteString(c)
+	}
+	buf.WriteByte('.')
+	for _, c := range nzDefaults {
+		buf.WriteString(c)
+	}
+	buf.WriteByte('.')
+	for _, c := range nzUniques {
+		buf.WriteString(c)
+	}
+	key := buf.String()
+	strmangle.PutBuffer(buf)
+
+	pilotUpsertCacheMut.RLock()
+	cache, cached := pilotUpsertCache[key]
+	pilotUpsertCacheMut.RUnlock()
+
+	var err error
+
+	if !cached {
+		insert, ret := insertColumns.InsertColumnSet(
+			pilotAllColumns,
+			pilotColumnsWithDefault,
+			pilotColumnsWithoutDefault,
+			nzDefaults,
+		)
+		update := updateColumns.UpdateColumnSet(
+			pilotAllColumns,
+			pilotPrimaryKeyColumns,
+		)
+
+		if !updateColumns.IsNone() && len(update) == 0 {
+			return errors.New("models: unable to upsert pilots, could not build update column list")
+		}
+
+		ret = strmangle.SetComplement(ret, nzUniques)
+		cache.query = buildUpsertQueryMySQL(dialect, "`pilots`", update, insert)
+		cache.retQuery = fmt.Sprintf(
+			"SELECT %s FROM `pilots` WHERE %s",
+			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
+			strmangle.WhereClause("`", "`", 0, nzUniques),
+		)
+
+		cache.valueMapping, err = queries.BindMapping(pilotType, pilotMapping, insert)
+		if err != nil {
+			return err
+		}
+		if len(ret) != 0 {
+			cache.retMapping, err = queries.BindMapping(pilotType, pilotMapping, ret)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	value := reflect.Indirect(reflect.ValueOf(o))
+	vals := queries.ValuesFromMapping(value, cache.valueMapping)
+	var returns []interface{}
+	if len(cache.retMapping) != 0 {
+		returns = queries.PtrsFromMapping(value, cache.retMapping)
+	}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.query)
+		fmt.Fprintln(writer, vals)
+	}
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
+
+	if err != nil {
+		return errors.Wrap(err, "models: unable to upsert for pilots")
+	}
+
+	var uniqueMap []uint64
+	var nzUniqueCols []interface{}
+
+	if len(cache.retMapping) == 0 {
+		goto CacheNoHooks
+	}
+
+	uniqueMap, err = queries.BindMapping(pilotType, pilotMapping, nzUniques)
+	if err != nil {
+		return errors.Wrap(err, "models: unable to retrieve unique values for pilots")
+	}
+	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, cache.retQuery)
+		fmt.Fprintln(writer, nzUniqueCols...)
+	}
+	err = exec.QueryRowContext(ctx, cache.retQuery, nzUniqueCols...).Scan(returns...)
+	if err != nil {
+		return errors.Wrap(err, "models: unable to populate default values for pilots")
+	}
+
+CacheNoHooks:
+	if !cached {
+		pilotUpsertCacheMut.Lock()
+		pilotUpsertCache[key] = cache
+		pilotUpsertCacheMut.Unlock()
+	}
+
+	return o.doAfterUpsertHooks(ctx, exec)
 }
 
 // Delete deletes a single Pilot record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Pilot) Delete(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *Pilot) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
-		return errors.New("models: no Pilot provided for delete")
+		return 0, errors.New("models: no Pilot provided for delete")
+	}
+
+	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
+		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), pilotPrimaryKeyMapping)
@@ -456,34 +803,56 @@ func (o *Pilot) Delete(ctx context.Context, exec boil.ContextExecutor) error {
 		fmt.Fprintln(writer, sql)
 		fmt.Fprintln(writer, args...)
 	}
-	_, err := exec.ExecContext(ctx, sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete from pilots")
+		return 0, errors.Wrap(err, "models: unable to delete from pilots")
 	}
 
-	return nil
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for pilots")
+	}
+
+	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
+		return 0, err
+	}
+
+	return rowsAff, nil
 }
 
 // DeleteAll deletes all matching rows.
-func (q pilotQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (q pilotQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
-		return errors.New("models: no pilotQuery provided for delete all")
+		return 0, errors.New("models: no pilotQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
-	_, err := q.Query.ExecContext(ctx, exec)
+	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from pilots")
+		return 0, errors.Wrap(err, "models: unable to delete all from pilots")
 	}
 
-	return nil
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for pilots")
+	}
+
+	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o PilotSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o PilotSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
-		return nil
+		return 0, nil
+	}
+
+	if len(pilotBeforeDeleteHooks) != 0 {
+		for _, obj := range o {
+			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
+				return 0, err
+			}
+		}
 	}
 
 	var args []interface{}
@@ -500,12 +869,25 @@ func (o PilotSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) er
 		fmt.Fprintln(writer, sql)
 		fmt.Fprintln(writer, args)
 	}
-	_, err := exec.ExecContext(ctx, sql, args...)
+	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to delete all from pilot slice")
+		return 0, errors.Wrap(err, "models: unable to delete all from pilot slice")
 	}
 
-	return nil
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for pilots")
+	}
+
+	if len(pilotAfterDeleteHooks) != 0 {
+		for _, obj := range o {
+			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
+				return 0, err
+			}
+		}
+	}
+
+	return rowsAff, nil
 }
 
 // Reload refetches the object from the database

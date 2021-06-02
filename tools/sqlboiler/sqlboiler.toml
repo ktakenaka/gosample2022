@@ -1,9 +1,6 @@
-output   = "models"
+output   = "models/boiler"
 wipe     = true
 no-tests = true
-no-hooks = true
-no-rows-affected = true
-no-driver-templates = true
 
 [mysql]
   dbname    = "gomsx"
