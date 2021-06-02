@@ -31,6 +31,7 @@ services:
       options:
         max-file: "3"
         max-size: "5m"
+    tty: true
 
   database:
     platform: linux/x86_64
@@ -52,8 +53,8 @@ services:
       context: ./tools/sqlboiler
       dockerfile: Dockerfile
     volumes:
-      - ./tools/sqlboiler/sqlboiler.toml:/sqlboiler/sqlboiler.toml
-      - ./app/internal/models:/sqlboiler/models
+      - ./tools/sqlboiler/sqlboiler.toml:/sqlboiler.toml
+      - ./app/internal/models/v1.0:/sqlboiler
 
   migration:
     build:
