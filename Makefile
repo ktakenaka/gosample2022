@@ -8,6 +8,9 @@ migrate-%:
 sqlboiler:
 	docker-compose run --rm sqlboiler mysql --config /sqlboiler.toml
 
+up:
+	docker-compose up -d
+
 mod:
 	docker-compose exec app go mod tidy
 	docker-compose exec app go mod vendor
