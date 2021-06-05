@@ -11,6 +11,9 @@ sqlboiler:
 up:
 	docker-compose up -d
 
+run-server:
+	docker-compose exec app go run app/cmd/main.go
+
 mod:
 	docker-compose exec app go mod tidy
 	docker-compose exec app go mod vendor
