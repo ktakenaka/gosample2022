@@ -32,7 +32,7 @@ func main() {
 			e.Logger.Fatal(errors.Wrap(err, "Server failure"))
 		}
 	}()
-	
+
 	shutdown.WaitForServerStop(ctx)
 
 	shutdownTaks.ExecuteAll(ctx)

@@ -55,17 +55,25 @@ services:
     volumes:
       - ./tools/sqlboiler/sqlboiler.toml:/sqlboiler.toml
       - ./app/internal/models/v1.0:/sqlboiler
+    depends_on:
+      - database
+    # profiles:
+    #   - tools
 
   migration:
     build:
       context: ./tools/sqlmigrate
       dockerfile: Dockerfile
     volumes:
-      - ./tools/sqlmigrate/dbconfig.yml:/db/dbconfig.yml
-      - ./db/migrations:/db/migrations
+      - ./tools/sqlmigrate/dbconfig.yml:/sqlmigrate/dbconfig.yml
+      - ./db/migrations:/sqlmigrate/migrations
     environment:
       DB_USER: *DB_USER
       DB_PASSWORD: *DB_PASSWORD
       DB_HOST: *DB_HOST
       DB_NAME: *DB_NAME
       DB_PORT: 3306
+    depends_on:
+      - database
+    # profiles:
+    #   - tools

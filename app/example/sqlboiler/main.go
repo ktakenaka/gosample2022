@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/ktakenaka/gomsx/app/internal/models/v1.0/models"
@@ -20,11 +20,17 @@ func main() {
 
 	ctx := context.Background()
 	pilots, err := models.Pilots().All(ctx, db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Println(pilots)
 
 	p := models.Pilot{Name: "hello"}
 	p.Insert(ctx, db, boil.Infer())
 
 	pilots, err = models.Pilots().All(ctx, db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Println(pilots[0].ID)
 }
