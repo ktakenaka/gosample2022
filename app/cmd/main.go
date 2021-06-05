@@ -8,6 +8,7 @@ import (
 
 	"github.com/friendsofgo/errors"
 	"github.com/ktakenaka/gomsx/app/cmd/db"
+	"github.com/ktakenaka/gomsx/app/cmd/logger"
 	"github.com/ktakenaka/gomsx/app/cmd/shutdown"
 	"github.com/ktakenaka/gomsx/app/config"
 
@@ -19,8 +20,11 @@ func main() {
 	ctx, ctxCancel := context.WithCancel(context.Background())
 	defer ctxCancel()
 
-	shutdownTaks := shutdown.NewShutdownTasks()
+	loggerTask := logger.Initialize(ctx)
+	shutdownTaks := shutdown.NewShutdownTasks(loggerTask.AppLogger)
 	defer shutdownTaks.ExecuteAll(ctx)
+
+	shutdownTaks.Add(loggerTask)
 
 	configFilePath := flag.String("c", "", "config file path for app")
 	flag.Parse()
@@ -38,8 +42,6 @@ func main() {
 	}
 	shutdownTaks.Add(dbTask)
 
-	// TODO (Optional): logger & monitor
-
 	// Server
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -51,7 +53,7 @@ func main() {
 		}
 	}()
 
-	shutdown.WaitForServerStop(ctx)
+	shutdownTaks.WaitForServerStop(ctx)
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
