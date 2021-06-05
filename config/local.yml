@@ -1,2 +1,5 @@
+env: development
 db:
-  name: hello
+  name: gomsx
+app:
+  service_name: gomsx

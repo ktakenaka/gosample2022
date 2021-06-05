@@ -10,6 +10,8 @@ x-var: &DB_HOST
   "database"
 x-var: &DB_NAME
   "gomsx"
+x-var: &DB_PORT
+  3306
 
 services:
   app:
@@ -26,6 +28,7 @@ services:
       DB_USER: *DB_USER
       DB_PASSWORD: *DB_PASSWORD
       DB_HOST: *DB_HOST
+      DB_PORT: *DB_PORT
     logging:
       driver: "json-file"
       options:
