@@ -2,7 +2,7 @@ STATICKCHECK_NAME=statickcheck:gomsx
 SQLMIGRATE_NAME=sqlmigrate:gomsx
 SQLBOILER_NAME=sqlboiler:gomsx
 
-sqlboiler:
+boiler:
 	docker-compose run --rm sqlboiler mysql --config /sqlboiler.toml
 
 up:
