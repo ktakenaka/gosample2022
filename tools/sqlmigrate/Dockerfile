@@ -1,7 +1,9 @@
 FROM golang:1.16.4-alpine
 
-WORKDIR /db
-RUN CGO_ENABLED=0 go get -v github.com/rubenv/sql-migrate/...
+RUN apk update && apk upgrade && apk add build-base
+
+WORKDIR /sqlmigrate
+RUN go get -v github.com/rubenv/sql-migrate/...
 
 ENTRYPOINT [ "/go/bin/sql-migrate" ]
 CMD [""]
