@@ -20,11 +20,17 @@ func main() {
 
 	ctx := context.Background()
 	pilots, err := models.Pilots().All(ctx, db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Println(pilots)
 
 	p := models.Pilot{Name: "hello"}
 	p.Insert(ctx, db, boil.Infer())
 
 	pilots, err = models.Pilots().All(ctx, db)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Println(pilots[0].ID)
 }
