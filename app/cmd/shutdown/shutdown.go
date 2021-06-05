@@ -2,17 +2,17 @@ package shutdown
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"log"
 )
 
 var defaultStogSigs = []os.Signal{os.Interrupt, syscall.SIGQUIT, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM}
 
 type Tasks struct {
 	// TODO: define logger interface in app/pkg/log
-	log log.Logger
+	log   log.Logger
 	tasks []Task
 }
 
@@ -23,7 +23,7 @@ type Task interface {
 
 func NewShutdownTasks() *Tasks {
 	return &Tasks{
-		log: log.Logger{},
+		log:   log.Logger{},
 		tasks: make([]Task, 0),
 	}
 }

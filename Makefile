@@ -17,3 +17,6 @@ run-server:
 mod:
 	docker-compose exec app go mod tidy
 	docker-compose exec app go mod vendor
+
+fmt:
+	docker-compose exec app go fmt ./...

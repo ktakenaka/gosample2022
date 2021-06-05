@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/ktakenaka/gomsx/app/internal/models/v1.0/models"
