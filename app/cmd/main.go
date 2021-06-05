@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"flag"
+	"log"
 	"net/http"
 
 	"github.com/friendsofgo/errors"
+	"github.com/ktakenaka/gomsx/app/cmd/db"
 	"github.com/ktakenaka/gomsx/app/cmd/shutdown"
+	"github.com/ktakenaka/gomsx/app/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,10 +20,24 @@ func main() {
 	defer ctxCancel()
 
 	shutdownTaks := shutdown.NewShutdownTasks()
+	defer shutdownTaks.ExecuteAll(ctx)
 
-	// TODO: Initialize Config
-	// TODO: Connect to DB
-	// TODO: Shut down task
+	configFilePath := flag.String("c", "", "config file path for app")
+	flag.Parse()
+	if configFilePath == nil {
+		log.Fatal("Please specify file path flag!")
+	}
+	conf, err := config.LoadConfig(*configFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbTask, err := db.Initialize(ctx, conf.DB)
+	if err != nil {
+		log.Fatal(err)
+	}
+	shutdownTaks.Add(dbTask)
+
 	// TODO (Optional): logger & monitor
 
 	// Server
@@ -34,8 +52,6 @@ func main() {
 	}()
 
 	shutdown.WaitForServerStop(ctx)
-
-	shutdownTaks.ExecuteAll(ctx)
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}

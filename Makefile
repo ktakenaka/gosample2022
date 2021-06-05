@@ -9,7 +9,7 @@ up:
 	docker-compose up -d app database
 
 run-server:
-	docker-compose exec app go run app/cmd/main.go
+	docker-compose exec app go run app/cmd/main.go -c config/local.yml
 
 mod:
 	docker-compose exec app go mod tidy
