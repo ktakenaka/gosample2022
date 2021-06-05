@@ -2,13 +2,6 @@ STATICKCHECK_NAME=statickcheck:gomsx
 SQLMIGRATE_NAME=sqlmigrate:gomsx
 SQLBOILER_NAME=sqlboiler:gomsx
 
-migrate-new:
-	docker-compose run --rm migration new ${name}
-
-migrate-%:
-	$(eval CMD:= $*)
-	docker-compose run --rm migration $(CMD)
-
 sqlboiler:
 	docker-compose run --rm sqlboiler mysql --config /sqlboiler.toml
 
@@ -36,23 +29,23 @@ lint:
 		--volume "$(PWD):/gomsx"\
 		$(STATICKCHECK_NAME) ./...
 
-# "host.docker.internal"がなかなか動かなかったので、localではdocker-composeで行く
-# boiler:
-# 	@docker run\
-# 		--rm\
-# 		--volume "$(PWD)/app/internal/models/v1.0:/sqlboiler"\
-# 		--volume "$(PWD)/tools/sqlboiler/sqlboiler.toml:/sqlboiler.toml"\
-# 		$(SQLBOILER_NAME) mysql --config /sqlboiler.toml
+migrate-new:
+	docker-compose run --rm migration new ${name}
 
-# sqlmigrate-%:
-# 	$(eval CMD:= $*)
-# 	@docker run\
-# 		--rm\
-# 		--volume "$(PWD)/db/migrations:/sqlmigrate/migrations"\
-# 		--volume "$(PWD)/tools/sqlmigrate/dbconfig.yml:/sqlmigrate/dbconfig.yml"\
-# 		--env DB_USER=${DB_USER}\
-# 		--env DB_PASSWORD=${DB_PASSWORD}\
-# 		--env DB_HOST=${DB_HOST}\
-# 		--env DB_NAME=${DB_NAME}\
-# 		--env DB_PORT=${DB_PORT}\
-# 		$(SQLMIGRATE_NAME) $(CMD)
+local-migrate-%:
+	$(eval CMD:= $*)
+	docker-compose run --rm migration $(CMD)
+
+# "host.docker.internal"がなかなか動かなかったので、localではdocker-composeで行く
+remote-migrate-%:
+	$(eval CMD:= $*)
+	@docker run\
+		--rm\
+		--volume "$(PWD)/db/migrations:/sqlmigrate/migrations"\
+		--volume "$(PWD)/tools/sqlmigrate/dbconfig.yml:/sqlmigrate/dbconfig.yml"\
+		--env DB_USER=${DB_USER}\
+		--env DB_PASSWORD=${DB_PASSWORD}\
+		--env DB_HOST=${DB_HOST}\
+		--env DB_NAME=${DB_NAME}\
+		--env DB_PORT=${DB_PORT}\
+		$(SQLMIGRATE_NAME) $(CMD)
