@@ -2,17 +2,17 @@ package shutdown
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/ktakenaka/gomsx/app/pkg/logger"
 )
 
 var defaultStogSigs = []os.Signal{os.Interrupt, syscall.SIGQUIT, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM}
 
 type Tasks struct {
-	// TODO: define logger interface in app/pkg/log
-	log   log.Logger
+	log   logger.Logger
 	tasks []Task
 }
 
@@ -21,9 +21,9 @@ type Task interface {
 	Name() string
 }
 
-func NewShutdownTasks() *Tasks {
+func NewShutdownTasks(l logger.Logger) *Tasks {
 	return &Tasks{
-		log:   log.Logger{},
+		log:   l,
 		tasks: make([]Task, 0),
 	}
 }
@@ -39,16 +39,17 @@ func (t *Tasks) ExecuteAll(ctx context.Context) {
 			continue
 		}
 
+		t.log.Infof(ctx, "Shutting down %s...", task.Name())
 		if err := task.Shutdown(ctx); err != nil {
-			t.log.Printf("Failed to shutdown %s", task.Name())
+			t.log.Errorf(ctx, "Failed to shutdown %s", task.Name())
 		}
 		t.tasks[i] = nil
 	}
 }
 
-func WaitForServerStop(ctx context.Context) {
+func (t *Tasks) WaitForServerStop(ctx context.Context) {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, defaultStogSigs...)
 	sig := <-sigChan
-	log.Printf("got stop sig: %s", sig.String())
+	t.log.Infof(ctx, "got stop sig: %s", sig.String())
 }
