@@ -4,7 +4,9 @@
 package models
 
 var TableNames = struct {
-	Pilots string
+	SampleComments string
+	Samples        string
 }{
-	Pilots: "pilots",
+	SampleComments: "sample_comments",
+	Samples:        "samples",
 }
