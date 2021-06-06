@@ -1,9 +1,11 @@
 package sqls
 
 import (
+	"context"
+	"database/sql"
+	"fmt"
 	"time"
 
-	"github.com/friendsofgo/errors"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
@@ -18,11 +20,24 @@ type DB struct {
 	*sqlx.DB
 }
 
+func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
+	tx, err := d.BeginTxx(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Tx{tx}, nil
+}
+
+type Tx struct {
+	*sqlx.Tx
+}
+
 func Connect(conf *Config) (*DB, error) {
 	db, err := sqlx.Connect(conf.Driver, conf.ToConnString())
 	// TODO: retry severail times
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to DB")
+		return nil, fmt.Errorf("failed to connect to DB: %w", err)
 	}
 
 	if conf.MaxIdleConns == 0 {

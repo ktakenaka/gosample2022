@@ -3,3 +3,4 @@ db:
   name: gomsx
 app:
   service_name: gomsx
+  port: 8080

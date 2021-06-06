@@ -1,7 +1,8 @@
 package config
 
 import (
-	"github.com/friendsofgo/errors"
+	"fmt"
+
 	"github.com/jinzhu/configor"
 	"github.com/ktakenaka/gomsx/app/pkg/sqls"
 )
@@ -14,6 +15,7 @@ type Config struct {
 
 type AppCnf struct {
 	ServiceName string `required:"true" yaml:"service_name" default:"gomsx"`
+	Port        uint   `required:"true" yaml:"port" default:"8080"`
 }
 
 type DB struct {
@@ -27,15 +29,20 @@ type DB struct {
 func LoadConfig(path string) (*Config, error) {
 	appConfig := Config{}
 	err := configor.Load(&appConfig, path)
-	return &appConfig, errors.Wrapf(err, "failed to load config %s", path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load config %s: %w", path, err)
+	}
+	return &appConfig, nil
 }
 
 func (d *DB) SqlsConf() *sqls.Config {
 	return &sqls.Config{
-		Driver:   "mysql",
-		Username: d.Name,
-		Password: d.Password,
-		Host:     d.Host,
-		Port:     d.Port,
+		Driver:       "mysql",
+		DBName:       d.Name,
+		Username:     d.User,
+		Password:     d.Password,
+		Host:         d.Host,
+		Port:         d.Port,
+		QueryOptions: map[string]string{"parseTime": "true"},
 	}
 }

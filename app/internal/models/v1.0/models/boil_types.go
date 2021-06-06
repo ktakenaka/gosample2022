@@ -50,3 +50,10 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	strmangle.PutBuffer(buf)
 	return str
 }
+
+// Enum values for samples.category
+const (
+	SamplesCategorySmall  = "small"
+	SamplesCategoryMedium = "medium"
+	SamplesCategoryLarge  = "large"
+)
