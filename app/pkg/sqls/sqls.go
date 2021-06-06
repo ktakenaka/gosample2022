@@ -1,6 +1,8 @@
 package sqls
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -16,6 +18,19 @@ const (
 
 type DB struct {
 	*sqlx.DB
+}
+
+func (d *DB) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
+	tx, err := d.BeginTxx(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Tx{tx}, nil
+}
+
+type Tx struct {
+	*sqlx.Tx
 }
 
 func Connect(conf *Config) (*DB, error) {

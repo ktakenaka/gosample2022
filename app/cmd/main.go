@@ -38,7 +38,7 @@ func main() {
 	}
 	shutdownTaks.Add(dbTask)
 
-	serverTask, err := httpserver.Initialize(ctx, conf.App)
+	serverTask, err := httpserver.Initialize(ctx, conf.App, dbTask)
 	if err != nil {
 		log.Fatal(err)
 	}

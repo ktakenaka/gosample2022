@@ -21,6 +21,10 @@ func Initialize(ctx context.Context, conf *config.DB) (*Task, error) {
 	return &Task{conf: conf, conn: db}, nil
 }
 
+func (t *Task) GetDB() *sqls.DB {
+	return t.conn
+}
+
 func (t *Task) Name() string {
 	return "db"
 }
