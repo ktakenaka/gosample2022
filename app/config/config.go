@@ -14,6 +14,7 @@ type Config struct {
 
 type AppCnf struct {
 	ServiceName string `required:"true" yaml:"service_name" default:"gomsx"`
+	Port        uint   `required:"true" yaml:"port" default:"8080"`
 }
 
 type DB struct {
