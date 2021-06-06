@@ -5,6 +5,8 @@ import (
 
 	"github.com/ktakenaka/gomsx/app/config"
 	"github.com/ktakenaka/gomsx/app/pkg/sqls"
+
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 type Task struct {
@@ -17,6 +19,9 @@ func Initialize(ctx context.Context, conf *config.DB) (*Task, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: remove after debugging
+	boil.DebugMode = true
 
 	return &Task{conf: conf, conn: db}, nil
 }
