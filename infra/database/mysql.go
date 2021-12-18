@@ -45,7 +45,6 @@ type DB struct {
 
 // New connect to db
 func New(cfg *Config) (*DB, error) {
-	connStr := conn
 	optionsMap := defaultOptions
 	if cfg.Options != nil {
 		for k, v := range cfg.Options {
@@ -58,7 +57,7 @@ func New(cfg *Config) (*DB, error) {
 		optionsSlice = append(optionsSlice, k+"="+v)
 	}
 
-	connStr = fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.DBName)
+	connStr := fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.DBName)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		return nil, err

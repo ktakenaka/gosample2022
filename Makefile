@@ -20,7 +20,7 @@ build-tools:
 	docker build --file ./tools/sqlmigrate/Dockerfile --tag $(SQLMIGRATE_NAME) .
 
 lint:
-	docker run --rm \
+	@docker run --rm \
 		--volume "$(PWD):/app" \
 		-w /app golangci/golangci-lint:v1.43.0 \
 		golangci-lint run

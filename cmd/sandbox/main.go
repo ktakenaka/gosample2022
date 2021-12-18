@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/ktakenaka/gosample2022/app/models"
+	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/infra/database"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func main() {
-	fmt.Println("hello")
-
 	cfg := &database.Config{
 		User:     "writer",
 		Password: "writer_password",
@@ -23,6 +23,19 @@ func main() {
 	}
 
 	ctx := context.Background()
+	id, _ := ulid.GenerateID()
+	println(id.String())
+	fmt.Println(id)
+	user := models.User{
+		ID:    id,
+		Email: "example@hoge.com",
+	}
+
+	boil.DebugMode = true
+	err = user.Upsert(ctx, db, boil.Infer(), boil.Infer())
+	if err != nil {
+		panic(err)
+	}
 	users, err := models.Users().All(ctx, db)
 	if err != nil {
 		panic(err)
