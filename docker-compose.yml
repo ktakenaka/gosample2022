@@ -1,17 +1,11 @@
 version: "3"
 
-x-var: &ENV
-  "development"
-x-var: &DB_USER
-  "gomsx"
-x-var: &DB_PASSWORD
-  "gomsx"
-x-var: &DB_HOST
-  "database"
-x-var: &DB_NAME
-  "gomsx"
-x-var: &DB_PORT
-  3306
+x-dbenv: &dbenv
+  DB_USER: "gomsx_user"
+  DB_PASSWORD: "gomsx_password"
+  DB_HOST: "database"
+  DB_NAME: "gomsx_development"
+  DB_PORT: 3306
 
 services:
   app:
@@ -24,11 +18,8 @@ services:
     volumes:
       - .:/go/src
     environment:
-      ENV: *ENV
-      DB_USER: *DB_USER
-      DB_PASSWORD: *DB_PASSWORD
-      DB_HOST: *DB_HOST
-      DB_PORT: *DB_PORT
+      ENV: "development"
+      <<: *dbenv
     logging:
       driver: "json-file"
       options:
@@ -44,39 +35,27 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./db-data:/var/lib/mysql:delegated
+      - ./db-data:/var/lib/mysql
       - ./docker/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf"
     environment:
       MYSQL_ROOT_PASSWORD: root
       BIND-ADDRESS: 0.0.0.0
-
-  sqlboiler:
-    build:
-      context: ./tools/sqlboiler
-      dockerfile: Dockerfile
-    volumes:
-      - ./tools/sqlboiler/sqlboiler.toml:/sqlboiler.toml
-      - ./app/internal/models/v1.0:/sqlboiler
-    depends_on:
-      - database
-    # profiles:
-    #   - tools
+    command:
+      [
+          "mysqld",
+          "--character-set-server=utf8mb4",
+          "--collation-server=utf8mb4_bin",
+      ]
 
   migration:
     build:
       context: ./tools/sqlmigrate
       dockerfile: Dockerfile
     volumes:
-      - ./tools/sqlmigrate/dbconfig.yml:/sqlmigrate/dbconfig.yml
+      - ./db/sqlmigrate.yml:/sqlmigrate/sqlmigrate.yml
       - ./db/migrations:/sqlmigrate/migrations
     environment:
-      DB_USER: *DB_USER
-      DB_PASSWORD: *DB_PASSWORD
-      DB_HOST: *DB_HOST
-      DB_NAME: *DB_NAME
-      DB_PORT: 3306
+      <<: *dbenv
     depends_on:
       - database
-    # profiles:
-    #   - tools

@@ -1,0 +1,83 @@
+# Linters settings
+# Detailed: https://moneyforward.kibe.la/notes/197750
+
+linters-settings:
+  funlen:
+    lines: 160
+    statements: 72
+  gci:
+    local-prefixes: github.com/moneyforwardvietnam/pjc_backend
+  gocyclo:
+    min-complexity: 30
+  goimports:
+    local-prefixes: github.com/golangci/golangci-lint
+  gomnd:
+    settings:
+      mnd:
+        checks: # don't include the "operation" and "assign"
+          - argument
+          - case
+          - condition
+          - return
+  lll:
+    line-length: 160
+  misspell:
+    locale: US
+
+linters:
+  enable:
+    - bodyclose
+    - contextcheck
+    - deadcode
+    - depguard
+    - dogsled
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - gci
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - goerr113
+    - gofmt
+    - goimports
+    - gomnd
+    - gosec
+    - gosimple
+    - govet
+    - ifshort
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - rowserrcheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+
+run:
+  skip-dirs:
+    - db
+    - config
+    - docker
+    - tools
+    - vendor
+
+# golangci configuration
+# https://github.com/golangci/golangci/wiki/Configuration
+service:
+  golangci-lint-version: 1.43.x

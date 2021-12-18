@@ -1,12 +1,12 @@
-output   = "models"
 wipe     = true
 no-tests = true
+output   ="app/internal/models/v1.0/models"
 
 [mysql]
-  dbname    = "gomsx"
+  dbname    = "gomsx_development"
   host      = "database"
   port      = 3306
-  user      = "gomsx"
-  pass      = "gomsx"
+  user      = "gomsx_user"
+  pass      = "gomsx_password"
   sslmode   = "false"
   blacklist = ["schema_migrations"]

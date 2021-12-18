@@ -1,5 +1,5 @@
-development:
+mysql:
   dialect: mysql
   datasource: ${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}?parseTime=true
-  dir: /sqlmigrate/migrations
+  dir: migrations
   table: schema_migrations

@@ -1,5 +1,9 @@
-FROM golang:1.16.4-alpine
+FROM golang:1.18beta1-alpine3.15
 
 RUN apk update && apk upgrade
+
+# On local development (local), we just use 1 image for more convenience.
+RUN go install github.com/volatiletech/sqlboiler/v4@latest &&\
+  go install github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-mysql@latest
 
 WORKDIR /go/src
