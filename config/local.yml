@@ -1,6 +1,6 @@
 env: development
 db:
-  name: gomsx
+  name: gosample2022
 app:
-  service_name: gomsx
+  service_name: gosample2022
   port: 8080

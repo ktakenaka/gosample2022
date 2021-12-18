@@ -1,14 +1,21 @@
 
 -- +migrate Up
 CREATE TABLE samples (
-  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  title      VARCHAR(20) NOT NULL,
+  id         BINARY(16) PRIMARY KEY,
+  office_id  BINARY(16) NOT NULL,
+  title      BINARY(16) NOT NULL,
   category   ENUM("small", "medium", "large"),
   memo       TEXT DEFAULT NULL,
   date       DATE NOT NULL,
   amount     DECIMAL(10, 2) NOT NULL,
+  created_by BINARY(16) NOT NULL,
+  updated_by BINARY(16) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `index_samples_office_id`(`office_id`),
+  CONSTRAINT `fk_samples_office_id` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`),
+  CONSTRAINT `fk_samples_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_samples_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
 );
 
 -- +migrate Down

@@ -1,12 +1,12 @@
 wipe     = true
 no-tests = true
-output   ="app/internal/models/v1.0/models"
+output   ="app/models"
 
 [mysql]
-  dbname    = "gomsx_development"
-  host      = "database"
+  dbname    = "gosample2022_development"
+  host      = "db"
   port      = 3306
-  user      = "gomsx_user"
-  pass      = "gomsx_password"
+  user      = "reader"
+  pass      = "reader_password"
   sslmode   = "false"
   blacklist = ["schema_migrations"]

@@ -1,7 +1,7 @@
-SQLMIGRATE_NAME=sqlmigrate:gomsx
+SQLMIGRATE_NAME=sqlmigrate:gosample2022
 
 up:
-	docker-compose up -d app database
+	docker-compose up -d app db
 
 down:
 	docker-compose down
@@ -29,8 +29,23 @@ boil:
 	docker-compose exec app sqlboiler mysql -c db/sqlboiler.toml
 
 migrate-new:
-	docker-compose run --rm migration new ${name}
+	@docker run --rm \
+	-w /sqlmigrate \
+	-v "$(PWD):/sqlmigrate" \
+	$(SQLMIGRATE_NAME) new -env=mysql -config db/sqlmigrate.yml ${name}
 
 local-migrate-%:
 	$(eval CMD:= $*)
-	docker-compose run --rm migration $(CMD) -env=mysql -config sqlmigrate.yml
+	@docker run --rm \
+	-w /sqlmigrate \
+	-v "$(PWD):/sqlmigrate" \
+	-e DB_USER=root -e DB_PASSWORD=root -e DB_HOST=docker.for.mac.localhost -e DB_PORT=3306 -e DB_NAME=gosample2022_development \
+	$(SQLMIGRATE_NAME) \
+	$(CMD) -env=mysql -config db/sqlmigrate.yml;\
+	seq 8 | xargs -P8 -I{} \
+	docker run --rm \
+	-w /sqlmigrate \
+	-v "$(PWD):/sqlmigrate" \
+	-e DB_USER=root -e DB_PASSWORD=root -e DB_HOST=docker.for.mac.localhost -e DB_PORT=3306 -e DB_NAME="gosample2022_test{}" \
+	$(SQLMIGRATE_NAME) \
+	$(CMD) -env=mysql -config db/sqlmigrate.yml;
