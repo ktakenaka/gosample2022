@@ -39,12 +39,8 @@ type Config struct {
 	Options map[string]string
 }
 
-type DB struct {
-	*sql.DB
-}
-
 // New connect to db
-func New(cfg *Config) (*DB, error) {
+func New(cfg *Config) (*sql.DB, error) {
 	optionsMap := defaultOptions
 	if cfg.Options != nil {
 		for k, v := range cfg.Options {
@@ -81,5 +77,5 @@ func New(cfg *Config) (*DB, error) {
 		db.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 	}
 
-	return &DB{db}, nil
+	return db, nil
 }

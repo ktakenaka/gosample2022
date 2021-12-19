@@ -7,7 +7,7 @@ down:
 	docker-compose down
 
 run:
-	docker-compose exec app go run cmd/grpc/main.go
+	docker-compose exec app go run cmd/main.go
 
 mod:
 	docker-compose exec app go mod tidy
