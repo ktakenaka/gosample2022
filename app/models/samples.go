@@ -27,8 +27,8 @@ import (
 type Sample struct {
 	ID        []byte        `boil:"id" json:"id" toml:"id" yaml:"id"`
 	OfficeID  []byte        `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
-	Title     []byte        `boil:"title" json:"title" toml:"title" yaml:"title"`
-	Category  null.String   `boil:"category" json:"category,omitempty" toml:"category" yaml:"category,omitempty"`
+	Title     string        `boil:"title" json:"title" toml:"title" yaml:"title"`
+	Category  string        `boil:"category" json:"category" toml:"category" yaml:"category"`
 	Memo      null.String   `boil:"memo" json:"memo,omitempty" toml:"memo" yaml:"memo,omitempty"`
 	Date      time.Time     `boil:"date" json:"date" toml:"date" yaml:"date"`
 	Amount    types.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
@@ -140,8 +140,8 @@ func (w whereHelpertypes_Decimal) GTE(x types.Decimal) qm.QueryMod {
 var SampleWhere = struct {
 	ID        whereHelper__byte
 	OfficeID  whereHelper__byte
-	Title     whereHelper__byte
-	Category  whereHelpernull_String
+	Title     whereHelperstring
+	Category  whereHelperstring
 	Memo      whereHelpernull_String
 	Date      whereHelpertime_Time
 	Amount    whereHelpertypes_Decimal
@@ -152,8 +152,8 @@ var SampleWhere = struct {
 }{
 	ID:        whereHelper__byte{field: "`samples`.`id`"},
 	OfficeID:  whereHelper__byte{field: "`samples`.`office_id`"},
-	Title:     whereHelper__byte{field: "`samples`.`title`"},
-	Category:  whereHelpernull_String{field: "`samples`.`category`"},
+	Title:     whereHelperstring{field: "`samples`.`title`"},
+	Category:  whereHelperstring{field: "`samples`.`category`"},
 	Memo:      whereHelpernull_String{field: "`samples`.`memo`"},
 	Date:      whereHelpertime_Time{field: "`samples`.`date`"},
 	Amount:    whereHelpertypes_Decimal{field: "`samples`.`amount`"},

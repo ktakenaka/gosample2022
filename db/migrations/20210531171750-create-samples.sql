@@ -3,8 +3,8 @@
 CREATE TABLE samples (
   id         BINARY(16) PRIMARY KEY,
   office_id  BINARY(16) NOT NULL,
-  title      BINARY(16) NOT NULL,
-  category   ENUM("small", "medium", "large"),
+  title      VARCHAR(30) NOT NULL,
+  category   ENUM("small", "medium", "large") NOT NULL,
   memo       TEXT DEFAULT NULL,
   date       DATE NOT NULL,
   amount     DECIMAL(10, 2) NOT NULL,

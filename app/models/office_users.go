@@ -21,18 +21,18 @@ import (
 	"github.com/volatiletech/strmangle"
 )
 
-// OfficesUser is an object representing the database table.
-type OfficesUser struct {
+// OfficeUser is an object representing the database table.
+type OfficeUser struct {
 	ID       []byte `boil:"id" json:"id" toml:"id" yaml:"id"`
 	OfficeID []byte `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
 	UserID   []byte `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 	Name     string `boil:"name" json:"name" toml:"name" yaml:"name"`
 
-	R *officesUserR `boil:"-" json:"-" toml:"-" yaml:"-"`
-	L officesUserL  `boil:"-" json:"-" toml:"-" yaml:"-"`
+	R *officeUserR `boil:"-" json:"-" toml:"-" yaml:"-"`
+	L officeUserL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
-var OfficesUserColumns = struct {
+var OfficeUserColumns = struct {
 	ID       string
 	OfficeID string
 	UserID   string
@@ -44,34 +44,66 @@ var OfficesUserColumns = struct {
 	Name:     "name",
 }
 
-var OfficesUserTableColumns = struct {
+var OfficeUserTableColumns = struct {
 	ID       string
 	OfficeID string
 	UserID   string
 	Name     string
 }{
-	ID:       "offices_users.id",
-	OfficeID: "offices_users.office_id",
-	UserID:   "offices_users.user_id",
-	Name:     "offices_users.name",
+	ID:       "office_users.id",
+	OfficeID: "office_users.office_id",
+	UserID:   "office_users.user_id",
+	Name:     "office_users.name",
 }
 
 // Generated where
 
-var OfficesUserWhere = struct {
+type whereHelper__byte struct{ field string }
+
+func (w whereHelper__byte) EQ(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelper__byte) NEQ(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelper__byte) LT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+
+type whereHelperstring struct{ field string }
+
+func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperstring) IN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+var OfficeUserWhere = struct {
 	ID       whereHelper__byte
 	OfficeID whereHelper__byte
 	UserID   whereHelper__byte
 	Name     whereHelperstring
 }{
-	ID:       whereHelper__byte{field: "`offices_users`.`id`"},
-	OfficeID: whereHelper__byte{field: "`offices_users`.`office_id`"},
-	UserID:   whereHelper__byte{field: "`offices_users`.`user_id`"},
-	Name:     whereHelperstring{field: "`offices_users`.`name`"},
+	ID:       whereHelper__byte{field: "`office_users`.`id`"},
+	OfficeID: whereHelper__byte{field: "`office_users`.`office_id`"},
+	UserID:   whereHelper__byte{field: "`office_users`.`user_id`"},
+	Name:     whereHelperstring{field: "`office_users`.`name`"},
 }
 
-// OfficesUserRels is where relationship names are stored.
-var OfficesUserRels = struct {
+// OfficeUserRels is where relationship names are stored.
+var OfficeUserRels = struct {
 	Office string
 	User   string
 }{
@@ -79,50 +111,50 @@ var OfficesUserRels = struct {
 	User:   "User",
 }
 
-// officesUserR is where relationships are stored.
-type officesUserR struct {
+// officeUserR is where relationships are stored.
+type officeUserR struct {
 	Office *Office `boil:"Office" json:"Office" toml:"Office" yaml:"Office"`
 	User   *User   `boil:"User" json:"User" toml:"User" yaml:"User"`
 }
 
 // NewStruct creates a new relationship struct
-func (*officesUserR) NewStruct() *officesUserR {
-	return &officesUserR{}
+func (*officeUserR) NewStruct() *officeUserR {
+	return &officeUserR{}
 }
 
-// officesUserL is where Load methods for each relationship are stored.
-type officesUserL struct{}
+// officeUserL is where Load methods for each relationship are stored.
+type officeUserL struct{}
 
 var (
-	officesUserAllColumns            = []string{"id", "office_id", "user_id", "name"}
-	officesUserColumnsWithoutDefault = []string{"id", "office_id", "user_id", "name"}
-	officesUserColumnsWithDefault    = []string{}
-	officesUserPrimaryKeyColumns     = []string{"id"}
+	officeUserAllColumns            = []string{"id", "office_id", "user_id", "name"}
+	officeUserColumnsWithoutDefault = []string{"id", "office_id", "user_id", "name"}
+	officeUserColumnsWithDefault    = []string{}
+	officeUserPrimaryKeyColumns     = []string{"id"}
 )
 
 type (
-	// OfficesUserSlice is an alias for a slice of pointers to OfficesUser.
-	// This should almost always be used instead of []OfficesUser.
-	OfficesUserSlice []*OfficesUser
-	// OfficesUserHook is the signature for custom OfficesUser hook methods
-	OfficesUserHook func(context.Context, boil.ContextExecutor, *OfficesUser) error
+	// OfficeUserSlice is an alias for a slice of pointers to OfficeUser.
+	// This should almost always be used instead of []OfficeUser.
+	OfficeUserSlice []*OfficeUser
+	// OfficeUserHook is the signature for custom OfficeUser hook methods
+	OfficeUserHook func(context.Context, boil.ContextExecutor, *OfficeUser) error
 
-	officesUserQuery struct {
+	officeUserQuery struct {
 		*queries.Query
 	}
 )
 
 // Cache for insert, update and upsert
 var (
-	officesUserType                 = reflect.TypeOf(&OfficesUser{})
-	officesUserMapping              = queries.MakeStructMapping(officesUserType)
-	officesUserPrimaryKeyMapping, _ = queries.BindMapping(officesUserType, officesUserMapping, officesUserPrimaryKeyColumns)
-	officesUserInsertCacheMut       sync.RWMutex
-	officesUserInsertCache          = make(map[string]insertCache)
-	officesUserUpdateCacheMut       sync.RWMutex
-	officesUserUpdateCache          = make(map[string]updateCache)
-	officesUserUpsertCacheMut       sync.RWMutex
-	officesUserUpsertCache          = make(map[string]insertCache)
+	officeUserType                 = reflect.TypeOf(&OfficeUser{})
+	officeUserMapping              = queries.MakeStructMapping(officeUserType)
+	officeUserPrimaryKeyMapping, _ = queries.BindMapping(officeUserType, officeUserMapping, officeUserPrimaryKeyColumns)
+	officeUserInsertCacheMut       sync.RWMutex
+	officeUserInsertCache          = make(map[string]insertCache)
+	officeUserUpdateCacheMut       sync.RWMutex
+	officeUserUpdateCache          = make(map[string]updateCache)
+	officeUserUpsertCacheMut       sync.RWMutex
+	officeUserUpsertCache          = make(map[string]insertCache)
 )
 
 var (
@@ -133,24 +165,24 @@ var (
 	_ = qmhelper.Where
 )
 
-var officesUserBeforeInsertHooks []OfficesUserHook
-var officesUserBeforeUpdateHooks []OfficesUserHook
-var officesUserBeforeDeleteHooks []OfficesUserHook
-var officesUserBeforeUpsertHooks []OfficesUserHook
+var officeUserBeforeInsertHooks []OfficeUserHook
+var officeUserBeforeUpdateHooks []OfficeUserHook
+var officeUserBeforeDeleteHooks []OfficeUserHook
+var officeUserBeforeUpsertHooks []OfficeUserHook
 
-var officesUserAfterInsertHooks []OfficesUserHook
-var officesUserAfterSelectHooks []OfficesUserHook
-var officesUserAfterUpdateHooks []OfficesUserHook
-var officesUserAfterDeleteHooks []OfficesUserHook
-var officesUserAfterUpsertHooks []OfficesUserHook
+var officeUserAfterInsertHooks []OfficeUserHook
+var officeUserAfterSelectHooks []OfficeUserHook
+var officeUserAfterUpdateHooks []OfficeUserHook
+var officeUserAfterDeleteHooks []OfficeUserHook
+var officeUserAfterUpsertHooks []OfficeUserHook
 
 // doBeforeInsertHooks executes all "before insert" hooks.
-func (o *OfficesUser) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserBeforeInsertHooks {
+	for _, hook := range officeUserBeforeInsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -160,12 +192,12 @@ func (o *OfficesUser) doBeforeInsertHooks(ctx context.Context, exec boil.Context
 }
 
 // doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *OfficesUser) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserBeforeUpdateHooks {
+	for _, hook := range officeUserBeforeUpdateHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -175,12 +207,12 @@ func (o *OfficesUser) doBeforeUpdateHooks(ctx context.Context, exec boil.Context
 }
 
 // doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *OfficesUser) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserBeforeDeleteHooks {
+	for _, hook := range officeUserBeforeDeleteHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -190,12 +222,12 @@ func (o *OfficesUser) doBeforeDeleteHooks(ctx context.Context, exec boil.Context
 }
 
 // doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *OfficesUser) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserBeforeUpsertHooks {
+	for _, hook := range officeUserBeforeUpsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -205,12 +237,12 @@ func (o *OfficesUser) doBeforeUpsertHooks(ctx context.Context, exec boil.Context
 }
 
 // doAfterInsertHooks executes all "after Insert" hooks.
-func (o *OfficesUser) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserAfterInsertHooks {
+	for _, hook := range officeUserAfterInsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -220,12 +252,12 @@ func (o *OfficesUser) doAfterInsertHooks(ctx context.Context, exec boil.ContextE
 }
 
 // doAfterSelectHooks executes all "after Select" hooks.
-func (o *OfficesUser) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserAfterSelectHooks {
+	for _, hook := range officeUserAfterSelectHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -235,12 +267,12 @@ func (o *OfficesUser) doAfterSelectHooks(ctx context.Context, exec boil.ContextE
 }
 
 // doAfterUpdateHooks executes all "after Update" hooks.
-func (o *OfficesUser) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserAfterUpdateHooks {
+	for _, hook := range officeUserAfterUpdateHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -250,12 +282,12 @@ func (o *OfficesUser) doAfterUpdateHooks(ctx context.Context, exec boil.ContextE
 }
 
 // doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *OfficesUser) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserAfterDeleteHooks {
+	for _, hook := range officeUserAfterDeleteHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -265,12 +297,12 @@ func (o *OfficesUser) doAfterDeleteHooks(ctx context.Context, exec boil.ContextE
 }
 
 // doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *OfficesUser) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
+func (o *OfficeUser) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
 	if boil.HooksAreSkipped(ctx) {
 		return nil
 	}
 
-	for _, hook := range officesUserAfterUpsertHooks {
+	for _, hook := range officeUserAfterUpsertHooks {
 		if err := hook(ctx, exec, o); err != nil {
 			return err
 		}
@@ -279,33 +311,33 @@ func (o *OfficesUser) doAfterUpsertHooks(ctx context.Context, exec boil.ContextE
 	return nil
 }
 
-// AddOfficesUserHook registers your hook function for all future operations.
-func AddOfficesUserHook(hookPoint boil.HookPoint, officesUserHook OfficesUserHook) {
+// AddOfficeUserHook registers your hook function for all future operations.
+func AddOfficeUserHook(hookPoint boil.HookPoint, officeUserHook OfficeUserHook) {
 	switch hookPoint {
 	case boil.BeforeInsertHook:
-		officesUserBeforeInsertHooks = append(officesUserBeforeInsertHooks, officesUserHook)
+		officeUserBeforeInsertHooks = append(officeUserBeforeInsertHooks, officeUserHook)
 	case boil.BeforeUpdateHook:
-		officesUserBeforeUpdateHooks = append(officesUserBeforeUpdateHooks, officesUserHook)
+		officeUserBeforeUpdateHooks = append(officeUserBeforeUpdateHooks, officeUserHook)
 	case boil.BeforeDeleteHook:
-		officesUserBeforeDeleteHooks = append(officesUserBeforeDeleteHooks, officesUserHook)
+		officeUserBeforeDeleteHooks = append(officeUserBeforeDeleteHooks, officeUserHook)
 	case boil.BeforeUpsertHook:
-		officesUserBeforeUpsertHooks = append(officesUserBeforeUpsertHooks, officesUserHook)
+		officeUserBeforeUpsertHooks = append(officeUserBeforeUpsertHooks, officeUserHook)
 	case boil.AfterInsertHook:
-		officesUserAfterInsertHooks = append(officesUserAfterInsertHooks, officesUserHook)
+		officeUserAfterInsertHooks = append(officeUserAfterInsertHooks, officeUserHook)
 	case boil.AfterSelectHook:
-		officesUserAfterSelectHooks = append(officesUserAfterSelectHooks, officesUserHook)
+		officeUserAfterSelectHooks = append(officeUserAfterSelectHooks, officeUserHook)
 	case boil.AfterUpdateHook:
-		officesUserAfterUpdateHooks = append(officesUserAfterUpdateHooks, officesUserHook)
+		officeUserAfterUpdateHooks = append(officeUserAfterUpdateHooks, officeUserHook)
 	case boil.AfterDeleteHook:
-		officesUserAfterDeleteHooks = append(officesUserAfterDeleteHooks, officesUserHook)
+		officeUserAfterDeleteHooks = append(officeUserAfterDeleteHooks, officeUserHook)
 	case boil.AfterUpsertHook:
-		officesUserAfterUpsertHooks = append(officesUserAfterUpsertHooks, officesUserHook)
+		officeUserAfterUpsertHooks = append(officeUserAfterUpsertHooks, officeUserHook)
 	}
 }
 
-// One returns a single officesUser record from the query.
-func (q officesUserQuery) One(ctx context.Context, exec boil.ContextExecutor) (*OfficesUser, error) {
-	o := &OfficesUser{}
+// One returns a single officeUser record from the query.
+func (q officeUserQuery) One(ctx context.Context, exec boil.ContextExecutor) (*OfficeUser, error) {
+	o := &OfficeUser{}
 
 	queries.SetLimit(q.Query, 1)
 
@@ -314,7 +346,7 @@ func (q officesUserQuery) One(ctx context.Context, exec boil.ContextExecutor) (*
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: failed to execute a one query for offices_users")
+		return nil, errors.Wrap(err, "models: failed to execute a one query for office_users")
 	}
 
 	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
@@ -324,16 +356,16 @@ func (q officesUserQuery) One(ctx context.Context, exec boil.ContextExecutor) (*
 	return o, nil
 }
 
-// All returns all OfficesUser records from the query.
-func (q officesUserQuery) All(ctx context.Context, exec boil.ContextExecutor) (OfficesUserSlice, error) {
-	var o []*OfficesUser
+// All returns all OfficeUser records from the query.
+func (q officeUserQuery) All(ctx context.Context, exec boil.ContextExecutor) (OfficeUserSlice, error) {
+	var o []*OfficeUser
 
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
-		return nil, errors.Wrap(err, "models: failed to assign all query results to OfficesUser slice")
+		return nil, errors.Wrap(err, "models: failed to assign all query results to OfficeUser slice")
 	}
 
-	if len(officesUserAfterSelectHooks) != 0 {
+	if len(officeUserAfterSelectHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
 				return o, err
@@ -344,8 +376,8 @@ func (q officesUserQuery) All(ctx context.Context, exec boil.ContextExecutor) (O
 	return o, nil
 }
 
-// Count returns the count of all OfficesUser records in the query.
-func (q officesUserQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+// Count returns the count of all OfficeUser records in the query.
+func (q officeUserQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -353,14 +385,14 @@ func (q officesUserQuery) Count(ctx context.Context, exec boil.ContextExecutor) 
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to count offices_users rows")
+		return 0, errors.Wrap(err, "models: failed to count office_users rows")
 	}
 
 	return count, nil
 }
 
 // Exists checks if the row exists in the table.
-func (q officesUserQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
+func (q officeUserQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
 	var count int64
 
 	queries.SetSelect(q.Query, nil)
@@ -369,14 +401,14 @@ func (q officesUserQuery) Exists(ctx context.Context, exec boil.ContextExecutor)
 
 	err := q.Query.QueryRowContext(ctx, exec).Scan(&count)
 	if err != nil {
-		return false, errors.Wrap(err, "models: failed to check if offices_users exists")
+		return false, errors.Wrap(err, "models: failed to check if office_users exists")
 	}
 
 	return count > 0, nil
 }
 
 // Office pointed to by the foreign key.
-func (o *OfficesUser) Office(mods ...qm.QueryMod) officeQuery {
+func (o *OfficeUser) Office(mods ...qm.QueryMod) officeQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("`id` = ?", o.OfficeID),
 	}
@@ -390,7 +422,7 @@ func (o *OfficesUser) Office(mods ...qm.QueryMod) officeQuery {
 }
 
 // User pointed to by the foreign key.
-func (o *OfficesUser) User(mods ...qm.QueryMod) userQuery {
+func (o *OfficeUser) User(mods ...qm.QueryMod) userQuery {
 	queryMods := []qm.QueryMod{
 		qm.Where("`id` = ?", o.UserID),
 	}
@@ -405,20 +437,20 @@ func (o *OfficesUser) User(mods ...qm.QueryMod) userQuery {
 
 // LoadOffice allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOfficesUser interface{}, mods queries.Applicator) error {
-	var slice []*OfficesUser
-	var object *OfficesUser
+func (officeUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOfficeUser interface{}, mods queries.Applicator) error {
+	var slice []*OfficeUser
+	var object *OfficeUser
 
 	if singular {
-		object = maybeOfficesUser.(*OfficesUser)
+		object = maybeOfficeUser.(*OfficeUser)
 	} else {
-		slice = *maybeOfficesUser.(*[]*OfficesUser)
+		slice = *maybeOfficeUser.(*[]*OfficeUser)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &officesUserR{}
+			object.R = &officeUserR{}
 		}
 		if !queries.IsNil(object.OfficeID) {
 			args = append(args, object.OfficeID)
@@ -428,7 +460,7 @@ func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, sing
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &officesUserR{}
+				obj.R = &officeUserR{}
 			}
 
 			for _, a := range args {
@@ -473,7 +505,7 @@ func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, sing
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for offices")
 	}
 
-	if len(officesUserAfterSelectHooks) != 0 {
+	if len(officeUserAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -491,7 +523,7 @@ func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, sing
 		if foreign.R == nil {
 			foreign.R = &officeR{}
 		}
-		foreign.R.OfficesUsers = append(foreign.R.OfficesUsers, object)
+		foreign.R.OfficeUsers = append(foreign.R.OfficeUsers, object)
 		return nil
 	}
 
@@ -502,7 +534,7 @@ func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, sing
 				if foreign.R == nil {
 					foreign.R = &officeR{}
 				}
-				foreign.R.OfficesUsers = append(foreign.R.OfficesUsers, local)
+				foreign.R.OfficeUsers = append(foreign.R.OfficeUsers, local)
 				break
 			}
 		}
@@ -513,20 +545,20 @@ func (officesUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, sing
 
 // LoadUser allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOfficesUser interface{}, mods queries.Applicator) error {
-	var slice []*OfficesUser
-	var object *OfficesUser
+func (officeUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOfficeUser interface{}, mods queries.Applicator) error {
+	var slice []*OfficeUser
+	var object *OfficeUser
 
 	if singular {
-		object = maybeOfficesUser.(*OfficesUser)
+		object = maybeOfficeUser.(*OfficeUser)
 	} else {
-		slice = *maybeOfficesUser.(*[]*OfficesUser)
+		slice = *maybeOfficeUser.(*[]*OfficeUser)
 	}
 
 	args := make([]interface{}, 0, 1)
 	if singular {
 		if object.R == nil {
-			object.R = &officesUserR{}
+			object.R = &officeUserR{}
 		}
 		if !queries.IsNil(object.UserID) {
 			args = append(args, object.UserID)
@@ -536,7 +568,7 @@ func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singul
 	Outer:
 		for _, obj := range slice {
 			if obj.R == nil {
-				obj.R = &officesUserR{}
+				obj.R = &officeUserR{}
 			}
 
 			for _, a := range args {
@@ -581,7 +613,7 @@ func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singul
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
 	}
 
-	if len(officesUserAfterSelectHooks) != 0 {
+	if len(officeUserAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -599,7 +631,7 @@ func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singul
 		if foreign.R == nil {
 			foreign.R = &userR{}
 		}
-		foreign.R.OfficesUsers = append(foreign.R.OfficesUsers, object)
+		foreign.R.OfficeUsers = append(foreign.R.OfficeUsers, object)
 		return nil
 	}
 
@@ -610,7 +642,7 @@ func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singul
 				if foreign.R == nil {
 					foreign.R = &userR{}
 				}
-				foreign.R.OfficesUsers = append(foreign.R.OfficesUsers, local)
+				foreign.R.OfficeUsers = append(foreign.R.OfficeUsers, local)
 				break
 			}
 		}
@@ -619,10 +651,10 @@ func (officesUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// SetOffice of the officesUser to the related item.
+// SetOffice of the officeUser to the related item.
 // Sets o.R.Office to related.
-// Adds o to related.R.OfficesUsers.
-func (o *OfficesUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Office) error {
+// Adds o to related.R.OfficeUsers.
+func (o *OfficeUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Office) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -631,9 +663,9 @@ func (o *OfficesUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE `offices_users` SET %s WHERE %s",
+		"UPDATE `office_users` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, []string{"office_id"}),
-		strmangle.WhereClause("`", "`", 0, officesUserPrimaryKeyColumns),
+		strmangle.WhereClause("`", "`", 0, officeUserPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
 
@@ -648,7 +680,7 @@ func (o *OfficesUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, 
 
 	queries.Assign(&o.OfficeID, related.ID)
 	if o.R == nil {
-		o.R = &officesUserR{
+		o.R = &officeUserR{
 			Office: related,
 		}
 	} else {
@@ -657,19 +689,19 @@ func (o *OfficesUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, 
 
 	if related.R == nil {
 		related.R = &officeR{
-			OfficesUsers: OfficesUserSlice{o},
+			OfficeUsers: OfficeUserSlice{o},
 		}
 	} else {
-		related.R.OfficesUsers = append(related.R.OfficesUsers, o)
+		related.R.OfficeUsers = append(related.R.OfficeUsers, o)
 	}
 
 	return nil
 }
 
-// SetUser of the officesUser to the related item.
+// SetUser of the officeUser to the related item.
 // Sets o.R.User to related.
-// Adds o to related.R.OfficesUsers.
-func (o *OfficesUser) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
+// Adds o to related.R.OfficeUsers.
+func (o *OfficeUser) SetUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -678,9 +710,9 @@ func (o *OfficesUser) SetUser(ctx context.Context, exec boil.ContextExecutor, in
 	}
 
 	updateQuery := fmt.Sprintf(
-		"UPDATE `offices_users` SET %s WHERE %s",
+		"UPDATE `office_users` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, []string{"user_id"}),
-		strmangle.WhereClause("`", "`", 0, officesUserPrimaryKeyColumns),
+		strmangle.WhereClause("`", "`", 0, officeUserPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
 
@@ -695,7 +727,7 @@ func (o *OfficesUser) SetUser(ctx context.Context, exec boil.ContextExecutor, in
 
 	queries.Assign(&o.UserID, related.ID)
 	if o.R == nil {
-		o.R = &officesUserR{
+		o.R = &officeUserR{
 			User: related,
 		}
 	} else {
@@ -704,56 +736,56 @@ func (o *OfficesUser) SetUser(ctx context.Context, exec boil.ContextExecutor, in
 
 	if related.R == nil {
 		related.R = &userR{
-			OfficesUsers: OfficesUserSlice{o},
+			OfficeUsers: OfficeUserSlice{o},
 		}
 	} else {
-		related.R.OfficesUsers = append(related.R.OfficesUsers, o)
+		related.R.OfficeUsers = append(related.R.OfficeUsers, o)
 	}
 
 	return nil
 }
 
-// OfficesUsers retrieves all the records using an executor.
-func OfficesUsers(mods ...qm.QueryMod) officesUserQuery {
-	mods = append(mods, qm.From("`offices_users`"))
-	return officesUserQuery{NewQuery(mods...)}
+// OfficeUsers retrieves all the records using an executor.
+func OfficeUsers(mods ...qm.QueryMod) officeUserQuery {
+	mods = append(mods, qm.From("`office_users`"))
+	return officeUserQuery{NewQuery(mods...)}
 }
 
-// FindOfficesUser retrieves a single record by ID with an executor.
+// FindOfficeUser retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindOfficesUser(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*OfficesUser, error) {
-	officesUserObj := &OfficesUser{}
+func FindOfficeUser(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*OfficeUser, error) {
+	officeUserObj := &OfficeUser{}
 
 	sel := "*"
 	if len(selectCols) > 0 {
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `offices_users` where `id`=?", sel,
+		"select %s from `office_users` where `id`=?", sel,
 	)
 
 	q := queries.Raw(query, iD)
 
-	err := q.Bind(ctx, exec, officesUserObj)
+	err := q.Bind(ctx, exec, officeUserObj)
 	if err != nil {
 		if errors.Cause(err) == sql.ErrNoRows {
 			return nil, sql.ErrNoRows
 		}
-		return nil, errors.Wrap(err, "models: unable to select from offices_users")
+		return nil, errors.Wrap(err, "models: unable to select from office_users")
 	}
 
-	if err = officesUserObj.doAfterSelectHooks(ctx, exec); err != nil {
-		return officesUserObj, err
+	if err = officeUserObj.doAfterSelectHooks(ctx, exec); err != nil {
+		return officeUserObj, err
 	}
 
-	return officesUserObj, nil
+	return officeUserObj, nil
 }
 
 // Insert a single record using an executor.
 // See boil.Columns.InsertColumnSet documentation to understand column list inference for inserts.
-func (o *OfficesUser) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
+func (o *OfficeUser) Insert(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no offices_users provided for insertion")
+		return errors.New("models: no office_users provided for insertion")
 	}
 
 	var err error
@@ -762,39 +794,39 @@ func (o *OfficesUser) Insert(ctx context.Context, exec boil.ContextExecutor, col
 		return err
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(officesUserColumnsWithDefault, o)
+	nzDefaults := queries.NonZeroDefaultSet(officeUserColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
-	officesUserInsertCacheMut.RLock()
-	cache, cached := officesUserInsertCache[key]
-	officesUserInsertCacheMut.RUnlock()
+	officeUserInsertCacheMut.RLock()
+	cache, cached := officeUserInsertCache[key]
+	officeUserInsertCacheMut.RUnlock()
 
 	if !cached {
 		wl, returnColumns := columns.InsertColumnSet(
-			officesUserAllColumns,
-			officesUserColumnsWithDefault,
-			officesUserColumnsWithoutDefault,
+			officeUserAllColumns,
+			officeUserColumnsWithDefault,
+			officeUserColumnsWithoutDefault,
 			nzDefaults,
 		)
 
-		cache.valueMapping, err = queries.BindMapping(officesUserType, officesUserMapping, wl)
+		cache.valueMapping, err = queries.BindMapping(officeUserType, officeUserMapping, wl)
 		if err != nil {
 			return err
 		}
-		cache.retMapping, err = queries.BindMapping(officesUserType, officesUserMapping, returnColumns)
+		cache.retMapping, err = queries.BindMapping(officeUserType, officeUserMapping, returnColumns)
 		if err != nil {
 			return err
 		}
 		if len(wl) != 0 {
-			cache.query = fmt.Sprintf("INSERT INTO `offices_users` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
+			cache.query = fmt.Sprintf("INSERT INTO `office_users` (`%s`) %%sVALUES (%s)%%s", strings.Join(wl, "`,`"), strmangle.Placeholders(dialect.UseIndexPlaceholders, len(wl), 1, 1))
 		} else {
-			cache.query = "INSERT INTO `offices_users` () VALUES ()%s%s"
+			cache.query = "INSERT INTO `office_users` () VALUES ()%s%s"
 		}
 
 		var queryOutput, queryReturning string
 
 		if len(cache.retMapping) != 0 {
-			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `offices_users` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, officesUserPrimaryKeyColumns))
+			cache.retQuery = fmt.Sprintf("SELECT `%s` FROM `office_users` WHERE %s", strings.Join(returnColumns, "`,`"), strmangle.WhereClause("`", "`", 0, officeUserPrimaryKeyColumns))
 		}
 
 		cache.query = fmt.Sprintf(cache.query, queryOutput, queryReturning)
@@ -811,7 +843,7 @@ func (o *OfficesUser) Insert(ctx context.Context, exec boil.ContextExecutor, col
 	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to insert into offices_users")
+		return errors.Wrap(err, "models: unable to insert into office_users")
 	}
 
 	var identifierCols []interface{}
@@ -831,50 +863,50 @@ func (o *OfficesUser) Insert(ctx context.Context, exec boil.ContextExecutor, col
 	}
 	err = exec.QueryRowContext(ctx, cache.retQuery, identifierCols...).Scan(queries.PtrsFromMapping(value, cache.retMapping)...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to populate default values for offices_users")
+		return errors.Wrap(err, "models: unable to populate default values for office_users")
 	}
 
 CacheNoHooks:
 	if !cached {
-		officesUserInsertCacheMut.Lock()
-		officesUserInsertCache[key] = cache
-		officesUserInsertCacheMut.Unlock()
+		officeUserInsertCacheMut.Lock()
+		officeUserInsertCache[key] = cache
+		officeUserInsertCacheMut.Unlock()
 	}
 
 	return o.doAfterInsertHooks(ctx, exec)
 }
 
-// Update uses an executor to update the OfficesUser.
+// Update uses an executor to update the OfficeUser.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
-func (o *OfficesUser) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+func (o *OfficeUser) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 	key := makeCacheKey(columns, nil)
-	officesUserUpdateCacheMut.RLock()
-	cache, cached := officesUserUpdateCache[key]
-	officesUserUpdateCacheMut.RUnlock()
+	officeUserUpdateCacheMut.RLock()
+	cache, cached := officeUserUpdateCache[key]
+	officeUserUpdateCacheMut.RUnlock()
 
 	if !cached {
 		wl := columns.UpdateColumnSet(
-			officesUserAllColumns,
-			officesUserPrimaryKeyColumns,
+			officeUserAllColumns,
+			officeUserPrimaryKeyColumns,
 		)
 
 		if !columns.IsWhitelist() {
 			wl = strmangle.SetComplement(wl, []string{"created_at"})
 		}
 		if len(wl) == 0 {
-			return 0, errors.New("models: unable to update offices_users, could not build whitelist")
+			return 0, errors.New("models: unable to update office_users, could not build whitelist")
 		}
 
-		cache.query = fmt.Sprintf("UPDATE `offices_users` SET %s WHERE %s",
+		cache.query = fmt.Sprintf("UPDATE `office_users` SET %s WHERE %s",
 			strmangle.SetParamNames("`", "`", 0, wl),
-			strmangle.WhereClause("`", "`", 0, officesUserPrimaryKeyColumns),
+			strmangle.WhereClause("`", "`", 0, officeUserPrimaryKeyColumns),
 		)
-		cache.valueMapping, err = queries.BindMapping(officesUserType, officesUserMapping, append(wl, officesUserPrimaryKeyColumns...))
+		cache.valueMapping, err = queries.BindMapping(officeUserType, officeUserMapping, append(wl, officeUserPrimaryKeyColumns...))
 		if err != nil {
 			return 0, err
 		}
@@ -890,42 +922,42 @@ func (o *OfficesUser) Update(ctx context.Context, exec boil.ContextExecutor, col
 	var result sql.Result
 	result, err = exec.ExecContext(ctx, cache.query, values...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update offices_users row")
+		return 0, errors.Wrap(err, "models: unable to update office_users row")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by update for offices_users")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by update for office_users")
 	}
 
 	if !cached {
-		officesUserUpdateCacheMut.Lock()
-		officesUserUpdateCache[key] = cache
-		officesUserUpdateCacheMut.Unlock()
+		officeUserUpdateCacheMut.Lock()
+		officeUserUpdateCache[key] = cache
+		officeUserUpdateCacheMut.Unlock()
 	}
 
 	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
 // UpdateAll updates all rows with the specified column values.
-func (q officesUserQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (q officeUserQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all for offices_users")
+		return 0, errors.Wrap(err, "models: unable to update all for office_users")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for offices_users")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected for office_users")
 	}
 
 	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
-func (o OfficesUserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
+func (o OfficeUserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	ln := int64(len(o))
 	if ln == 0 {
 		return 0, nil
@@ -947,13 +979,13 @@ func (o OfficesUserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecut
 
 	// Append all of the primary key values for each column
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officesUserPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officeUserPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := fmt.Sprintf("UPDATE `offices_users` SET %s WHERE %s",
+	sql := fmt.Sprintf("UPDATE `office_users` SET %s WHERE %s",
 		strmangle.SetParamNames("`", "`", 0, colNames),
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officesUserPrimaryKeyColumns, len(o)))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officeUserPrimaryKeyColumns, len(o)))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -962,33 +994,33 @@ func (o OfficesUserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecut
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to update all in officesUser slice")
+		return 0, errors.Wrap(err, "models: unable to update all in officeUser slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all officesUser")
+		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all officeUser")
 	}
 	return rowsAff, nil
 }
 
-var mySQLOfficesUserUniqueColumns = []string{
+var mySQLOfficeUserUniqueColumns = []string{
 	"id",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
 // See boil.Columns documentation for how to properly use updateColumns and insertColumns.
-func (o *OfficesUser) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
+func (o *OfficeUser) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
-		return errors.New("models: no offices_users provided for upsert")
+		return errors.New("models: no office_users provided for upsert")
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
 		return err
 	}
 
-	nzDefaults := queries.NonZeroDefaultSet(officesUserColumnsWithDefault, o)
-	nzUniques := queries.NonZeroDefaultSet(mySQLOfficesUserUniqueColumns, o)
+	nzDefaults := queries.NonZeroDefaultSet(officeUserColumnsWithDefault, o)
+	nzUniques := queries.NonZeroDefaultSet(mySQLOfficeUserUniqueColumns, o)
 
 	if len(nzUniques) == 0 {
 		return errors.New("cannot upsert with a table that cannot conflict on a unique column")
@@ -1016,42 +1048,42 @@ func (o *OfficesUser) Upsert(ctx context.Context, exec boil.ContextExecutor, upd
 	key := buf.String()
 	strmangle.PutBuffer(buf)
 
-	officesUserUpsertCacheMut.RLock()
-	cache, cached := officesUserUpsertCache[key]
-	officesUserUpsertCacheMut.RUnlock()
+	officeUserUpsertCacheMut.RLock()
+	cache, cached := officeUserUpsertCache[key]
+	officeUserUpsertCacheMut.RUnlock()
 
 	var err error
 
 	if !cached {
 		insert, ret := insertColumns.InsertColumnSet(
-			officesUserAllColumns,
-			officesUserColumnsWithDefault,
-			officesUserColumnsWithoutDefault,
+			officeUserAllColumns,
+			officeUserColumnsWithDefault,
+			officeUserColumnsWithoutDefault,
 			nzDefaults,
 		)
 		update := updateColumns.UpdateColumnSet(
-			officesUserAllColumns,
-			officesUserPrimaryKeyColumns,
+			officeUserAllColumns,
+			officeUserPrimaryKeyColumns,
 		)
 
 		if !updateColumns.IsNone() && len(update) == 0 {
-			return errors.New("models: unable to upsert offices_users, could not build update column list")
+			return errors.New("models: unable to upsert office_users, could not build update column list")
 		}
 
 		ret = strmangle.SetComplement(ret, nzUniques)
-		cache.query = buildUpsertQueryMySQL(dialect, "`offices_users`", update, insert)
+		cache.query = buildUpsertQueryMySQL(dialect, "`office_users`", update, insert)
 		cache.retQuery = fmt.Sprintf(
-			"SELECT %s FROM `offices_users` WHERE %s",
+			"SELECT %s FROM `office_users` WHERE %s",
 			strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, ret), ","),
 			strmangle.WhereClause("`", "`", 0, nzUniques),
 		)
 
-		cache.valueMapping, err = queries.BindMapping(officesUserType, officesUserMapping, insert)
+		cache.valueMapping, err = queries.BindMapping(officeUserType, officeUserMapping, insert)
 		if err != nil {
 			return err
 		}
 		if len(ret) != 0 {
-			cache.retMapping, err = queries.BindMapping(officesUserType, officesUserMapping, ret)
+			cache.retMapping, err = queries.BindMapping(officeUserType, officeUserMapping, ret)
 			if err != nil {
 				return err
 			}
@@ -1073,7 +1105,7 @@ func (o *OfficesUser) Upsert(ctx context.Context, exec boil.ContextExecutor, upd
 	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
-		return errors.Wrap(err, "models: unable to upsert for offices_users")
+		return errors.Wrap(err, "models: unable to upsert for office_users")
 	}
 
 	var uniqueMap []uint64
@@ -1083,9 +1115,9 @@ func (o *OfficesUser) Upsert(ctx context.Context, exec boil.ContextExecutor, upd
 		goto CacheNoHooks
 	}
 
-	uniqueMap, err = queries.BindMapping(officesUserType, officesUserMapping, nzUniques)
+	uniqueMap, err = queries.BindMapping(officeUserType, officeUserMapping, nzUniques)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to retrieve unique values for offices_users")
+		return errors.Wrap(err, "models: unable to retrieve unique values for office_users")
 	}
 	nzUniqueCols = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), uniqueMap)
 
@@ -1096,32 +1128,32 @@ func (o *OfficesUser) Upsert(ctx context.Context, exec boil.ContextExecutor, upd
 	}
 	err = exec.QueryRowContext(ctx, cache.retQuery, nzUniqueCols...).Scan(returns...)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to populate default values for offices_users")
+		return errors.Wrap(err, "models: unable to populate default values for office_users")
 	}
 
 CacheNoHooks:
 	if !cached {
-		officesUserUpsertCacheMut.Lock()
-		officesUserUpsertCache[key] = cache
-		officesUserUpsertCacheMut.Unlock()
+		officeUserUpsertCacheMut.Lock()
+		officeUserUpsertCache[key] = cache
+		officeUserUpsertCacheMut.Unlock()
 	}
 
 	return o.doAfterUpsertHooks(ctx, exec)
 }
 
-// Delete deletes a single OfficesUser record with an executor.
+// Delete deletes a single OfficeUser record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *OfficesUser) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o *OfficeUser) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
-		return 0, errors.New("models: no OfficesUser provided for delete")
+		return 0, errors.New("models: no OfficeUser provided for delete")
 	}
 
 	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
 		return 0, err
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), officesUserPrimaryKeyMapping)
-	sql := "DELETE FROM `offices_users` WHERE `id`=?"
+	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), officeUserPrimaryKeyMapping)
+	sql := "DELETE FROM `office_users` WHERE `id`=?"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1130,12 +1162,12 @@ func (o *OfficesUser) Delete(ctx context.Context, exec boil.ContextExecutor) (in
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete from offices_users")
+		return 0, errors.Wrap(err, "models: unable to delete from office_users")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for offices_users")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for office_users")
 	}
 
 	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
@@ -1146,33 +1178,33 @@ func (o *OfficesUser) Delete(ctx context.Context, exec boil.ContextExecutor) (in
 }
 
 // DeleteAll deletes all matching rows.
-func (q officesUserQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (q officeUserQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
-		return 0, errors.New("models: no officesUserQuery provided for delete all")
+		return 0, errors.New("models: no officeUserQuery provided for delete all")
 	}
 
 	queries.SetDelete(q.Query)
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from offices_users")
+		return 0, errors.Wrap(err, "models: unable to delete all from office_users")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for offices_users")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for office_users")
 	}
 
 	return rowsAff, nil
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o OfficesUserSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o OfficeUserSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
 
-	if len(officesUserBeforeDeleteHooks) != 0 {
+	if len(officeUserBeforeDeleteHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
 				return 0, err
@@ -1182,12 +1214,12 @@ func (o OfficesUserSlice) DeleteAll(ctx context.Context, exec boil.ContextExecut
 
 	var args []interface{}
 	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officesUserPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officeUserPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "DELETE FROM `offices_users` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officesUserPrimaryKeyColumns, len(o))
+	sql := "DELETE FROM `office_users` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officeUserPrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1196,15 +1228,15 @@ func (o OfficesUserSlice) DeleteAll(ctx context.Context, exec boil.ContextExecut
 	}
 	result, err := exec.ExecContext(ctx, sql, args...)
 	if err != nil {
-		return 0, errors.Wrap(err, "models: unable to delete all from officesUser slice")
+		return 0, errors.Wrap(err, "models: unable to delete all from officeUser slice")
 	}
 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
-		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for offices_users")
+		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for office_users")
 	}
 
-	if len(officesUserAfterDeleteHooks) != 0 {
+	if len(officeUserAfterDeleteHooks) != 0 {
 		for _, obj := range o {
 			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
 				return 0, err
@@ -1217,8 +1249,8 @@ func (o OfficesUserSlice) DeleteAll(ctx context.Context, exec boil.ContextExecut
 
 // Reload refetches the object from the database
 // using the primary keys with an executor.
-func (o *OfficesUser) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindOfficesUser(ctx, exec, o.ID)
+func (o *OfficeUser) Reload(ctx context.Context, exec boil.ContextExecutor) error {
+	ret, err := FindOfficeUser(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1229,26 +1261,26 @@ func (o *OfficesUser) Reload(ctx context.Context, exec boil.ContextExecutor) err
 
 // ReloadAll refetches every row with matching primary key column values
 // and overwrites the original object slice with the newly updated slice.
-func (o *OfficesUserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
+func (o *OfficeUserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) error {
 	if o == nil || len(*o) == 0 {
 		return nil
 	}
 
-	slice := OfficesUserSlice{}
+	slice := OfficeUserSlice{}
 	var args []interface{}
 	for _, obj := range *o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officesUserPrimaryKeyMapping)
+		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), officeUserPrimaryKeyMapping)
 		args = append(args, pkeyArgs...)
 	}
 
-	sql := "SELECT `offices_users`.* FROM `offices_users` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officesUserPrimaryKeyColumns, len(*o))
+	sql := "SELECT `office_users`.* FROM `office_users` WHERE " +
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, officeUserPrimaryKeyColumns, len(*o))
 
 	q := queries.Raw(sql, args...)
 
 	err := q.Bind(ctx, exec, &slice)
 	if err != nil {
-		return errors.Wrap(err, "models: unable to reload all in OfficesUserSlice")
+		return errors.Wrap(err, "models: unable to reload all in OfficeUserSlice")
 	}
 
 	*o = slice
@@ -1256,10 +1288,10 @@ func (o *OfficesUserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecu
 	return nil
 }
 
-// OfficesUserExists checks if the OfficesUser row exists.
-func OfficesUserExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
+// OfficeUserExists checks if the OfficeUser row exists.
+func OfficeUserExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `offices_users` where `id`=? limit 1)"
+	sql := "select exists(select 1 from `office_users` where `id`=? limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1270,7 +1302,7 @@ func OfficesUserExists(ctx context.Context, exec boil.ContextExecutor, iD []byte
 
 	err := row.Scan(&exists)
 	if err != nil {
-		return false, errors.Wrap(err, "models: unable to check if offices_users exists")
+		return false, errors.Wrap(err, "models: unable to check if office_users exists")
 	}
 
 	return exists, nil
