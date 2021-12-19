@@ -7,7 +7,7 @@ down:
 	docker-compose down
 
 run:
-	docker-compose exec app go run app/cmd/main.go -c config/local.yml
+	docker-compose exec app go run cmd/grpc/main.go
 
 mod:
 	docker-compose exec app go mod tidy
@@ -27,6 +27,9 @@ lint:
 
 boil:
 	docker-compose exec app sqlboiler mysql -c db/sqlboiler.toml
+
+protoc:
+	docker-compose exec app protoc --go_out=./app/interface/grpc --go-grpc_out=./app/interface/grpc protos/${name}.proto
 
 migrate-new:
 	@docker run --rm \

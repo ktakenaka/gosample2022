@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "protos/sample";
+
+service Sample {
+  rpc ListSamples(Request) returns (Response) {}
+}
+
+message Request { optional string title = 1; }
+
+message Response {
+  string id = 1;
+  string title = 2;
+  string category = 3;
+  string memo = 4;
+  string date = 5;
+  float amount = 6;
+}
