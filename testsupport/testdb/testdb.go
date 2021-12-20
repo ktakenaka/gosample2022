@@ -2,12 +2,14 @@ package testdb
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
+	"github.com/ktakenaka/gosample2022/app/models"
 	"github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
-	"github.com/volatiletech/sqlboiler/v4/types"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 func GetFuncs() (read repository.DBReadFunc, write repository.DBWriteFunc, release func()) {
@@ -58,19 +60,28 @@ func GetFuncs() (read repository.DBReadFunc, write repository.DBWriteFunc, relea
 
 func cleanup(db repository.WriteExecutor, dbname string) error {
 	var raws []*struct{ Name string }
-	err := queries.
-		Raw(
-			"SELECT TABLE_NAME AS 'name' FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=? AND TABLE_NAME NOT IN (?)",
-			dbname, types.Array([]string{"schema_migrations"}),
-		).
-		Bind(context.Background(), db, &raws)
+	protectedTables := []interface{}{"schema_migrations"}
+	err := models.NewQuery(
+		qm.Select("table_name AS 'name'"),
+		qm.From("information_schema.tables"),
+		qm.Where("table_schema=?", dbname),
+		qm.WhereNotIn("table_name NOT IN ?", protectedTables...),
+	).Bind(context.Background(), db, &raws)
 	if err != nil {
 		return err
 	}
 
+	var groupedErr error
 	for i := range raws {
 		// 他に方法が思いつかないので、SQL Injection対策はしない
-		queries.Raw("TRUNCATE TABLE " + raws[i].Name).Exec(db)
+		_, err = queries.Raw("TRUNCATE TABLE " + raws[i].Name).Exec(db)
+		if err != nil && groupedErr == nil {
+			groupedErr = err
+			continue
+		}
+		if err != nil {
+			groupedErr = fmt.Errorf("%s: %s", groupedErr, err)
+		}
 	}
-	return nil
+	return groupedErr
 }
