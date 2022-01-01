@@ -32,7 +32,7 @@ type Config struct {
 	Password        string
 	Host            string
 	Port            uint
-	DBName          string
+	DBName          string `yaml:"db_name"`
 	MaxIdleConns    int
 	MaxOpenConns    int
 	ConnMaxLifetime time.Duration
@@ -55,6 +55,7 @@ func New(cfg *Config) (*sql.DB, error) {
 	}
 
 	connStr := fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
+
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		return nil, err

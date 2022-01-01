@@ -1,6 +1,0 @@
-env: development
-db:
-  name: gosample2022
-app:
-  service_name: gosample2022
-  port: 8080

@@ -6,27 +6,27 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
+	"github.com/ktakenaka/gosample2022/cmd/config"
 	"github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func main() {
-	cfg := &database.Config{
-		User:     "writer",
-		Password: "writer_password",
-		Host:     "db",
-		Port:     3306,
-		DBName:   "gosample2022_development",
+	cfg, err := config.Initialize()
+	if err != nil {
+		panic(err)
 	}
-	db, err := database.New(cfg)
+
+	fmt.Printf("%v\n", cfg.DB.Read)
+	fmt.Printf("%v\n", cfg.DB.Write)
+
+	db, err := database.New(cfg.DB.Write)
 	if err != nil {
 		panic(err)
 	}
 
 	ctx := context.Background()
 	id, _ := ulid.GenerateID()
-	println(id.String())
-	fmt.Println(id)
 	user := models.User{
 		ID:    id,
 		Email: "example@hoge.com",

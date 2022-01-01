@@ -7,7 +7,7 @@ down:
 	docker-compose down
 
 run:
-	docker-compose exec app go run cmd/main.go
+	docker-compose exec app go run cmd/main.go -c environment/local.yml
 
 mod:
 	docker-compose exec app go mod tidy

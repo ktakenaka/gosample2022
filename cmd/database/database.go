@@ -10,15 +10,12 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
-func Init() (read repository.DBReadFunc, write repository.DBWriteFunc, task shutdown.Task, err error) {
-	// TODO: Pass app config from outside
-	writeCfg := &infraDB.Config{
-		User:     "writer",
-		Password: "writer_password",
-		Host:     "db",
-		Port:     3306,
-		DBName:   "gosample2022_development",
-	}
+func Init(writeCfg, readCfg *infraDB.Config) (
+	read repository.DBReadFunc,
+	write repository.DBWriteFunc,
+	task shutdown.Task,
+	err error,
+) {
 	writeDB, err := infraDB.New(writeCfg)
 	if err != nil {
 		return
@@ -27,13 +24,6 @@ func Init() (read repository.DBReadFunc, write repository.DBWriteFunc, task shut
 		return writeDB
 	}
 
-	readCfg := &infraDB.Config{
-		User:     "reader",
-		Password: "reader_password",
-		Host:     "db",
-		Port:     3306,
-		DBName:   "gosample2022_development",
-	}
 	readDB, err := infraDB.New(readCfg)
 	if err != nil {
 		return

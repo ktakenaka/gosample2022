@@ -1,0 +1,18 @@
+env: development
+app:
+  service_name: gosample2022
+  port: 8080
+db:
+  write:
+    user: writer
+    password: writer_password
+    host: db
+    port: 3306
+    db_name: gosample2022_development
+  read:
+    user: reader
+    password: reader_password
+    host: db
+    port: 3306
+    db_name: gosample2022_development
+
