@@ -18,7 +18,9 @@ func main() {
 		panic(err)
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	tasks := shutdown.New()
 	defer tasks.Shutdown(ctx)
 
