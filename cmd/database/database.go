@@ -16,6 +16,7 @@ func Init() (read repository.DBReadFunc, write repository.DBWriteFunc, task shut
 		User:     "writer",
 		Password: "writer_password",
 		Host:     "db",
+		Port:     3306,
 		DBName:   "gosample2022_development",
 	}
 	writeDB, err := infraDB.New(writeCfg)
@@ -30,6 +31,7 @@ func Init() (read repository.DBReadFunc, write repository.DBWriteFunc, task shut
 		User:     "reader",
 		Password: "reader_password",
 		Host:     "db",
+		Port:     3306,
 		DBName:   "gosample2022_development",
 	}
 	readDB, err := infraDB.New(readCfg)

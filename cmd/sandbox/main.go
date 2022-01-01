@@ -15,6 +15,7 @@ func main() {
 		User:     "writer",
 		Password: "writer_password",
 		Host:     "db",
+		Port:     3306,
 		DBName:   "gosample2022_development",
 	}
 	db, err := database.New(cfg)

@@ -23,7 +23,7 @@ const (
 	defaultMaxOpenConns    = 10
 	defaultConnMaxLifetime = 20 * time.Second
 
-	conn = "%s:%s@tcp(%s)/%s"
+	conn = "%s:%s@tcp(%s:%d)/%s"
 )
 
 // Config connection information
@@ -31,6 +31,7 @@ type Config struct {
 	User            string
 	Password        string
 	Host            string
+	Port            uint
 	DBName          string
 	MaxIdleConns    int
 	MaxOpenConns    int
@@ -53,7 +54,7 @@ func New(cfg *Config) (*sql.DB, error) {
 		optionsSlice = append(optionsSlice, k+"="+v)
 	}
 
-	connStr := fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.DBName)
+	connStr := fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		return nil, err
