@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ericlagergren/decimal"
-	"github.com/ktakenaka/gosample2022/app/models"
+	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/testsupport/factory"
 	"github.com/ktakenaka/gosample2022/testsupport/testdb"

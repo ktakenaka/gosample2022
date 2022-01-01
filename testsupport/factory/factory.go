@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/ktakenaka/gosample2022/app/models"
+	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 )
 

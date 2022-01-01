@@ -1,6 +1,6 @@
 wipe     = true
 no-tests = true
-output   ="app/models"
+output   ="app/domain/models"
 
 [mysql]
   dbname    = "gosample2022_development"

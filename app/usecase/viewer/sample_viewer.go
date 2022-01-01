@@ -3,8 +3,8 @@ package viewer
 import (
 	"context"
 
+	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
-	"github.com/ktakenaka/gosample2022/app/models"
 )
 
 type SampleViewer interface {
