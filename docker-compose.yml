@@ -19,6 +19,7 @@ services:
       - .:/go/src
     environment:
       ENV: "development"
+      ROLLBAR_TOKEN: ${ROLLBAR_TOKEN}
       <<: *dbenv
     logging:
       driver: "json-file"

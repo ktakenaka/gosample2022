@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
+	pkgNotifier "github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
+	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
@@ -17,30 +20,28 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", cfg.DB.Read)
-	fmt.Printf("%v\n", cfg.DB.Write)
-
 	db, err := database.New(cfg.DB.Write)
 	if err != nil {
 		panic(err)
 	}
 
 	ctx := context.Background()
-	id, _ := ulid.GenerateID()
-	user := models.User{
-		ID:    id,
-		Email: "example@hoge.com",
-	}
 
 	boil.DebugMode = true
-	err = user.Upsert(ctx, db, boil.Infer(), boil.Infer())
-	if err != nil {
-		panic(err)
-	}
 	users, err := models.Users().All(ctx, db)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(users)
+	user := users[0]
+
+	ntfr, _ := notifier.Init(cfg)
+
+	ntfr.ErrorWithExtrasAndContext(
+		pkgNotifier.NewPersonContext(ctx, ulid.ULID(user.ID).String()),
+		pkgNotifier.WARN,
+		fmt.Errorf("hellow"),
+		map[string]interface{}{"user": user},
+	)
+	time.Sleep(time.Second * 3)
 }

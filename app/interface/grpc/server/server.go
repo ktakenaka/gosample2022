@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
+	"github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/app/usecase/updater"
 	"github.com/ktakenaka/gosample2022/app/usecase/viewer"
 )
@@ -10,12 +11,15 @@ import (
 type server struct {
 	samplePb.UnimplementedSampleServer
 
+	ntfr notifier.Notifier
+
 	sampleUpdater updater.SampleUpdater
 	sampleViewer  viewer.SampleViewer
 }
 
-func NewServer(read repository.DBReadFunc, write repository.DBWriteFunc) *server {
+func NewServer(read repository.DBReadFunc, write repository.DBWriteFunc, ntfr notifier.Notifier) *server {
 	srv := &server{
+		ntfr:          ntfr,
 		sampleUpdater: updater.NewSampleUpdater(write),
 		sampleViewer:  viewer.NewSampleViewer(read),
 	}

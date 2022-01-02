@@ -6,6 +6,7 @@ import (
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/database"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
+	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 )
 
@@ -27,7 +28,10 @@ func main() {
 	}
 	tasks.Add(task)
 
-	task, err = grpc.New(cfg, read, write)
+	ntfr, task := notifier.Init(cfg)
+	tasks.Add(task)
+
+	task, err = grpc.New(cfg, read, write, ntfr)
 	if err != nil {
 		panic(err)
 	}

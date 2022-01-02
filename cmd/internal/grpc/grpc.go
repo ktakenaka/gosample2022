@@ -11,6 +11,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	"github.com/ktakenaka/gosample2022/app/interface/grpc/server"
+	"github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	pkggrpc "google.golang.org/grpc"
 )
@@ -31,8 +32,9 @@ func New(
 	cfg *config.Config,
 	read repository.DBReadFunc,
 	write repository.DBWriteFunc,
+	ntfr notifier.Notifier,
 ) (shutdown.Task, error) {
-	srv := server.NewServer(read, write)
+	srv := server.NewServer(read, write, ntfr)
 
 	s := pkggrpc.NewServer()
 	samplePb.RegisterSampleServer(s, srv)

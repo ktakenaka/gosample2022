@@ -2,6 +2,7 @@ env: development
 app:
   service_name: gosample2022
   port: 8080
+  api: v1
 db:
   write:
     user: writer
@@ -15,4 +16,5 @@ db:
     host: db
     port: 3306
     db_name: gosample2022_development
-
+rollbar:
+  token: ${ROLLBAR_TOKEN}

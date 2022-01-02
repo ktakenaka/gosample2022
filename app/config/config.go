@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/ktakenaka/gosample2022/infra/database"
+	"github.com/ktakenaka/gosample2022/infra/rollbar"
 )
 
 type Config struct {
@@ -18,6 +19,7 @@ type Config struct {
 		Write *database.Config
 		Read  *database.Config
 	}
+	Rollbar *rollbar.Config
 }
 
 func New(configFilePath string) (*Config, error) {
