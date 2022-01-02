@@ -9,7 +9,6 @@ import (
 	"github.com/ktakenaka/gosample2022/cmd/config"
 	"github.com/ktakenaka/gosample2022/cmd/database"
 	"github.com/ktakenaka/gosample2022/cmd/grpc"
-	"github.com/ktakenaka/gosample2022/cmd/shutdown"
 	"github.com/ktakenaka/gosample2022/cmd/tmanager"
 )
 
@@ -22,18 +21,12 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	tasks := shutdown.New()
-	defer tasks.Shutdown(ctx)
-
 	tm := &tmanager.TManager{}
+	defer tm.Shutdown(ctx)
 
-	read, write, task, err := database.Init(cfg.DB.Write, cfg.DB.Read)
-	if err != nil {
+	if err = tm.InitDB(cfg); err != nil {
 		panic(err)
 	}
-	tasks.Add(task)
-	tm.ReadDBFactory = read
-	tm.WriteDBFactory = write
 
 	s, task := grpc.New(tm)
 	tasks.Add(task)

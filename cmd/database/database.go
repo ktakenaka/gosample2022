@@ -2,18 +2,43 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
-	"github.com/ktakenaka/gosample2022/cmd/shutdown"
+	"github.com/ktakenaka/gosample2022/cmd/tmanager"
 	infraDB "github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
+type task struct {
+	dbWrite *sql.DB
+	dbRead *sql.DB
+}
+
+func (t *task) Name() string {
+	return "database"
+}
+
+func (t *task) Shutdown(ctx context.Context) (err error) {
+	if e := t.dbRead.Close(); e != nil {
+		err = e
+	}
+	if e := t.dbWrite.Close(); e != nil {
+		if err != nil {
+			err = fmt.Errorf("%w, %w", err, e)
+			return
+		}
+		err = e
+		return
+	}
+	return nil
+}
+
 func Init(writeCfg, readCfg *infraDB.Config) (
 	read repository.DBReadFunc,
 	write repository.DBWriteFunc,
-	task shutdown.Task,
+	t tmanager.Task,
 	err error,
 ) {
 	writeDB, err := infraDB.New(writeCfg)
@@ -32,19 +57,8 @@ func Init(writeCfg, readCfg *infraDB.Config) (
 		return readDB
 	}
 
-	task = func(ctx context.Context) error {
-		var err error
-		if err1 := writeDB.Close(); err1 != nil {
-			err = fmt.Errorf("write db close: %w", err1)
-		}
-		if err2 := readDB.Close(); err2 != nil {
-			err = fmt.Errorf("read db close: %w", err2)
-		}
-
-		return err
-	}
-
+	t = &task{dbWrite: writeDB, dbRead: readDB}
 	boil.DebugMode = true
 
-	return read, write, task, nil
+	return read, write, t, nil
 }
