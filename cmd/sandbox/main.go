@@ -6,7 +6,7 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
-	"github.com/ktakenaka/gosample2022/cmd/config"
+	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )

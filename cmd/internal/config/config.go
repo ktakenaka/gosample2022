@@ -4,15 +4,15 @@ import (
 	"errors"
 	"flag"
 
-	appCfg "github.com/ktakenaka/gosample2022/app/config"
+	"github.com/ktakenaka/gosample2022/app/config"
 )
 
-func Initialize() (*appCfg.Config, error) {
+func Initialize() (*config.Config, error) {
 	configFilePath := flag.String("c", "", "config file path for app")
 	flag.Parse()
-	if configFilePath == nil {
+	if *configFilePath == "" {
 		return nil, errors.New("Not having config file")
 	}
 
-	return appCfg.New(*configFilePath)
+	return config.New(*configFilePath)
 }
