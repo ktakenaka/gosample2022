@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -29,7 +28,7 @@ type Sample struct {
 	OfficeID  []byte        `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
 	Title     string        `boil:"title" json:"title" toml:"title" yaml:"title"`
 	Category  string        `boil:"category" json:"category" toml:"category" yaml:"category"`
-	Memo      null.String   `boil:"memo" json:"memo,omitempty" toml:"memo" yaml:"memo,omitempty"`
+	Memo      string        `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
 	Date      time.Time     `boil:"date" json:"date" toml:"date" yaml:"date"`
 	Amount    types.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	CreatedBy []byte        `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
@@ -142,7 +141,7 @@ var SampleWhere = struct {
 	OfficeID  whereHelper__byte
 	Title     whereHelperstring
 	Category  whereHelperstring
-	Memo      whereHelpernull_String
+	Memo      whereHelperstring
 	Date      whereHelpertime_Time
 	Amount    whereHelpertypes_Decimal
 	CreatedBy whereHelper__byte
@@ -154,7 +153,7 @@ var SampleWhere = struct {
 	OfficeID:  whereHelper__byte{field: "`samples`.`office_id`"},
 	Title:     whereHelperstring{field: "`samples`.`title`"},
 	Category:  whereHelperstring{field: "`samples`.`category`"},
-	Memo:      whereHelpernull_String{field: "`samples`.`memo`"},
+	Memo:      whereHelperstring{field: "`samples`.`memo`"},
 	Date:      whereHelpertime_Time{field: "`samples`.`date`"},
 	Amount:    whereHelpertypes_Decimal{field: "`samples`.`amount`"},
 	CreatedBy: whereHelper__byte{field: "`samples`.`created_by`"},

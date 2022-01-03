@@ -5,7 +5,7 @@ CREATE TABLE samples (
   office_id  BINARY(16) NOT NULL,
   title      VARCHAR(30) NOT NULL,
   category   ENUM("small", "medium", "large") NOT NULL,
-  memo       TEXT DEFAULT NULL,
+  memo       TEXT NOT NULL,
   date       DATE NOT NULL,
   amount     DECIMAL(10, 2) NOT NULL,
   created_by BINARY(16) NOT NULL,
