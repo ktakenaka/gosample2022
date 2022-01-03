@@ -31,6 +31,7 @@ func main() {
 	}
 
 	ctx := context.Background()
+	user, _ := models.Users().One(ctx, db)
 	office, _ := models.Offices().One(ctx, db)
 
 	id, _ := ulid.GenerateID()
@@ -47,7 +48,7 @@ func main() {
 
 	ntfr, _ := notifier.Init(cfg)
 	ntfr.ErrorWithExtrasAndContext(
-		pkgNotifier.NewPersonContext(ctx, ulid.ULID(office.ID).String()),
+		pkgNotifier.NewPersonContext(ctx, ulid.ULID(office.ID), ulid.ULID(user.ID)),
 		pkgNotifier.WARN,
 		fmt.Errorf("hellow"),
 		map[string]interface{}{"user": office},

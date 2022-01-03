@@ -9,7 +9,7 @@ import (
 
 // SampleList implements samplePb.SampleList
 func (s *server) SampleList(ctx context.Context, in *samplePb.ListRequest) (*samplePb.ListResponse, error) {
-	office, err := s.viewer.CurrentOffice(ctx)
+	ctx, office, err := s.getCurrentOffice(ctx)
 	if err != nil {
 		err = s.notifyError(ctx, err)
 		return nil, err

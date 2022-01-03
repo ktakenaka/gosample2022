@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/rollbar/rollbar-go"
 )
 
@@ -20,9 +21,10 @@ type Notifier interface {
 	ErrorWithExtrasAndContext(ctx context.Context, level string, err error, extras map[string]interface{})
 }
 
-func NewPersonContext(ctx context.Context, id string) context.Context {
-	// In this application, we don't know users' email and name. That's why we just use id.
-	return rollbar.NewPersonContext(ctx, &rollbar.Person{Id: id})
+func NewPersonContext(ctx context.Context, officeID, userID ulid.ULID) context.Context {
+	// This application is multi-tenant application, and each office has many users.
+	// That's why we use officeID for ID, and userID for Username
+	return rollbar.NewPersonContext(ctx, &rollbar.Person{Id: officeID.String(), Username: userID.String()})
 }
 
 type ntfr struct{}
