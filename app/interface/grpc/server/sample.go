@@ -13,7 +13,6 @@ import (
 // LisaSamples implements samplePb.LisaSamples
 func (s *server) ListSamples(ctx context.Context, in *samplePb.Request) (*samplePb.Response, error) {
 	samples, err := s.sampleViewer.List(ctx)
-
 	if err != nil {
 		// Temporary implementation
 		s.ntfr.Message(notifier.ERR, err.Error())
@@ -31,5 +30,5 @@ func (s *server) ListSamples(ctx context.Context, in *samplePb.Request) (*sample
 			Amount:   samples[i].Amount.String(),
 		}
 	}
-	return &samplePb.Response{}, err
+	return &samplePb.Response{Values: pbSamples}, err
 }

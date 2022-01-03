@@ -52,3 +52,7 @@ local-migrate-%:
 	-e DB_USER=root -e DB_PASSWORD=root -e DB_HOST=docker.for.mac.localhost -e DB_PORT=3306 -e DB_NAME="gosample2022_test{}" \
 	$(SQLMIGRATE_NAME) \
 	$(CMD) -env=mysql -config db/sqlmigrate.yml;
+
+test-seed:
+	@seq 8 | xargs -P8 -I{} \
+	bash -c "docker-compose exec db mysql -uroot -proot gosample2022_test{} < ./testsupport/seed/seed.sql"

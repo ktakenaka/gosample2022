@@ -11,8 +11,13 @@ import (
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/infra/database"
+	"github.com/shopspring/decimal"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
+
+func init() {
+	boil.DebugMode = true
+}
 
 func main() {
 	cfg, err := config.Initialize()
@@ -26,22 +31,25 @@ func main() {
 	}
 
 	ctx := context.Background()
+	office, _ := models.Offices().One(ctx, db)
 
-	boil.DebugMode = true
-	users, err := models.Users().All(ctx, db)
-	if err != nil {
-		panic(err)
-	}
+	id, _ := ulid.GenerateID()
+	office.AddSamples(ctx, db, true, &models.Sample{
+		ID:       id,
+		Title:    "title",
+		Category: "small",
+		Date:     time.Now(),
+		Amount:   decimal.New(123, -2),
+	})
 
-	user := users[0]
+	samples, _ := models.Samples().All(ctx, db)
+	fmt.Printf("%v\n", samples)
 
 	ntfr, _ := notifier.Init(cfg)
-
 	ntfr.ErrorWithExtrasAndContext(
-		pkgNotifier.NewPersonContext(ctx, ulid.ULID(user.ID).String()),
+		pkgNotifier.NewPersonContext(ctx, ulid.ULID(office.ID).String()),
 		pkgNotifier.WARN,
 		fmt.Errorf("hellow"),
-		map[string]interface{}{"user": user},
+		map[string]interface{}{"user": office},
 	)
-	time.Sleep(time.Second * 3)
 }

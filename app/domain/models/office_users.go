@@ -26,7 +26,6 @@ type OfficeUser struct {
 	ID       []byte `boil:"id" json:"id" toml:"id" yaml:"id"`
 	OfficeID []byte `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
 	UserID   []byte `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Name     string `boil:"name" json:"name" toml:"name" yaml:"name"`
 
 	R *officeUserR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L officeUserL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -36,24 +35,20 @@ var OfficeUserColumns = struct {
 	ID       string
 	OfficeID string
 	UserID   string
-	Name     string
 }{
 	ID:       "id",
 	OfficeID: "office_id",
 	UserID:   "user_id",
-	Name:     "name",
 }
 
 var OfficeUserTableColumns = struct {
 	ID       string
 	OfficeID string
 	UserID   string
-	Name     string
 }{
 	ID:       "office_users.id",
 	OfficeID: "office_users.office_id",
 	UserID:   "office_users.user_id",
-	Name:     "office_users.name",
 }
 
 // Generated where
@@ -67,39 +62,14 @@ func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.f
 func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
 func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
-type whereHelperstring struct{ field string }
-
-func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperstring) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
 var OfficeUserWhere = struct {
 	ID       whereHelper__byte
 	OfficeID whereHelper__byte
 	UserID   whereHelper__byte
-	Name     whereHelperstring
 }{
 	ID:       whereHelper__byte{field: "`office_users`.`id`"},
 	OfficeID: whereHelper__byte{field: "`office_users`.`office_id`"},
 	UserID:   whereHelper__byte{field: "`office_users`.`user_id`"},
-	Name:     whereHelperstring{field: "`office_users`.`name`"},
 }
 
 // OfficeUserRels is where relationship names are stored.
@@ -126,8 +96,8 @@ func (*officeUserR) NewStruct() *officeUserR {
 type officeUserL struct{}
 
 var (
-	officeUserAllColumns            = []string{"id", "office_id", "user_id", "name"}
-	officeUserColumnsWithoutDefault = []string{"id", "office_id", "user_id", "name"}
+	officeUserAllColumns            = []string{"id", "office_id", "user_id"}
+	officeUserColumnsWithoutDefault = []string{"id", "office_id", "user_id"}
 	officeUserColumnsWithDefault    = []string{}
 	officeUserPrimaryKeyColumns     = []string{"id"}
 )

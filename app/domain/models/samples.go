@@ -31,8 +31,6 @@ type Sample struct {
 	Memo      string          `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
 	Date      time.Time       `boil:"date" json:"date" toml:"date" yaml:"date"`
 	Amount    decimal.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
-	CreatedBy []byte          `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	UpdatedBy []byte          `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
 	CreatedAt time.Time       `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time       `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
@@ -48,8 +46,6 @@ var SampleColumns = struct {
 	Memo      string
 	Date      string
 	Amount    string
-	CreatedBy string
-	UpdatedBy string
 	CreatedAt string
 	UpdatedAt string
 }{
@@ -60,8 +56,6 @@ var SampleColumns = struct {
 	Memo:      "memo",
 	Date:      "date",
 	Amount:    "amount",
-	CreatedBy: "created_by",
-	UpdatedBy: "updated_by",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 }
@@ -74,8 +68,6 @@ var SampleTableColumns = struct {
 	Memo      string
 	Date      string
 	Amount    string
-	CreatedBy string
-	UpdatedBy string
 	CreatedAt string
 	UpdatedAt string
 }{
@@ -86,8 +78,6 @@ var SampleTableColumns = struct {
 	Memo:      "samples.memo",
 	Date:      "samples.date",
 	Amount:    "samples.amount",
-	CreatedBy: "samples.created_by",
-	UpdatedBy: "samples.updated_by",
 	CreatedAt: "samples.created_at",
 	UpdatedAt: "samples.updated_at",
 }
@@ -144,8 +134,6 @@ var SampleWhere = struct {
 	Memo      whereHelperstring
 	Date      whereHelpertime_Time
 	Amount    whereHelperdecimal_Decimal
-	CreatedBy whereHelper__byte
-	UpdatedBy whereHelper__byte
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 }{
@@ -156,30 +144,22 @@ var SampleWhere = struct {
 	Memo:      whereHelperstring{field: "`samples`.`memo`"},
 	Date:      whereHelpertime_Time{field: "`samples`.`date`"},
 	Amount:    whereHelperdecimal_Decimal{field: "`samples`.`amount`"},
-	CreatedBy: whereHelper__byte{field: "`samples`.`created_by`"},
-	UpdatedBy: whereHelper__byte{field: "`samples`.`updated_by`"},
 	CreatedAt: whereHelpertime_Time{field: "`samples`.`created_at`"},
 	UpdatedAt: whereHelpertime_Time{field: "`samples`.`updated_at`"},
 }
 
 // SampleRels is where relationship names are stored.
 var SampleRels = struct {
-	CreatedByUser  string
 	Office         string
-	UpdatedByUser  string
 	SampleComments string
 }{
-	CreatedByUser:  "CreatedByUser",
 	Office:         "Office",
-	UpdatedByUser:  "UpdatedByUser",
 	SampleComments: "SampleComments",
 }
 
 // sampleR is where relationships are stored.
 type sampleR struct {
-	CreatedByUser  *User              `boil:"CreatedByUser" json:"CreatedByUser" toml:"CreatedByUser" yaml:"CreatedByUser"`
 	Office         *Office            `boil:"Office" json:"Office" toml:"Office" yaml:"Office"`
-	UpdatedByUser  *User              `boil:"UpdatedByUser" json:"UpdatedByUser" toml:"UpdatedByUser" yaml:"UpdatedByUser"`
 	SampleComments SampleCommentSlice `boil:"SampleComments" json:"SampleComments" toml:"SampleComments" yaml:"SampleComments"`
 }
 
@@ -192,8 +172,8 @@ func (*sampleR) NewStruct() *sampleR {
 type sampleL struct{}
 
 var (
-	sampleAllColumns            = []string{"id", "office_id", "title", "category", "memo", "date", "amount", "created_by", "updated_by", "created_at", "updated_at"}
-	sampleColumnsWithoutDefault = []string{"id", "office_id", "title", "category", "memo", "date", "amount", "created_by", "updated_by"}
+	sampleAllColumns            = []string{"id", "office_id", "title", "category", "memo", "date", "amount", "created_at", "updated_at"}
+	sampleColumnsWithoutDefault = []string{"id", "office_id", "title", "category", "memo", "date", "amount"}
 	sampleColumnsWithDefault    = []string{"created_at", "updated_at"}
 	samplePrimaryKeyColumns     = []string{"id"}
 )
@@ -473,20 +453,6 @@ func (q sampleQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (boo
 	return count > 0, nil
 }
 
-// CreatedByUser pointed to by the foreign key.
-func (o *Sample) CreatedByUser(mods ...qm.QueryMod) userQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("`id` = ?", o.CreatedBy),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	query := Users(queryMods...)
-	queries.SetFrom(query.Query, "`users`")
-
-	return query
-}
-
 // Office pointed to by the foreign key.
 func (o *Sample) Office(mods ...qm.QueryMod) officeQuery {
 	queryMods := []qm.QueryMod{
@@ -497,20 +463,6 @@ func (o *Sample) Office(mods ...qm.QueryMod) officeQuery {
 
 	query := Offices(queryMods...)
 	queries.SetFrom(query.Query, "`offices`")
-
-	return query
-}
-
-// UpdatedByUser pointed to by the foreign key.
-func (o *Sample) UpdatedByUser(mods ...qm.QueryMod) userQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("`id` = ?", o.UpdatedBy),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	query := Users(queryMods...)
-	queries.SetFrom(query.Query, "`users`")
 
 	return query
 }
@@ -534,114 +486,6 @@ func (o *Sample) SampleComments(mods ...qm.QueryMod) sampleCommentQuery {
 	}
 
 	return query
-}
-
-// LoadCreatedByUser allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (sampleL) LoadCreatedByUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSample interface{}, mods queries.Applicator) error {
-	var slice []*Sample
-	var object *Sample
-
-	if singular {
-		object = maybeSample.(*Sample)
-	} else {
-		slice = *maybeSample.(*[]*Sample)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &sampleR{}
-		}
-		if !queries.IsNil(object.CreatedBy) {
-			args = append(args, object.CreatedBy)
-		}
-
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &sampleR{}
-			}
-
-			for _, a := range args {
-				if queries.Equal(a, obj.CreatedBy) {
-					continue Outer
-				}
-			}
-
-			if !queries.IsNil(obj.CreatedBy) {
-				args = append(args, obj.CreatedBy)
-			}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.From(`users`),
-		qm.WhereIn(`users.id in ?`, args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load User")
-	}
-
-	var resultSlice []*User
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice User")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for users")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
-	}
-
-	if len(sampleAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.CreatedByUser = foreign
-		if foreign.R == nil {
-			foreign.R = &userR{}
-		}
-		foreign.R.CreatedBySamples = append(foreign.R.CreatedBySamples, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if queries.Equal(local.CreatedBy, foreign.ID) {
-				local.R.CreatedByUser = foreign
-				if foreign.R == nil {
-					foreign.R = &userR{}
-				}
-				foreign.R.CreatedBySamples = append(foreign.R.CreatedBySamples, local)
-				break
-			}
-		}
-	}
-
-	return nil
 }
 
 // LoadOffice allows an eager lookup of values, cached into the
@@ -752,114 +596,6 @@ func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular 
 	return nil
 }
 
-// LoadUpdatedByUser allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (sampleL) LoadUpdatedByUser(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSample interface{}, mods queries.Applicator) error {
-	var slice []*Sample
-	var object *Sample
-
-	if singular {
-		object = maybeSample.(*Sample)
-	} else {
-		slice = *maybeSample.(*[]*Sample)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &sampleR{}
-		}
-		if !queries.IsNil(object.UpdatedBy) {
-			args = append(args, object.UpdatedBy)
-		}
-
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &sampleR{}
-			}
-
-			for _, a := range args {
-				if queries.Equal(a, obj.UpdatedBy) {
-					continue Outer
-				}
-			}
-
-			if !queries.IsNil(obj.UpdatedBy) {
-				args = append(args, obj.UpdatedBy)
-			}
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.From(`users`),
-		qm.WhereIn(`users.id in ?`, args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load User")
-	}
-
-	var resultSlice []*User
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice User")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for users")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for users")
-	}
-
-	if len(sampleAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.UpdatedByUser = foreign
-		if foreign.R == nil {
-			foreign.R = &userR{}
-		}
-		foreign.R.UpdatedBySamples = append(foreign.R.UpdatedBySamples, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if queries.Equal(local.UpdatedBy, foreign.ID) {
-				local.R.UpdatedByUser = foreign
-				if foreign.R == nil {
-					foreign.R = &userR{}
-				}
-				foreign.R.UpdatedBySamples = append(foreign.R.UpdatedBySamples, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
 // LoadSampleComments allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (sampleL) LoadSampleComments(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSample interface{}, mods queries.Applicator) error {
@@ -958,53 +694,6 @@ func (sampleL) LoadSampleComments(ctx context.Context, e boil.ContextExecutor, s
 	return nil
 }
 
-// SetCreatedByUser of the sample to the related item.
-// Sets o.R.CreatedByUser to related.
-// Adds o to related.R.CreatedBySamples.
-func (o *Sample) SetCreatedByUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE `samples` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, []string{"created_by"}),
-		strmangle.WhereClause("`", "`", 0, samplePrimaryKeyColumns),
-	)
-	values := []interface{}{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	queries.Assign(&o.CreatedBy, related.ID)
-	if o.R == nil {
-		o.R = &sampleR{
-			CreatedByUser: related,
-		}
-	} else {
-		o.R.CreatedByUser = related
-	}
-
-	if related.R == nil {
-		related.R = &userR{
-			CreatedBySamples: SampleSlice{o},
-		}
-	} else {
-		related.R.CreatedBySamples = append(related.R.CreatedBySamples, o)
-	}
-
-	return nil
-}
-
 // SetOffice of the sample to the related item.
 // Sets o.R.Office to related.
 // Adds o to related.R.Samples.
@@ -1047,53 +736,6 @@ func (o *Sample) SetOffice(ctx context.Context, exec boil.ContextExecutor, inser
 		}
 	} else {
 		related.R.Samples = append(related.R.Samples, o)
-	}
-
-	return nil
-}
-
-// SetUpdatedByUser of the sample to the related item.
-// Sets o.R.UpdatedByUser to related.
-// Adds o to related.R.UpdatedBySamples.
-func (o *Sample) SetUpdatedByUser(ctx context.Context, exec boil.ContextExecutor, insert bool, related *User) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE `samples` SET %s WHERE %s",
-		strmangle.SetParamNames("`", "`", 0, []string{"updated_by"}),
-		strmangle.WhereClause("`", "`", 0, samplePrimaryKeyColumns),
-	)
-	values := []interface{}{related.ID, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	queries.Assign(&o.UpdatedBy, related.ID)
-	if o.R == nil {
-		o.R = &sampleR{
-			UpdatedByUser: related,
-		}
-	} else {
-		o.R.UpdatedByUser = related
-	}
-
-	if related.R == nil {
-		related.R = &userR{
-			UpdatedBySamples: SampleSlice{o},
-		}
-	} else {
-		related.R.UpdatedBySamples = append(related.R.UpdatedBySamples, o)
 	}
 
 	return nil

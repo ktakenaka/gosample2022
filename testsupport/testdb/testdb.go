@@ -12,6 +12,10 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
+var (
+	protectedTables = []interface{}{"schema_migrations", "users", "offices", "office_users"}
+)
+
 func GetFuncs() (read repository.DBReadFunc, write repository.DBWriteFunc, release func()) {
 	// いったん一つのDBだけで使えるようにする
 	// TODO: 8並列で別のDBに接続して使えるようにする
@@ -60,7 +64,7 @@ func GetFuncs() (read repository.DBReadFunc, write repository.DBWriteFunc, relea
 
 func cleanup(db repository.WriteExecutor, dbname string) error {
 	var raws []*struct{ Name string }
-	protectedTables := []interface{}{"schema_migrations"}
+
 	err := models.NewQuery(
 		qm.Select("table_name AS 'name'"),
 		qm.From("information_schema.tables"),

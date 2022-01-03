@@ -28,13 +28,11 @@ func Test_sampleViewer_List(t *testing.T) {
 		id, _ := ulid.GenerateID()
 		amount, _ := decimal.NewFromString("123.45")
 		sample := &models.Sample{
-			ID:        id,
-			Title:     "title",
-			Category:  "small",
-			Date:      time.Now(),
-			Amount:    amount,
-			CreatedBy: user.ID,
-			UpdatedBy: user.ID,
+			ID:       id,
+			Title:    "title",
+			Category: "small",
+			Date:     time.Now(),
+			Amount:   amount,
 		}
 
 		_ = office.Reload(ctx, writeDB)
