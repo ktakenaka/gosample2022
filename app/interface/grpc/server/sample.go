@@ -4,19 +4,21 @@ import (
 	"context"
 
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
-	"github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-// LisaSamples implements samplePb.LisaSamples
-func (s *server) ListSamples(ctx context.Context, in *samplePb.ListRequest) (*samplePb.ListResponse, error) {
-	samples, err := s.sampleViewer.List(ctx)
+// SampleList implements samplePb.SampleList
+func (s *server) SampleList(ctx context.Context, in *samplePb.ListRequest) (*samplePb.ListResponse, error) {
+	office, err := s.viewer.CurrentOffice(ctx)
 	if err != nil {
-		// Temporary implementation
-		s.ntfr.Message(notifier.ERR, err.Error())
-		return nil, status.Errorf(codes.Internal, err.Error())
+		err = s.notifyError(ctx, err)
+		return nil, err
+	}
+
+	samples, err := s.viewer.SampleList(ctx, office)
+	if err != nil {
+		err = s.notifyError(ctx, err)
+		return nil, err
 	}
 
 	pbSamples := make([]*samplePb.OneSample, len(samples))
@@ -30,5 +32,5 @@ func (s *server) ListSamples(ctx context.Context, in *samplePb.ListRequest) (*sa
 			Amount:   samples[i].Amount.String(),
 		}
 	}
-	return &samplePb.ListResponse{Values: pbSamples}, err
+	return &samplePb.ListResponse{Values: pbSamples}, nil
 }

@@ -17,7 +17,7 @@ func main() {
 
 	client := pb.NewSampleClient(conn)
 
-	resp, err := client.ListSamples(
+	resp, err := client.SampleList(
 		context.Background(),
 		&pb.ListRequest{},
 	)

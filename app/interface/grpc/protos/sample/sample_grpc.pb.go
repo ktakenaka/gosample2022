@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SampleClient interface {
-	ListSamples(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
+	SampleList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 }
 
 type sampleClient struct {
@@ -29,9 +29,9 @@ func NewSampleClient(cc grpc.ClientConnInterface) SampleClient {
 	return &sampleClient{cc}
 }
 
-func (c *sampleClient) ListSamples(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+func (c *sampleClient) SampleList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
 	out := new(ListResponse)
-	err := c.cc.Invoke(ctx, "/Sample/ListSamples", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sample/SampleList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *sampleClient) ListSamples(ctx context.Context, in *ListRequest, opts ..
 // All implementations must embed UnimplementedSampleServer
 // for forward compatibility
 type SampleServer interface {
-	ListSamples(context.Context, *ListRequest) (*ListResponse, error)
+	SampleList(context.Context, *ListRequest) (*ListResponse, error)
 	mustEmbedUnimplementedSampleServer()
 }
 
@@ -50,8 +50,8 @@ type SampleServer interface {
 type UnimplementedSampleServer struct {
 }
 
-func (UnimplementedSampleServer) ListSamples(context.Context, *ListRequest) (*ListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListSamples not implemented")
+func (UnimplementedSampleServer) SampleList(context.Context, *ListRequest) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SampleList not implemented")
 }
 func (UnimplementedSampleServer) mustEmbedUnimplementedSampleServer() {}
 
@@ -66,20 +66,20 @@ func RegisterSampleServer(s grpc.ServiceRegistrar, srv SampleServer) {
 	s.RegisterService(&Sample_ServiceDesc, srv)
 }
 
-func _Sample_ListSamples_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sample_SampleList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SampleServer).ListSamples(ctx, in)
+		return srv.(SampleServer).SampleList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Sample/ListSamples",
+		FullMethod: "/Sample/SampleList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SampleServer).ListSamples(ctx, req.(*ListRequest))
+		return srv.(SampleServer).SampleList(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +92,8 @@ var Sample_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SampleServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListSamples",
-			Handler:    _Sample_ListSamples_Handler,
+			MethodName: "SampleList",
+			Handler:    _Sample_SampleList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
