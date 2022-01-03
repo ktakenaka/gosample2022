@@ -19,7 +19,7 @@ func main() {
 
 	resp, err := client.ListSamples(
 		context.Background(),
-		&pb.Request{},
+		&pb.ListRequest{},
 	)
 	if err != nil {
 		panic(err)

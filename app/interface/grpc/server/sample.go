@@ -11,7 +11,7 @@ import (
 )
 
 // LisaSamples implements samplePb.LisaSamples
-func (s *server) ListSamples(ctx context.Context, in *samplePb.Request) (*samplePb.Response, error) {
+func (s *server) ListSamples(ctx context.Context, in *samplePb.ListRequest) (*samplePb.ListResponse, error) {
 	samples, err := s.sampleViewer.List(ctx)
 	if err != nil {
 		// Temporary implementation
@@ -30,5 +30,5 @@ func (s *server) ListSamples(ctx context.Context, in *samplePb.Request) (*sample
 			Amount:   samples[i].Amount.String(),
 		}
 	}
-	return &samplePb.Response{Values: pbSamples}, err
+	return &samplePb.ListResponse{Values: pbSamples}, err
 }

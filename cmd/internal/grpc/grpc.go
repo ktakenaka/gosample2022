@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 
@@ -50,6 +51,7 @@ func New(
 			panic(err)
 		}
 	}()
+	log.Printf("Listening to... %d", cfg.App.Port)
 
 	return &task{srv: s}, nil
 }

@@ -2,12 +2,12 @@ syntax = "proto3";
 option go_package = "protos/sample";
 
 service Sample {
-  rpc ListSamples(Request) returns (Response) {}
+  rpc ListSamples(ListRequest) returns (ListResponse) {}
 }
 
-message Request { optional string title = 1; }
+message ListRequest { optional string title = 1; }
 
-message Response {
+message ListResponse {
   repeated OneSample values = 1;
 }
 

@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SampleClient interface {
-	ListSamples(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	ListSamples(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error)
 }
 
 type sampleClient struct {
@@ -29,8 +29,8 @@ func NewSampleClient(cc grpc.ClientConnInterface) SampleClient {
 	return &sampleClient{cc}
 }
 
-func (c *sampleClient) ListSamples(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
+func (c *sampleClient) ListSamples(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
 	err := c.cc.Invoke(ctx, "/Sample/ListSamples", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (c *sampleClient) ListSamples(ctx context.Context, in *Request, opts ...grp
 // All implementations must embed UnimplementedSampleServer
 // for forward compatibility
 type SampleServer interface {
-	ListSamples(context.Context, *Request) (*Response, error)
+	ListSamples(context.Context, *ListRequest) (*ListResponse, error)
 	mustEmbedUnimplementedSampleServer()
 }
 
@@ -50,7 +50,7 @@ type SampleServer interface {
 type UnimplementedSampleServer struct {
 }
 
-func (UnimplementedSampleServer) ListSamples(context.Context, *Request) (*Response, error) {
+func (UnimplementedSampleServer) ListSamples(context.Context, *ListRequest) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListSamples not implemented")
 }
 func (UnimplementedSampleServer) mustEmbedUnimplementedSampleServer() {}
@@ -67,7 +67,7 @@ func RegisterSampleServer(s grpc.ServiceRegistrar, srv SampleServer) {
 }
 
 func _Sample_ListSamples_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(ListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func _Sample_ListSamples_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/Sample/ListSamples",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SampleServer).ListSamples(ctx, req.(*Request))
+		return srv.(SampleServer).ListSamples(ctx, req.(*ListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
