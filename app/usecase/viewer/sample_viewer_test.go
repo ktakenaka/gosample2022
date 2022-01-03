@@ -6,13 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ericlagergren/decimal"
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/testsupport/factory"
 	"github.com/ktakenaka/gosample2022/testsupport/testdb"
+	"github.com/shopspring/decimal"
 	"github.com/volatiletech/sqlboiler/v4/boil"
-	"github.com/volatiletech/sqlboiler/v4/types"
 )
 
 func Test_sampleViewer_List(t *testing.T) {
@@ -27,12 +26,13 @@ func Test_sampleViewer_List(t *testing.T) {
 		_ = ou.Upsert(ctx, writeDB, boil.Infer(), boil.Infer())
 
 		id, _ := ulid.GenerateID()
+		amount, _ := decimal.NewFromString("123.45")
 		sample := &models.Sample{
 			ID:        id,
 			Title:     "title",
 			Category:  "small",
 			Date:      time.Now(),
-			Amount:    types.NewDecimal(decimal.New(123, 3)),
+			Amount:    amount,
 			CreatedBy: user.ID,
 			UpdatedBy: user.ID,
 		}

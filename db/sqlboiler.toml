@@ -10,3 +10,11 @@ output   ="app/domain/models"
   pass      = "reader_password"
   sslmode   = "false"
   blacklist = ["schema_migrations"]
+
+[[types]]
+  [types.match]
+    type = "types.Decimal"
+  [types.replace]
+    type = "decimal.Decimal"
+  [types.imports]
+    third_party = ['"github.com/shopspring/decimal"']

@@ -7,7 +7,7 @@ CREATE TABLE samples (
   category   ENUM("small", "medium", "large") NOT NULL,
   memo       TEXT NOT NULL,
   date       DATE NOT NULL,
-  amount     DECIMAL(10, 2) NOT NULL,
+  amount     DECIMAL(10, 2) UNSIGNED NOT NULL,
   created_by BINARY(16) NOT NULL,
   updated_by BINARY(16) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

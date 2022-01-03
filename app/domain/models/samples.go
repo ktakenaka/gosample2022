@@ -14,27 +14,27 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/shopspring/decimal"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // Sample is an object representing the database table.
 type Sample struct {
-	ID        []byte        `boil:"id" json:"id" toml:"id" yaml:"id"`
-	OfficeID  []byte        `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
-	Title     string        `boil:"title" json:"title" toml:"title" yaml:"title"`
-	Category  string        `boil:"category" json:"category" toml:"category" yaml:"category"`
-	Memo      string        `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
-	Date      time.Time     `boil:"date" json:"date" toml:"date" yaml:"date"`
-	Amount    types.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
-	CreatedBy []byte        `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
-	UpdatedBy []byte        `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
-	CreatedAt time.Time     `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time     `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	ID        []byte          `boil:"id" json:"id" toml:"id" yaml:"id"`
+	OfficeID  []byte          `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
+	Title     string          `boil:"title" json:"title" toml:"title" yaml:"title"`
+	Category  string          `boil:"category" json:"category" toml:"category" yaml:"category"`
+	Memo      string          `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
+	Date      time.Time       `boil:"date" json:"date" toml:"date" yaml:"date"`
+	Amount    decimal.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
+	CreatedBy []byte          `boil:"created_by" json:"created_by" toml:"created_by" yaml:"created_by"`
+	UpdatedBy []byte          `boil:"updated_by" json:"updated_by" toml:"updated_by" yaml:"updated_by"`
+	CreatedAt time.Time       `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time       `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *sampleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L sampleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -115,24 +115,24 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-type whereHelpertypes_Decimal struct{ field string }
+type whereHelperdecimal_Decimal struct{ field string }
 
-func (w whereHelpertypes_Decimal) EQ(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) EQ(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.EQ, x)
 }
-func (w whereHelpertypes_Decimal) NEQ(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) NEQ(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.NEQ, x)
 }
-func (w whereHelpertypes_Decimal) LT(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) LT(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpertypes_Decimal) LTE(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) LTE(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpertypes_Decimal) GT(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) GT(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpertypes_Decimal) GTE(x types.Decimal) qm.QueryMod {
+func (w whereHelperdecimal_Decimal) GTE(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
@@ -143,7 +143,7 @@ var SampleWhere = struct {
 	Category  whereHelperstring
 	Memo      whereHelperstring
 	Date      whereHelpertime_Time
-	Amount    whereHelpertypes_Decimal
+	Amount    whereHelperdecimal_Decimal
 	CreatedBy whereHelper__byte
 	UpdatedBy whereHelper__byte
 	CreatedAt whereHelpertime_Time
@@ -155,7 +155,7 @@ var SampleWhere = struct {
 	Category:  whereHelperstring{field: "`samples`.`category`"},
 	Memo:      whereHelperstring{field: "`samples`.`memo`"},
 	Date:      whereHelpertime_Time{field: "`samples`.`date`"},
-	Amount:    whereHelpertypes_Decimal{field: "`samples`.`amount`"},
+	Amount:    whereHelperdecimal_Decimal{field: "`samples`.`amount`"},
 	CreatedBy: whereHelper__byte{field: "`samples`.`created_by`"},
 	UpdatedBy: whereHelper__byte{field: "`samples`.`updated_by`"},
 	CreatedAt: whereHelpertime_Time{field: "`samples`.`created_at`"},
