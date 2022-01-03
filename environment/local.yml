@@ -1,8 +1,9 @@
 env: development
 app:
-  service_name: gosample2022
+  service_name: github.com/ktakenaka/gosample2022
   port: 8080
   api: v1
+  is_rollbar: false
 db:
   write:
     user: writer

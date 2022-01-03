@@ -26,13 +26,14 @@ func (t *task) Shutdown(ctx context.Context) error {
 
 func Init(cfg *config.Config) (notifier.Notifier, shutdown.Task) {
 	rollbarCfg := cfg.Rollbar
-	if rollbarCfg.Token == "" {
+
+	if rollbarCfg.Token == "" || !cfg.App.IsRollbar {
 		return notifier.NewStd(), &task{}
 	}
 
 	rollbarCfg.Environment = cfg.Env
-	rollbarCfg.CodeVersion = "v1"
-	rollbarCfg.ServerRoot = "github.com/ktakenaka/gosample2022"
+	rollbarCfg.CodeVersion = cfg.App.API
+	rollbarCfg.ServerRoot = cfg.App.ServiceName
 
 	client := rollbar.New(rollbarCfg)
 	return client, &task{client: client}

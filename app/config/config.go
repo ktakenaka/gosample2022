@@ -12,8 +12,10 @@ import (
 type Config struct {
 	Env string
 	App struct {
-		ServiceName string
+		ServiceName string `yaml:"service_name"`
 		Port        int
+		API         string `yaml:"api"`
+		IsRollbar   bool
 	}
 	DB struct {
 		Write *database.Config
