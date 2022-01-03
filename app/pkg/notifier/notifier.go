@@ -27,7 +27,7 @@ func NewPersonContext(ctx context.Context, id string) context.Context {
 
 type ntfr struct{}
 
-func New() Notifier {
+func NewStd() Notifier {
 	return &ntfr{}
 }
 

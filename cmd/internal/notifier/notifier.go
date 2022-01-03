@@ -27,7 +27,7 @@ func (t *task) Shutdown(ctx context.Context) error {
 func Init(cfg *config.Config) (notifier.Notifier, shutdown.Task) {
 	rollbarCfg := cfg.Rollbar
 	if rollbarCfg.Token == "" {
-		return notifier.New(), &task{}
+		return notifier.NewStd(), &task{}
 	}
 
 	rollbarCfg.Environment = cfg.Env
