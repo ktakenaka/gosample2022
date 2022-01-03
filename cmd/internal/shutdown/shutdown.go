@@ -31,7 +31,7 @@ func (ts *tasks) Add(task Task) {
 }
 
 func (ts *tasks) Shutdown(ctx context.Context) {
-	for i := range ts.tasks {
+	for i := len(ts.tasks) - 1; i >= 0; i-- {
 		log.Printf("%s: shutting down...\n", ts.tasks[i].Name())
 		if err := ts.tasks[i].Shutdown(ctx); err != nil {
 			log.Printf("%s: %v\n", ts.tasks[i].Name(), err)
