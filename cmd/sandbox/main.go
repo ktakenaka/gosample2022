@@ -3,23 +3,73 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
-	pkgNotifier "github.com/ktakenaka/gosample2022/app/pkg/notifier"
-	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
-	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/infra/database"
-	"github.com/shopspring/decimal"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func init() {
 	boil.DebugMode = true
+	boil.SetLocation(time.FixedZone("Asia/Tokyo", 9*60*60))
+}
+
+func dummyReq(i int) result {
+	fmt.Println("request", i)
+	time.Sleep(1 * time.Second)
+	return result{res: fmt.Sprintf("ok %d", i)}
+}
+
+type result struct {
+	err error
+	res string
 }
 
 func main() {
+	results, done := make(chan result), make(chan struct{})
+	defer close(done)
+
+	limiter := make(chan struct{}, 5)
+	defer close(limiter)
+
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(j int) {
+			limiter <- struct{}{}
+
+			defer wg.Done()
+			defer func() { <-limiter }()
+			for {
+				select {
+				case <-done:
+					fmt.Printf("done %d\n", j)
+					return
+				case results <- dummyReq(j):
+					return
+				}
+			}
+		}(i)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	for res := range results {
+		if res.err != nil {
+			fmt.Println("see you")
+			return
+		}
+		fmt.Println(res.res)
+	}
+}
+
+func sampleDB() {
 	cfg, err := config.Initialize()
 	if err != nil {
 		panic(err)
@@ -31,26 +81,6 @@ func main() {
 	}
 
 	ctx := context.Background()
-	user, _ := models.Users().One(ctx, db)
-	office, _ := models.Offices().One(ctx, db)
-
-	id, _ := ulid.GenerateID()
-	office.AddSamples(ctx, db, true, &models.Sample{
-		ID:       id,
-		Title:    "title",
-		Category: "small",
-		Date:     time.Now(),
-		Amount:   decimal.New(123, -2),
-	})
-
-	samples, _ := models.Samples().All(ctx, db)
-	fmt.Printf("%v\n", samples)
-
-	ntfr, _ := notifier.Init(cfg)
-	ntfr.ErrorWithExtrasAndContext(
-		pkgNotifier.NewPersonContext(ctx, ulid.ULID(office.ID), ulid.ULID(user.ID)),
-		pkgNotifier.WARN,
-		fmt.Errorf("hellow"),
-		map[string]interface{}{"user": office},
-	)
+	sample, _ := models.Samples().One(ctx, db)
+	fmt.Println(sample.CreatedAt)
 }
