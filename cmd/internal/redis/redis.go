@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
+
 	"github.com/ktakenaka/gosample2022/app/config"
-	"github.com/ktakenaka/gosample2022/app/domain/repository"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	infraRedis "github.com/ktakenaka/gosample2022/infra/redis"
 )
@@ -22,7 +22,7 @@ func (t *task) Name() string {
 	return "redis"
 }
 
-func Init(ctx context.Context, cfg *config.Config) (repository.Redis, shutdown.Task, error) {
+func Init(ctx context.Context, cfg *config.Config) (*redis.Client, shutdown.Task, error) {
 	client, err := infraRedis.New(
 		&infraRedis.Config{
 			URL:          cfg.Redis.URL,
