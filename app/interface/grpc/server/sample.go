@@ -15,7 +15,7 @@ func (s *server) SampleList(ctx context.Context, in *samplePb.ListRequest) (*sam
 		return nil, err
 	}
 
-	samples, err := s.viewer.SampleList(ctx, office)
+	samples, err := s.interactor.SampleList(ctx, office)
 	if err != nil {
 		err = s.notifyError(ctx, err)
 		return nil, err

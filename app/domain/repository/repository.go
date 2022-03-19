@@ -5,16 +5,13 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
-// Transaction
-type ReadExecutor interface {
+type Executor interface {
 	boil.ContextExecutor
 }
-type WriteExecutor interface {
+type DB interface {
 	boil.ContextExecutor
-	boil.Beginner
+	boil.ContextBeginner
 }
-type DBWriteFunc func() WriteExecutor
-type DBReadFunc func() ReadExecutor
 
 type Redis interface {
 	redis.Cmdable

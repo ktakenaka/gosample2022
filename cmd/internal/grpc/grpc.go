@@ -9,10 +9,9 @@ import (
 	"net/http"
 
 	"github.com/ktakenaka/gosample2022/app/config"
-	"github.com/ktakenaka/gosample2022/app/domain/repository"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	"github.com/ktakenaka/gosample2022/app/interface/grpc/server"
-	"github.com/ktakenaka/gosample2022/app/pkg/notifier"
+	"github.com/ktakenaka/gosample2022/app/registry"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	pkggrpc "google.golang.org/grpc"
 )
@@ -29,13 +28,8 @@ func (t *task) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func New(
-	cfg *config.Config,
-	read repository.DBReadFunc,
-	write repository.DBWriteFunc,
-	ntfr notifier.Notifier,
-) (shutdown.Task, error) {
-	srv := server.NewServer(read, write, ntfr)
+func New(cfg *config.Config, provider *registry.Provider) (shutdown.Task, error) {
+	srv := server.NewServer(provider)
 
 	s := pkggrpc.NewServer()
 	samplePb.RegisterSampleServer(s, srv)
