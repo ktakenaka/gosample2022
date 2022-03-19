@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
-	"github.com/ktakenaka/gosample2022/app/domain/repository"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	pkgNotifier "github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
-	ucUpdater "github.com/ktakenaka/gosample2022/app/usecase/updater"
-	ucViewer "github.com/ktakenaka/gosample2022/app/usecase/viewer"
+	"github.com/ktakenaka/gosample2022/app/registry"
+	"github.com/ktakenaka/gosample2022/app/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,24 +16,17 @@ import (
 type server struct {
 	samplePb.UnimplementedSampleServer
 
-	ntfr pkgNotifier.Notifier
-
-	updater ucUpdater.Updater
-	viewer  ucViewer.Viewer
+	interactor usecase.Interactor
 }
 
-func NewServer(read repository.DBReadFunc, write repository.DBWriteFunc, ntfr pkgNotifier.Notifier) *server {
-	srv := &server{
-		ntfr:    ntfr,
-		updater: ucUpdater.NewUpdater(write),
-		viewer:  ucViewer.NewViewer(read),
-	}
+func NewServer(provider *registry.Provider) *server {
+	srv := &server{interactor: usecase.NewInteractor(provider.DB, provider.Redis)}
 	return srv
 }
 
 func (s *server) getCurrentOffice(ctx context.Context) (context.Context, *models.Office, error) {
 	// TODO: Implement authN logic
-	currentOffice, err := s.viewer.OfficeOne(ctx, nil)
+	currentOffice, err := s.interactor.OfficeOne(ctx, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -44,6 +36,6 @@ func (s *server) getCurrentOffice(ctx context.Context) (context.Context, *models
 
 func (s *server) notifyError(ctx context.Context, err error) error {
 	// TODO: Implement the logic
-	s.ntfr.ErrorWithExtrasAndContext(ctx, pkgNotifier.ERR, err, nil)
+	// s.ntfr.ErrorWithExtrasAndContext(ctx, pkgNotifier.ERR, err, nil)
 	return status.Errorf(codes.Internal, err.Error())
 }

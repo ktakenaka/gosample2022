@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 
+	ntfr "github.com/ktakenaka/gosample2022/app/pkg/notifier"
+	"github.com/ktakenaka/gosample2022/app/registry"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
-	"github.com/ktakenaka/gosample2022/cmd/internal/database"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
+	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
+	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 )
 
@@ -22,17 +25,30 @@ func main() {
 	tasks := shutdown.New()
 	defer tasks.Shutdown(ctx)
 
-	read, write, task, err := database.Init(cfg)
+	task, err := notifier.Init(ctx, cfg)
 	if err != nil {
 		panic(err)
 	}
 	tasks.Add(task)
 
-	ntfr, task := notifier.Init(cfg)
+	provider := &registry.Provider{}
+	provider.DB, task, err = mysql.Init(ctx, cfg)
+	if err != nil {
+		ntfr.Error(err)
+		panic(err)
+	}
 	tasks.Add(task)
 
-	task, err = grpc.New(cfg, read, write, ntfr)
+	provider.Redis, task, err = redis.Init(ctx, cfg)
 	if err != nil {
+		ntfr.Error(err)
+		panic(err)
+	}
+	tasks.Add(task)
+
+	task, err = grpc.New(cfg, provider)
+	if err != nil {
+		ntfr.Error(err)
 		panic(err)
 	}
 	tasks.Add(task)
