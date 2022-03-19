@@ -16,3 +16,6 @@ type DB interface {
 type Redis interface {
 	redis.Cmdable
 }
+
+type Mongo interface {
+}
