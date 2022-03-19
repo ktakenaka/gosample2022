@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -20,6 +21,14 @@ type Config struct {
 	DB struct {
 		Write *database.Config
 		Read  *database.Config
+	}
+	Redis struct {
+		URL          string        `yaml:"url"`
+		PoolSize     int           `yaml:"pool_size"`
+		MinIdleConns int           `yaml:"min_idle_conns"`
+		ReadTimeout  time.Duration `yaml:"read_timeout"`
+		WriteTimeout time.Duration `yaml:"write_timeout"`
+		UseTLS       bool          `yaml:"use_tls"`
 	}
 	Rollbar *rollbar.Config
 }

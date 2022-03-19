@@ -7,6 +7,7 @@ import (
 	"github.com/ktakenaka/gosample2022/cmd/internal/database"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
+	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 )
 
@@ -27,6 +28,13 @@ func main() {
 		panic(err)
 	}
 	tasks.Add(task)
+
+	redis, task, err := redis.Init(ctx, cfg)
+	if err != nil {
+		panic(err)
+	}
+	tasks.Add(task)
+	println(redis.Ping(ctx).Name())
 
 	ntfr, task := notifier.Init(cfg)
 	tasks.Add(task)

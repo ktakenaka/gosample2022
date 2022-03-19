@@ -17,5 +17,8 @@ db:
     host: db
     port: 3306
     db_name: gosample2022_development
+redis:
+  url: redis://@redis:6379
+  use_tls: false
 rollbar:
   token: ${ROLLBAR_TOKEN}
