@@ -21,7 +21,7 @@ func (t *task) Shutdown(ctx context.Context) error {
 	return t.client.Disconnect(ctx)
 }
 
-func Init(ctx context.Context, cfg *config.Config) (*mongo.Client, shutdown.Task, error) {
+func Init(ctx context.Context, cfg *config.Config) (*mongo.Database, shutdown.Task, error) {
 	client, err := mongodb.New(ctx, &mongodb.Config{
 		URI: cfg.Mongo.URL,
 	})
@@ -33,5 +33,5 @@ func Init(ctx context.Context, cfg *config.Config) (*mongo.Client, shutdown.Task
 		return nil, nil, err
 	}
 
-	return client, &task{client: client}, nil
+	return client.Database(cfg.Mongo.DBName), &task{client: client}, nil
 }
