@@ -42,21 +42,7 @@ type Config struct {
 
 // New connect to db
 func New(cfg *Config) (*sql.DB, error) {
-	optionsMap := defaultOptions
-	if cfg.Options != nil {
-		for k, v := range cfg.Options {
-			optionsMap[k] = v
-		}
-	}
-
-	var optionsSlice []string
-	for k, v := range optionsMap {
-		optionsSlice = append(optionsSlice, k+"="+v)
-	}
-
-	connStr := fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
-
-	db, err := sql.Open("mysql", connStr)
+	db, err := sql.Open("mysql", ConnStr(cfg))
 	if err != nil {
 		return nil, err
 	}
@@ -80,4 +66,20 @@ func New(cfg *Config) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func ConnStr(cfg *Config) string {
+	optionsMap := defaultOptions
+	if cfg.Options != nil {
+		for k, v := range cfg.Options {
+			optionsMap[k] = v
+		}
+	}
+
+	var optionsSlice []string
+	for k, v := range optionsMap {
+		optionsSlice = append(optionsSlice, k+"="+v)
+	}
+
+	return fmt.Sprintf(conn+"?"+strings.Join(optionsSlice, "&"), cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.DBName)
 }
