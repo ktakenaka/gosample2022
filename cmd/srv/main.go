@@ -7,6 +7,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/registry"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
+	"github.com/ktakenaka/gosample2022/cmd/internal/mongodb"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
@@ -40,6 +41,13 @@ func main() {
 	tasks.Add(task)
 
 	provider.Redis, task, err = redis.Init(ctx, cfg)
+	if err != nil {
+		ntfr.Error(err)
+		panic(err)
+	}
+	tasks.Add(task)
+
+	provider.Mongo, task, err = mongodb.Init(ctx, cfg)
 	if err != nil {
 		ntfr.Error(err)
 		panic(err)

@@ -20,5 +20,7 @@ db:
 redis:
   url: redis://@redis:6379
   use_tls: false
+mongo:
+  url: mongodb://root:password@mongodb:27017/?authSource=admin
 rollbar:
   token: ${ROLLBAR_TOKEN}

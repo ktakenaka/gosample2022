@@ -30,6 +30,9 @@ type Config struct {
 		WriteTimeout time.Duration `yaml:"write_timeout"`
 		UseTLS       bool          `yaml:"use_tls"`
 	}
+	Mongo struct {
+		URL string `yaml:"url"`
+	}
 	Rollbar *rollbar.Config
 }
 
