@@ -31,7 +31,8 @@ type Config struct {
 		UseTLS       bool          `yaml:"use_tls"`
 	}
 	Mongo struct {
-		URL string `yaml:"url"`
+		URL    string `yaml:"url"`
+		DBName string `yaml:"db_name"`
 	}
 	Rollbar *rollbar.Config
 }
