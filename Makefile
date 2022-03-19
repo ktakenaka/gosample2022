@@ -1,7 +1,7 @@
 SQLMIGRATE_NAME=sqlmigrate:gosample2022
 
 up:
-	docker-compose up -d app db
+	docker-compose up -d
 
 down:
 	docker-compose down

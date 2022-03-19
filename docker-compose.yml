@@ -34,7 +34,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./dbvolume:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     environment:
       <<: *dbenv
@@ -46,3 +46,19 @@ services:
           "--character-set-server=utf8mb4",
           "--collation-server=utf8mb4_bin",
       ]
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - "./data/redis:/data"
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./data/mongo:/data/db
