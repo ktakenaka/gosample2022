@@ -4,37 +4,31 @@ import (
 	"context"
 
 	"github.com/ktakenaka/gosample2022/app/config"
-	"github.com/ktakenaka/gosample2022/app/pkg/notifier"
+	ntfr "github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
-	"github.com/ktakenaka/gosample2022/infra/rollbar"
 )
 
-type task struct {
-	client interface{ Close() error }
-}
+type task struct{}
 
 func (t *task) Name() string {
 	return "notifier"
 }
 
 func (t *task) Shutdown(ctx context.Context) error {
-	if t.client != nil {
-		return t.client.Close()
-	}
-	return nil
+	return ntfr.Close()
 }
 
-func Init(cfg *config.Config) (notifier.Notifier, shutdown.Task) {
-	rollbarCfg := cfg.Rollbar
-
-	if rollbarCfg.Token == "" || !cfg.App.IsRollbar {
-		return notifier.NewStd(), &task{}
+func Init(ctx context.Context, cfg *config.Config) (shutdown.Task, error) {
+	if cfg.App.IsRollbar {
+		err := ntfr.InitRollbar(
+			&ntfr.Config{
+				Token:       cfg.Rollbar.Token,
+				Environment: cfg.Env,
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
-
-	rollbarCfg.Environment = cfg.Env
-	rollbarCfg.CodeVersion = cfg.App.API
-	rollbarCfg.ServerRoot = cfg.App.ServiceName
-
-	client := rollbar.New(rollbarCfg)
-	return client, &task{client: client}
+	return &task{}, nil
 }
