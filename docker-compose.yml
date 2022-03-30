@@ -3,7 +3,7 @@ version: "3"
 x-dbenv: &dbenv
   DB_USER: "gosample2022_user"
   DB_PASSWORD: "gosample2022_password"
-  DB_HOST: "db"
+  DB_HOST: "mysql"
   DB_NAME: "gosample2022_development"
   DB_PORT: 3306
 
@@ -22,7 +22,7 @@ services:
       ROLLBAR_TOKEN: ${ROLLBAR_TOKEN}
       <<: *dbenv
     depends_on:
-      - db
+      - mysql
       - redis
       - mongodb
       - kafka
@@ -32,7 +32,7 @@ services:
         max-file: "3"
         max-size: "5m"
 
-  db:
+  mysql:
     tty: true
     platform: linux/x86_64
     image: mysql:8
@@ -41,6 +41,7 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d/
     environment:
       <<: *dbenv
       MYSQL_ROOT_PASSWORD: root
