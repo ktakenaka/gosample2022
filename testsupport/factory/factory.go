@@ -32,13 +32,8 @@ func (attrs Attributes) overWrite(ptr reflect.Value) error {
 }
 
 func MustBuildOffice(attrs Attributes) *models.Office {
-	id, err := ulid.GenerateID()
-	if err != nil {
-		panic(err)
-	}
-
 	office := &models.Office{
-		ID:   id,
+		ID:   ulid.MustNew(),
 		Name: "name",
 	}
 
@@ -50,13 +45,8 @@ func MustBuildOffice(attrs Attributes) *models.Office {
 }
 
 func MustBuildUser(attrs Attributes) *models.User {
-	id, err := ulid.GenerateID()
-	if err != nil {
-		panic(err)
-	}
-
 	user := &models.User{
-		ID:    id,
+		ID:    ulid.MustNew(),
 		Email: "example@dummy.com",
 	}
 
@@ -73,13 +63,8 @@ func MustBuildOfficeUser(attrs Attributes) (
 	user := MustBuildUser(nil)
 	office := MustBuildOffice(nil)
 
-	id, err := ulid.GenerateID()
-	if err != nil {
-		panic(err)
-	}
-
 	ou := &models.OfficeUser{
-		ID:       id,
+		ID:       ulid.MustNew(),
 		UserID:   user.ID,
 		OfficeID: office.ID,
 	}
