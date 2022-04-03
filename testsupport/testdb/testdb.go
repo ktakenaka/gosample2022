@@ -18,7 +18,7 @@ var (
 	cfg = &database.Config{
 		User:     "root",
 		Password: "root",
-		Host:     "db",
+		Host:     "mysql",
 		DBName:   dbName,
 		Options:  map[string]string{"foreign_key_checks": "0"},
 	}

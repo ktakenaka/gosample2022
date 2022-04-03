@@ -8,13 +8,13 @@ db:
   write:
     user: writer
     password: writer_password
-    host: db
+    host: mysql
     port: 3306
     db_name: gosample2022_development
   read:
     user: reader
     password: reader_password
-    host: db
+    host: mysql
     port: 3306
     db_name: gosample2022_development
 redis:

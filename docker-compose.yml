@@ -3,7 +3,7 @@ version: "3"
 x-dbenv: &dbenv
   DB_USER: "gosample2022_user"
   DB_PASSWORD: "gosample2022_password"
-  DB_HOST: "db"
+  DB_HOST: "mysql"
   DB_NAME: "gosample2022_development"
   DB_PORT: 3306
 
@@ -22,7 +22,7 @@ services:
       ROLLBAR_TOKEN: ${ROLLBAR_TOKEN}
       <<: *dbenv
     depends_on:
-      - db
+      - mysql
       - redis
       - mongodb
       - kafka
@@ -32,7 +32,7 @@ services:
         max-file: "3"
         max-size: "5m"
 
-  db:
+  mysql:
     tty: true
     platform: linux/x86_64
     image: mysql:8
@@ -41,6 +41,7 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d/
     environment:
       <<: *dbenv
       MYSQL_ROOT_PASSWORD: root
@@ -88,7 +89,20 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  connect:
+    image: debezium/connect
+    ports:
+      - 8083:8083
+    depends_on:
+      - kafka
+      - mysql
+    environment:
+     BOOTSTRAP_SERVERS: kafka:29092
+     GROUP_ID: 1
+     CONFIG_STORAGE_TOPIC: my_connect_configs
+     OFFSET_STORAGE_TOPIC: my_connect_offsets
+     STATUS_STORAGE_TOPIC: my_connect_statuses

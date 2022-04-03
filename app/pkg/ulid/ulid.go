@@ -18,14 +18,14 @@ var (
 
 type ULID []byte
 
-func GenerateID() (ULID, error) {
+func MustNew() ULID {
 	entropyMtx.Lock()
 	defer entropyMtx.Unlock()
 	newULID, err := pkgulid.New(pkgulid.Timestamp(nowfunc()), entropy)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate ulid: %w", err)
+		panic(err)
 	}
-	return newULID[:], nil
+	return newULID[:]
 }
 
 func Parse(idStr string) (ULID, error) {

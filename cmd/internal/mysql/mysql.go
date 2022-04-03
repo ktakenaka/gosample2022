@@ -41,9 +41,16 @@ func Init(ctx context.Context, cfg *config.Config) (repository.DB, shutdown.Task
 	if err != nil {
 		return nil, nil, err
 	}
+	if err := write.Ping(); err != nil {
+		return nil, nil, err
+	}
 
 	read, err := infraDB.New(cfg.DB.Read)
 	if err != nil {
+		write.Close()
+		return nil, nil, err
+	}
+	if err := read.Ping(); err != nil {
 		write.Close()
 		return nil, nil, err
 	}

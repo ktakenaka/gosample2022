@@ -4,7 +4,7 @@ output   ="app/domain/models"
 
 [mysql]
   dbname    = "gosample2022_development"
-  host      = "db"
+  host      = "mysql"
   port      = 3306
   user      = "reader"
   pass      = "reader_password"
