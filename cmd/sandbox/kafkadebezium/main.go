@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -18,22 +17,21 @@ var (
 	cfg, _ = config.Initialize()
 	ctx    = context.Background()
 
-	officeID, _ = hex.DecodeString("01563E3AB5D3D6764C61EFB99302BD5B")
+	officeID = ulid.MustNew()
 )
 
 func main() {
 	db, task, _ := mysql.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
-	office := models.Office{ID: officeID, Name: "sample"}
+	office := &models.Office{ID: officeID, Name: "sample"}
 	office.Upsert(ctx, db, boil.Infer(), boil.Infer())
 	err := office.AddSamples(ctx, db, true, &models.Sample{
-		ID:       ulid.MustNew(),
-		Title:    "title",
-		Category: models.SamplesCategorySmall,
-		Memo:     "memo",
-		Date:     time.Now(),
-		Amount:   decimal.NewFromFloat(1.2),
+		Biid:      ulid.MustNew(),
+		Code:      "code",
+		Category:  models.SamplesCategorySmall,
+		Amount:    decimal.NewFromFloat(1.2),
+		ValidFrom: time.Now(),
 	})
 	fmt.Println(err)
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	pkgNotifier "github.com/ktakenaka/gosample2022/app/pkg/notifier"
-	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/app/registry"
 	"github.com/ktakenaka/gosample2022/app/usecase"
 	"google.golang.org/grpc/codes"
@@ -26,11 +25,11 @@ func NewServer(provider *registry.Provider) *server {
 
 func (s *server) getCurrentOffice(ctx context.Context) (context.Context, *models.Office, error) {
 	// TODO: Implement authN logic
-	currentOffice, err := s.interactor.OfficeOne(ctx, nil)
+	currentOffice, err := s.interactor.OfficeOne(ctx, "")
 	if err != nil {
 		return nil, nil, err
 	}
-	ctx = pkgNotifier.NewPersonContext(ctx, ulid.ULID(currentOffice.ID), ulid.ULID(currentOffice.ID))
+	ctx = pkgNotifier.NewPersonContext(ctx, currentOffice.ID, currentOffice.ID)
 	return ctx, currentOffice, nil
 }
 

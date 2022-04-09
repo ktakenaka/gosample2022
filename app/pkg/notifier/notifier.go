@@ -6,7 +6,6 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/rollbar/rollbar-go"
 )
 
@@ -27,10 +26,10 @@ var (
 	scrubFields  = regexp.MustCompile("password|secret|token")
 )
 
-func NewPersonContext(ctx context.Context, officeID, userID ulid.ULID) context.Context {
+func NewPersonContext(ctx context.Context, officeID, userID string) context.Context {
 	// This application is multi-tenant application, and each office has many users.
-	// That's why we use officeID for ID, and userID for Username
-	return rollbar.NewPersonContext(ctx, &rollbar.Person{Id: officeID.String(), Username: userID.String()})
+	// That's why we use officeID for Username.
+	return rollbar.NewPersonContext(ctx, &rollbar.Person{Id: userID, Username: officeID})
 }
 
 func Message(level string, msg string) {

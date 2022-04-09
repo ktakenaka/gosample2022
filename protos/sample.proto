@@ -12,12 +12,11 @@ message ListResponse {
 }
 
 message OneSample {
-  string id = 1;
-  string title = 2;
-  string category = 3;
-  string memo = 4;
-  string date = 5;
+  uint32 id = 1;
+  string biid = 2;
+  string code = 3;
+  string category = 4;
   // TODO: Consider to define decimal for amount
   // https://docs.microsoft.com/en-us/dotnet/architecture/grpc-for-wcf-developers/protobuf-data-types#decimals
-  string amount = 6; 
+  string amount = 5;
 }

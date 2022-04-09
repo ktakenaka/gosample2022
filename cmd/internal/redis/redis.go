@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
-
 	"github.com/ktakenaka/gosample2022/app/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	infraRedis "github.com/ktakenaka/gosample2022/infra/redis"
