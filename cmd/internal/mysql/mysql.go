@@ -3,7 +3,6 @@ package mysql
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/ktakenaka/gosample2022/app/config"
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
@@ -11,6 +10,7 @@ import (
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	infraDB "github.com/ktakenaka/gosample2022/infra/database"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"go.uber.org/multierr"
 )
 
 type task struct {
@@ -23,15 +23,11 @@ func (t *task) Name() string {
 }
 
 func (t *task) Shutdown(ctx context.Context) (err error) {
-	if err1 := t.write.Close(); err1 != nil {
-		err = err1
+	if e := t.write.Close(); e != nil {
+		err = multierr.Append(err, e)
 	}
-	if err2 := t.read.Close(); err2 != nil {
-		if err != nil {
-			err = fmt.Errorf("%w, %s", err, err2)
-			return
-		}
-		err = err2
+	if e := t.read.Close(); e != nil {
+		err = multierr.Append(err, e)
 	}
 	return err
 }
