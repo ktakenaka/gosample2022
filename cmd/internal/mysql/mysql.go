@@ -56,6 +56,8 @@ func Init(ctx context.Context, cfg *config.Config) (repository.DB, shutdown.Task
 	}
 
 	boil.DebugMode = true
+	db := dbresolver.New(write, read)
+	boil.SetDB(db)
 
-	return dbresolver.New(write, read), &task{write: write, read: read}, nil
+	return db, &task{write: write, read: read}, nil
 }
