@@ -53,4 +53,4 @@ local-migrate-%:
 	$(CMD) -env=mysql -config db/sqlmigrate.yml;
 
 test-seed:
-	docker-compose exec db mysql -uroot -proot gosample2022_test < ./testsupport/seed/seed.sql
+	docker-compose exec mysql mysql -uroot -proot gosample2022_test < ./testsupport/seed/seed.sql
