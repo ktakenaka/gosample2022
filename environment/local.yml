@@ -25,7 +25,7 @@ mongo:
   db_name: gosample2022_development
 kafka:
   address: kafka:29092
-  topic_samples: gosample2022_dbserver.gosample2022_development.sample
+  topic_samples: gosample2022_dbserver.gosample2022_development.samples
   topic_transactions: gosample2022_dbserver.transaction
 rollbar:
   token: ${ROLLBAR_TOKEN}
