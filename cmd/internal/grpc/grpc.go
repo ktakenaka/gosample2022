@@ -11,7 +11,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/config"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	"github.com/ktakenaka/gosample2022/app/interface/grpc/server"
-	"github.com/ktakenaka/gosample2022/app/registry"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	pkggrpc "google.golang.org/grpc"
 )
@@ -28,7 +28,7 @@ func (t *task) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func New(cfg *config.Config, provider *registry.Provider) (shutdown.Task, error) {
+func New(cfg *config.Config, provider *infrastructure.Provider) (shutdown.Task, error) {
 	srv := server.NewServer(provider)
 
 	s := pkggrpc.NewServer()

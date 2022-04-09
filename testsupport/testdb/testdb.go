@@ -6,7 +6,7 @@ import (
 	"github.com/DATA-DOG/go-txdb"
 	"github.com/google/uuid"
 
-	"github.com/ktakenaka/gosample2022/app/domain/repository"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/infra/database"
 )
 
@@ -28,7 +28,7 @@ func init() {
 	txdb.Register("txdb", "mysql", database.ConnStr(cfg))
 }
 
-func GetDB() (db repository.DB, release func()) {
+func GetDB() (db infrastructure.DB, release func()) {
 	// TODO: no need to use uuid
 	sqlDB, err := sql.Open("txdb", uuid.New().String())
 	if err != nil {

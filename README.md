@@ -13,12 +13,11 @@ curl --location --request POST 'http://localhost:8083/connectors' \
         "database.user": "root",
         "database.password": "root",
         "database.include.list": "gosample2022_development",
-        "table.include.list": "samples",
+        "table.include.list": "gosample2022_development.samples",
         "database.server.name": "gosample2022_dbserver",
         "database.history.kafka.bootstrap.servers": "kafka:29092",
         "database.history.kafka.topic": "schema-changes.gosample2022",
-        "provide.transaction.metadata": true,
-        "transaction.topic": "gosample2022_development.transactions"
+        "provide.transaction.metadata": true
     }
 }'
 ```

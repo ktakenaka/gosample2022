@@ -5,8 +5,7 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
-	pkgNotifier "github.com/ktakenaka/gosample2022/app/pkg/notifier"
-	"github.com/ktakenaka/gosample2022/app/registry"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,19 +17,19 @@ type server struct {
 	interactor usecase.Interactor
 }
 
-func NewServer(provider *registry.Provider) *server {
-	srv := &server{interactor: usecase.NewInteractor(provider.DB, provider.Redis)}
+func NewServer(provider *infrastructure.Provider) *server {
+	srv := &server{interactor: usecase.NewInteractor(provider)}
 	return srv
 }
 
-func (s *server) getCurrentOffice(ctx context.Context) (context.Context, *models.Office, error) {
+func (s *server) getCurrentOffice(ctx context.Context) (*models.Office, error) {
 	// TODO: Implement authN logic
 	currentOffice, err := s.interactor.OfficeOne(ctx, "")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	ctx = pkgNotifier.NewPersonContext(ctx, currentOffice.ID, currentOffice.ID)
-	return ctx, currentOffice, nil
+	// TODO: Add Person context for error tracing (Rollbar)
+	return currentOffice, nil
 }
 
 func (s *server) notifyError(ctx context.Context, err error) error {

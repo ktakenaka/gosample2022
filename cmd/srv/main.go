@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	ntfr "github.com/ktakenaka/gosample2022/app/pkg/notifier"
-	"github.com/ktakenaka/gosample2022/app/registry"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
@@ -31,7 +31,7 @@ func main() {
 	}
 	tasks.Add(task)
 
-	provider := &registry.Provider{}
+	provider := &infrastructure.Provider{}
 	provider.DB, task, err = mysql.Init(ctx, cfg)
 	if err != nil {
 		ntfr.Error(err)
