@@ -23,7 +23,7 @@ import (
 
 // Office is an object representing the database table.
 type Office struct {
-	ID   []byte `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID   string `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Name string `boil:"name" json:"name" toml:"name" yaml:"name"`
 
 	R *officeR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -48,34 +48,11 @@ var OfficeTableColumns = struct {
 
 // Generated where
 
-type whereHelperstring struct{ field string }
-
-func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperstring) IN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
 var OfficeWhere = struct {
-	ID   whereHelper__byte
+	ID   whereHelperstring
 	Name whereHelperstring
 }{
-	ID:   whereHelper__byte{field: "`offices`.`id`"},
+	ID:   whereHelperstring{field: "`offices`.`id`"},
 	Name: whereHelperstring{field: "`offices`.`name`"},
 }
 
@@ -418,6 +395,7 @@ func (o *Office) Samples(mods ...qm.QueryMod) sampleQuery {
 
 	queryMods = append(queryMods,
 		qm.Where("`samples`.`office_id`=?", o.ID),
+		qmhelper.WhereIsNull("`samples`.`deleted_at`"),
 	)
 
 	query := Samples(queryMods...)
@@ -456,7 +434,7 @@ func (officeL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, sing
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.ID) {
+				if a == obj.ID {
 					continue Outer
 				}
 			}
@@ -514,7 +492,7 @@ func (officeL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, sing
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.OfficeID) {
+			if local.ID == foreign.OfficeID {
 				local.R.OfficeUsers = append(local.R.OfficeUsers, foreign)
 				if foreign.R == nil {
 					foreign.R = &officeUserR{}
@@ -554,7 +532,7 @@ func (officeL) LoadSamples(ctx context.Context, e boil.ContextExecutor, singular
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.ID) {
+				if a == obj.ID {
 					continue Outer
 				}
 			}
@@ -570,6 +548,7 @@ func (officeL) LoadSamples(ctx context.Context, e boil.ContextExecutor, singular
 	query := NewQuery(
 		qm.From(`samples`),
 		qm.WhereIn(`samples.office_id in ?`, args...),
+		qmhelper.WhereIsNull(`samples.deleted_at`),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -612,7 +591,7 @@ func (officeL) LoadSamples(ctx context.Context, e boil.ContextExecutor, singular
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.OfficeID) {
+			if local.ID == foreign.OfficeID {
 				local.R.Samples = append(local.R.Samples, foreign)
 				if foreign.R == nil {
 					foreign.R = &sampleR{}
@@ -634,7 +613,7 @@ func (o *Office) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, 
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.OfficeID, o.ID)
+			rel.OfficeID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -655,7 +634,7 @@ func (o *Office) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, 
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.OfficeID, o.ID)
+			rel.OfficeID = o.ID
 		}
 	}
 
@@ -687,7 +666,7 @@ func (o *Office) AddSamples(ctx context.Context, exec boil.ContextExecutor, inse
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.OfficeID, o.ID)
+			rel.OfficeID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -708,7 +687,7 @@ func (o *Office) AddSamples(ctx context.Context, exec boil.ContextExecutor, inse
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.OfficeID, o.ID)
+			rel.OfficeID = o.ID
 		}
 	}
 
@@ -740,7 +719,7 @@ func Offices(mods ...qm.QueryMod) officeQuery {
 
 // FindOffice retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindOffice(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*Office, error) {
+func FindOffice(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*Office, error) {
 	officeObj := &Office{}
 
 	sel := "*"
@@ -1277,7 +1256,7 @@ func (o *OfficeSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 }
 
 // OfficeExists checks if the Office row exists.
-func OfficeExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
+func OfficeExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `offices` where `id`=? limit 1)"
 

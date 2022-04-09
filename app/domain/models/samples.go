@@ -15,6 +15,7 @@ import (
 
 	"github.com/friendsofgo/errors"
 	"github.com/shopspring/decimal"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -24,15 +25,17 @@ import (
 
 // Sample is an object representing the database table.
 type Sample struct {
-	ID        []byte          `boil:"id" json:"id" toml:"id" yaml:"id"`
-	OfficeID  []byte          `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
-	Title     string          `boil:"title" json:"title" toml:"title" yaml:"title"`
+	ID uint `boil:"id" json:"id" toml:"id" yaml:"id"`
+	// use ulid
+	Biid      string          `boil:"biid" json:"biid" toml:"biid" yaml:"biid"`
+	OfficeID  string          `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
+	Code      string          `boil:"code" json:"code" toml:"code" yaml:"code"`
 	Category  string          `boil:"category" json:"category" toml:"category" yaml:"category"`
-	Memo      string          `boil:"memo" json:"memo" toml:"memo" yaml:"memo"`
-	Date      time.Time       `boil:"date" json:"date" toml:"date" yaml:"date"`
 	Amount    decimal.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
+	ValidFrom time.Time       `boil:"valid_from" json:"valid_from" toml:"valid_from" yaml:"valid_from"`
+	ValidTo   time.Time       `boil:"valid_to" json:"valid_to" toml:"valid_to" yaml:"valid_to"`
 	CreatedAt time.Time       `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt time.Time       `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	DeletedAt null.Time       `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *sampleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L sampleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,69 +43,75 @@ type Sample struct {
 
 var SampleColumns = struct {
 	ID        string
+	Biid      string
 	OfficeID  string
-	Title     string
+	Code      string
 	Category  string
-	Memo      string
-	Date      string
 	Amount    string
+	ValidFrom string
+	ValidTo   string
 	CreatedAt string
-	UpdatedAt string
+	DeletedAt string
 }{
 	ID:        "id",
+	Biid:      "biid",
 	OfficeID:  "office_id",
-	Title:     "title",
+	Code:      "code",
 	Category:  "category",
-	Memo:      "memo",
-	Date:      "date",
 	Amount:    "amount",
+	ValidFrom: "valid_from",
+	ValidTo:   "valid_to",
 	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	DeletedAt: "deleted_at",
 }
 
 var SampleTableColumns = struct {
 	ID        string
+	Biid      string
 	OfficeID  string
-	Title     string
+	Code      string
 	Category  string
-	Memo      string
-	Date      string
 	Amount    string
+	ValidFrom string
+	ValidTo   string
 	CreatedAt string
-	UpdatedAt string
+	DeletedAt string
 }{
 	ID:        "samples.id",
+	Biid:      "samples.biid",
 	OfficeID:  "samples.office_id",
-	Title:     "samples.title",
+	Code:      "samples.code",
 	Category:  "samples.category",
-	Memo:      "samples.memo",
-	Date:      "samples.date",
 	Amount:    "samples.amount",
+	ValidFrom: "samples.valid_from",
+	ValidTo:   "samples.valid_to",
 	CreatedAt: "samples.created_at",
-	UpdatedAt: "samples.updated_at",
+	DeletedAt: "samples.deleted_at",
 }
 
 // Generated where
 
-type whereHelpertime_Time struct{ field string }
+type whereHelperuint struct{ field string }
 
-func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
+func (w whereHelperuint) EQ(x uint) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperuint) NEQ(x uint) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperuint) LT(x uint) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperuint) LTE(x uint) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperuint) GT(x uint) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperuint) GTE(x uint) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperuint) IN(slice []uint) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.NEQ, x)
-}
-func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
+func (w whereHelperuint) NIN(slice []uint) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
 type whereHelperdecimal_Decimal struct{ field string }
@@ -126,41 +135,85 @@ func (w whereHelperdecimal_Decimal) GTE(x decimal.Decimal) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
+type whereHelpertime_Time struct{ field string }
+
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+type whereHelpernull_Time struct{ field string }
+
+func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var SampleWhere = struct {
-	ID        whereHelper__byte
-	OfficeID  whereHelper__byte
-	Title     whereHelperstring
+	ID        whereHelperuint
+	Biid      whereHelperstring
+	OfficeID  whereHelperstring
+	Code      whereHelperstring
 	Category  whereHelperstring
-	Memo      whereHelperstring
-	Date      whereHelpertime_Time
 	Amount    whereHelperdecimal_Decimal
+	ValidFrom whereHelpertime_Time
+	ValidTo   whereHelpertime_Time
 	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
+	DeletedAt whereHelpernull_Time
 }{
-	ID:        whereHelper__byte{field: "`samples`.`id`"},
-	OfficeID:  whereHelper__byte{field: "`samples`.`office_id`"},
-	Title:     whereHelperstring{field: "`samples`.`title`"},
+	ID:        whereHelperuint{field: "`samples`.`id`"},
+	Biid:      whereHelperstring{field: "`samples`.`biid`"},
+	OfficeID:  whereHelperstring{field: "`samples`.`office_id`"},
+	Code:      whereHelperstring{field: "`samples`.`code`"},
 	Category:  whereHelperstring{field: "`samples`.`category`"},
-	Memo:      whereHelperstring{field: "`samples`.`memo`"},
-	Date:      whereHelpertime_Time{field: "`samples`.`date`"},
 	Amount:    whereHelperdecimal_Decimal{field: "`samples`.`amount`"},
+	ValidFrom: whereHelpertime_Time{field: "`samples`.`valid_from`"},
+	ValidTo:   whereHelpertime_Time{field: "`samples`.`valid_to`"},
 	CreatedAt: whereHelpertime_Time{field: "`samples`.`created_at`"},
-	UpdatedAt: whereHelpertime_Time{field: "`samples`.`updated_at`"},
+	DeletedAt: whereHelpernull_Time{field: "`samples`.`deleted_at`"},
 }
 
 // SampleRels is where relationship names are stored.
 var SampleRels = struct {
-	Office         string
-	SampleComments string
+	Office string
 }{
-	Office:         "Office",
-	SampleComments: "SampleComments",
+	Office: "Office",
 }
 
 // sampleR is where relationships are stored.
 type sampleR struct {
-	Office         *Office            `boil:"Office" json:"Office" toml:"Office" yaml:"Office"`
-	SampleComments SampleCommentSlice `boil:"SampleComments" json:"SampleComments" toml:"SampleComments" yaml:"SampleComments"`
+	Office *Office `boil:"Office" json:"Office" toml:"Office" yaml:"Office"`
 }
 
 // NewStruct creates a new relationship struct
@@ -172,9 +225,9 @@ func (*sampleR) NewStruct() *sampleR {
 type sampleL struct{}
 
 var (
-	sampleAllColumns            = []string{"id", "office_id", "title", "category", "memo", "date", "amount", "created_at", "updated_at"}
-	sampleColumnsWithoutDefault = []string{"id", "office_id", "title", "category", "memo", "date", "amount"}
-	sampleColumnsWithDefault    = []string{"created_at", "updated_at"}
+	sampleAllColumns            = []string{"id", "biid", "office_id", "code", "category", "amount", "valid_from", "valid_to", "created_at", "deleted_at"}
+	sampleColumnsWithoutDefault = []string{"biid", "office_id", "code", "category", "amount", "valid_from", "created_at", "deleted_at"}
+	sampleColumnsWithDefault    = []string{"id", "valid_to"}
 	samplePrimaryKeyColumns     = []string{"id"}
 	sampleGeneratedColumns      = []string{}
 )
@@ -471,27 +524,6 @@ func (o *Sample) Office(mods ...qm.QueryMod) officeQuery {
 	return query
 }
 
-// SampleComments retrieves all the sample_comment's SampleComments with an executor.
-func (o *Sample) SampleComments(mods ...qm.QueryMod) sampleCommentQuery {
-	var queryMods []qm.QueryMod
-	if len(mods) != 0 {
-		queryMods = append(queryMods, mods...)
-	}
-
-	queryMods = append(queryMods,
-		qm.Where("`sample_comments`.`sample_id`=?", o.ID),
-	)
-
-	query := SampleComments(queryMods...)
-	queries.SetFrom(query.Query, "`sample_comments`")
-
-	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"`sample_comments`.*"})
-	}
-
-	return query
-}
-
 // LoadOffice allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
 func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSample interface{}, mods queries.Applicator) error {
@@ -509,9 +541,7 @@ func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular 
 		if object.R == nil {
 			object.R = &sampleR{}
 		}
-		if !queries.IsNil(object.OfficeID) {
-			args = append(args, object.OfficeID)
-		}
+		args = append(args, object.OfficeID)
 
 	} else {
 	Outer:
@@ -521,14 +551,12 @@ func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular 
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.OfficeID) {
+				if a == obj.OfficeID {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.OfficeID) {
-				args = append(args, obj.OfficeID)
-			}
+			args = append(args, obj.OfficeID)
 
 		}
 	}
@@ -586,110 +614,12 @@ func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular 
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.OfficeID, foreign.ID) {
+			if local.OfficeID == foreign.ID {
 				local.R.Office = foreign
 				if foreign.R == nil {
 					foreign.R = &officeR{}
 				}
 				foreign.R.Samples = append(foreign.R.Samples, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// LoadSampleComments allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (sampleL) LoadSampleComments(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSample interface{}, mods queries.Applicator) error {
-	var slice []*Sample
-	var object *Sample
-
-	if singular {
-		object = maybeSample.(*Sample)
-	} else {
-		slice = *maybeSample.(*[]*Sample)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &sampleR{}
-		}
-		args = append(args, object.ID)
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &sampleR{}
-			}
-
-			for _, a := range args {
-				if queries.Equal(a, obj.ID) {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.ID)
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.From(`sample_comments`),
-		qm.WhereIn(`sample_comments.sample_id in ?`, args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load sample_comments")
-	}
-
-	var resultSlice []*SampleComment
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice sample_comments")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on sample_comments")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for sample_comments")
-	}
-
-	if len(sampleCommentAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-	if singular {
-		object.R.SampleComments = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &sampleCommentR{}
-			}
-			foreign.R.Sample = object
-		}
-		return nil
-	}
-
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.SampleID) {
-				local.R.SampleComments = append(local.R.SampleComments, foreign)
-				if foreign.R == nil {
-					foreign.R = &sampleCommentR{}
-				}
-				foreign.R.Sample = local
 				break
 			}
 		}
@@ -725,7 +655,7 @@ func (o *Sample) SetOffice(ctx context.Context, exec boil.ContextExecutor, inser
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.OfficeID, related.ID)
+	o.OfficeID = related.ID
 	if o.R == nil {
 		o.R = &sampleR{
 			Office: related,
@@ -745,68 +675,15 @@ func (o *Sample) SetOffice(ctx context.Context, exec boil.ContextExecutor, inser
 	return nil
 }
 
-// AddSampleComments adds the given related objects to the existing relationships
-// of the sample, optionally inserting them as new records.
-// Appends related to o.R.SampleComments.
-// Sets related.R.Sample appropriately.
-func (o *Sample) AddSampleComments(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*SampleComment) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			queries.Assign(&rel.SampleID, o.ID)
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		} else {
-			updateQuery := fmt.Sprintf(
-				"UPDATE `sample_comments` SET %s WHERE %s",
-				strmangle.SetParamNames("`", "`", 0, []string{"sample_id"}),
-				strmangle.WhereClause("`", "`", 0, sampleCommentPrimaryKeyColumns),
-			)
-			values := []interface{}{o.ID, rel.ID}
-
-			if boil.IsDebug(ctx) {
-				writer := boil.DebugWriterFrom(ctx)
-				fmt.Fprintln(writer, updateQuery)
-				fmt.Fprintln(writer, values)
-			}
-			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-				return errors.Wrap(err, "failed to update foreign table")
-			}
-
-			queries.Assign(&rel.SampleID, o.ID)
-		}
-	}
-
-	if o.R == nil {
-		o.R = &sampleR{
-			SampleComments: related,
-		}
-	} else {
-		o.R.SampleComments = append(o.R.SampleComments, related...)
-	}
-
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &sampleCommentR{
-				Sample: o,
-			}
-		} else {
-			rel.R.Sample = o
-		}
-	}
-	return nil
-}
-
 // Samples retrieves all the records using an executor.
 func Samples(mods ...qm.QueryMod) sampleQuery {
-	mods = append(mods, qm.From("`samples`"))
+	mods = append(mods, qm.From("`samples`"), qmhelper.WhereIsNull("`samples`.`deleted_at`"))
 	return sampleQuery{NewQuery(mods...)}
 }
 
 // FindSample retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindSample(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*Sample, error) {
+func FindSample(ctx context.Context, exec boil.ContextExecutor, iD uint, selectCols ...string) (*Sample, error) {
 	sampleObj := &Sample{}
 
 	sel := "*"
@@ -814,7 +691,7 @@ func FindSample(ctx context.Context, exec boil.ContextExecutor, iD []byte, selec
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `samples` where `id`=?", sel,
+		"select %s from `samples` where `id`=? and `deleted_at` is null", sel,
 	)
 
 	q := queries.Raw(query, iD)
@@ -847,9 +724,6 @@ func (o *Sample) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
-		}
-		if o.UpdatedAt.IsZero() {
-			o.UpdatedAt = currTime
 		}
 	}
 
@@ -903,15 +777,26 @@ func (o *Sample) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	_, err = exec.ExecContext(ctx, cache.query, vals...)
+	result, err := exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into samples")
 	}
 
+	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
+		goto CacheNoHooks
+	}
+
+	lastID, err = result.LastInsertId()
+	if err != nil {
+		return ErrSyncFail
+	}
+
+	o.ID = uint(lastID)
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == sampleMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -943,12 +828,6 @@ CacheNoHooks:
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Sample) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	if !boil.TimestampsAreSkipped(ctx) {
-		currTime := time.Now().In(boil.GetLocation())
-
-		o.UpdatedAt = currTime
-	}
-
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1089,7 +968,6 @@ func (o *Sample) Upsert(ctx context.Context, exec boil.ContextExecutor, updateCo
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
 		}
-		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
@@ -1180,16 +1058,27 @@ func (o *Sample) Upsert(ctx context.Context, exec boil.ContextExecutor, updateCo
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	_, err = exec.ExecContext(ctx, cache.query, vals...)
+	result, err := exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for samples")
 	}
 
+	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
+		goto CacheNoHooks
+	}
+
+	lastID, err = result.LastInsertId()
+	if err != nil {
+		return ErrSyncFail
+	}
+
+	o.ID = uint(lastID)
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == sampleMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -1221,7 +1110,7 @@ CacheNoHooks:
 
 // Delete deletes a single Sample record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Sample provided for delete")
 	}
@@ -1230,8 +1119,26 @@ func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, 
 		return 0, err
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), samplePrimaryKeyMapping)
-	sql := "DELETE FROM `samples` WHERE `id`=?"
+	var (
+		sql  string
+		args []interface{}
+	)
+	if hardDelete {
+		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), samplePrimaryKeyMapping)
+		sql = "DELETE FROM `samples` WHERE `id`=?"
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		o.DeletedAt = null.TimeFrom(currTime)
+		wl := []string{"deleted_at"}
+		sql = fmt.Sprintf("UPDATE `samples` SET %s WHERE `id`=?",
+			strmangle.SetParamNames("`", "`", 0, wl),
+		)
+		valueMapping, err := queries.BindMapping(sampleType, sampleMapping, append(wl, samplePrimaryKeyColumns...))
+		if err != nil {
+			return 0, err
+		}
+		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), valueMapping)
+	}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1256,12 +1163,17 @@ func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, 
 }
 
 // DeleteAll deletes all matching rows.
-func (q sampleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (q sampleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no sampleQuery provided for delete all")
 	}
 
-	queries.SetDelete(q.Query)
+	if hardDelete {
+		queries.SetDelete(q.Query)
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		queries.SetUpdate(q.Query, M{"deleted_at": currTime})
+	}
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
@@ -1277,7 +1189,7 @@ func (q sampleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o SampleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o SampleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
@@ -1290,14 +1202,31 @@ func (o SampleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 		}
 	}
 
-	var args []interface{}
-	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), samplePrimaryKeyMapping)
-		args = append(args, pkeyArgs...)
+	var (
+		sql  string
+		args []interface{}
+	)
+	if hardDelete {
+		for _, obj := range o {
+			pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), samplePrimaryKeyMapping)
+			args = append(args, pkeyArgs...)
+		}
+		sql = "DELETE FROM `samples` WHERE " +
+			strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, samplePrimaryKeyColumns, len(o))
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		for _, obj := range o {
+			pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), samplePrimaryKeyMapping)
+			args = append(args, pkeyArgs...)
+			obj.DeletedAt = null.TimeFrom(currTime)
+		}
+		wl := []string{"deleted_at"}
+		sql = fmt.Sprintf("UPDATE `samples` SET %s WHERE "+
+			strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, samplePrimaryKeyColumns, len(o)),
+			strmangle.SetParamNames("`", "`", 0, wl),
+		)
+		args = append([]interface{}{currTime}, args...)
 	}
-
-	sql := "DELETE FROM `samples` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, samplePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1352,7 +1281,8 @@ func (o *SampleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 	}
 
 	sql := "SELECT `samples`.* FROM `samples` WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, samplePrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 0, samplePrimaryKeyColumns, len(*o)) +
+		"and `deleted_at` is null"
 
 	q := queries.Raw(sql, args...)
 
@@ -1367,9 +1297,9 @@ func (o *SampleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 }
 
 // SampleExists checks if the Sample row exists.
-func SampleExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
+func SampleExists(ctx context.Context, exec boil.ContextExecutor, iD uint) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `samples` where `id`=? limit 1)"
+	sql := "select exists(select 1 from `samples` where `id`=? and `deleted_at` is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)

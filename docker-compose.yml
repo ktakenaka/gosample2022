@@ -103,6 +103,6 @@ services:
     environment:
      BOOTSTRAP_SERVERS: kafka:29092
      GROUP_ID: 1
-     CONFIG_STORAGE_TOPIC: my_connect_configs
-     OFFSET_STORAGE_TOPIC: my_connect_offsets
-     STATUS_STORAGE_TOPIC: my_connect_statuses
+     CONFIG_STORAGE_TOPIC: gosample2022_connect_config
+     OFFSET_STORAGE_TOPIC: gosample2022_connect_offset
+     STATUS_STORAGE_TOPIC: gosample2022_connect_status

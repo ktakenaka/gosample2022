@@ -5,11 +5,10 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/domain/repository"
-	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 )
 
 type Interactor interface {
-	OfficeOne(ctx context.Context, officeID ulid.ULID) (*models.Office, error)
+	OfficeOne(ctx context.Context, officeID string) (*models.Office, error)
 
 	SampleList(ctx context.Context, office *models.Office) (models.SampleSlice, error)
 }
@@ -23,7 +22,7 @@ func NewInteractor(db repository.DB, redis repository.Redis) Interactor {
 	return &interactor{db: db, redis: redis}
 }
 
-func (i *interactor) OfficeOne(ctx context.Context, officeID ulid.ULID) (*models.Office, error) {
+func (i *interactor) OfficeOne(ctx context.Context, officeID string) (*models.Office, error) {
 	return models.Offices(models.OfficeWhere.ID.EQ(officeID)).One(ctx, i.db)
 }
 

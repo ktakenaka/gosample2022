@@ -1,15 +1,18 @@
 
 -- +migrate Up
 CREATE TABLE samples (
-  id         BINARY(16) PRIMARY KEY,
-  office_id  BINARY(16) NOT NULL,
-  title      VARCHAR(30) NOT NULL,
+  id         INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  biid       VARCHAR(26) CHARACTER SET ASCII NOT NULL COMMENT "use ulid",
+  office_id  VARCHAR(26) CHARACTER SET ASCII NOT NULL,
+  code       VARCHAR(10) NOT NULL,
   category   ENUM("small", "medium", "large") NOT NULL,
-  memo       TEXT NOT NULL,
-  date       DATE NOT NULL,
   amount     DECIMAL(10, 2) UNSIGNED NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  valid_from DATE NOT NULL,
+  valid_to   DATE NOT NULL DEFAULT "9999-12-31",
+  created_at TIMESTAMP NOT NULL,
+  deleted_at TIMESTAMP,
+
   CONSTRAINT `fk_samples_office_id` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
 );
 

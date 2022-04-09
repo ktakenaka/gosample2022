@@ -4,15 +4,13 @@
 package models
 
 var TableNames = struct {
-	OfficeUsers    string
-	Offices        string
-	SampleComments string
-	Samples        string
-	Users          string
+	OfficeUsers string
+	Offices     string
+	Samples     string
+	Users       string
 }{
-	OfficeUsers:    "office_users",
-	Offices:        "offices",
-	SampleComments: "sample_comments",
-	Samples:        "samples",
-	Users:          "users",
+	OfficeUsers: "office_users",
+	Offices:     "offices",
+	Samples:     "samples",
+	Users:       "users",
 }
