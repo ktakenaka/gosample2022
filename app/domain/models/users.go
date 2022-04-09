@@ -23,7 +23,7 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID    []byte `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID    string `boil:"id" json:"id" toml:"id" yaml:"id"`
 	Email string `boil:"email" json:"email" toml:"email" yaml:"email"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -49,10 +49,10 @@ var UserTableColumns = struct {
 // Generated where
 
 var UserWhere = struct {
-	ID    whereHelper__byte
+	ID    whereHelperstring
 	Email whereHelperstring
 }{
-	ID:    whereHelper__byte{field: "`users`.`id`"},
+	ID:    whereHelperstring{field: "`users`.`id`"},
 	Email: whereHelperstring{field: "`users`.`email`"},
 }
 
@@ -409,7 +409,7 @@ func (userL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, singul
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.ID) {
+				if a == obj.ID {
 					continue Outer
 				}
 			}
@@ -467,7 +467,7 @@ func (userL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.UserID) {
+			if local.ID == foreign.UserID {
 				local.R.OfficeUsers = append(local.R.OfficeUsers, foreign)
 				if foreign.R == nil {
 					foreign.R = &officeUserR{}
@@ -489,7 +489,7 @@ func (o *User) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, in
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.UserID, o.ID)
+			rel.UserID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -510,7 +510,7 @@ func (o *User) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.UserID, o.ID)
+			rel.UserID = o.ID
 		}
 	}
 
@@ -542,7 +542,7 @@ func Users(mods ...qm.QueryMod) userQuery {
 
 // FindUser retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUser(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*User, error) {
+func FindUser(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*User, error) {
 	userObj := &User{}
 
 	sel := "*"
@@ -1080,7 +1080,7 @@ func (o *UserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 }
 
 // UserExists checks if the User row exists.
-func UserExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
+func UserExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `users` where `id`=? limit 1)"
 

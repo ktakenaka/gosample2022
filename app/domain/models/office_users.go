@@ -23,9 +23,9 @@ import (
 
 // OfficeUser is an object representing the database table.
 type OfficeUser struct {
-	ID       []byte `boil:"id" json:"id" toml:"id" yaml:"id"`
-	OfficeID []byte `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
-	UserID   []byte `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID       string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	OfficeID string `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
+	UserID   string `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
 
 	R *officeUserR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L officeUserL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -53,23 +53,37 @@ var OfficeUserTableColumns = struct {
 
 // Generated where
 
-type whereHelper__byte struct{ field string }
+type whereHelperstring struct{ field string }
 
-func (w whereHelper__byte) EQ(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelper__byte) NEQ(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelper__byte) LT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelper__byte) LTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelper__byte) GT(x []byte) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelper__byte) GTE(x []byte) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperstring) NEQ(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperstring) IN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperstring) NIN(slice []string) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
 
 var OfficeUserWhere = struct {
-	ID       whereHelper__byte
-	OfficeID whereHelper__byte
-	UserID   whereHelper__byte
+	ID       whereHelperstring
+	OfficeID whereHelperstring
+	UserID   whereHelperstring
 }{
-	ID:       whereHelper__byte{field: "`office_users`.`id`"},
-	OfficeID: whereHelper__byte{field: "`office_users`.`office_id`"},
-	UserID:   whereHelper__byte{field: "`office_users`.`user_id`"},
+	ID:       whereHelperstring{field: "`office_users`.`id`"},
+	OfficeID: whereHelperstring{field: "`office_users`.`office_id`"},
+	UserID:   whereHelperstring{field: "`office_users`.`user_id`"},
 }
 
 // OfficeUserRels is where relationship names are stored.
@@ -426,9 +440,7 @@ func (officeUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singu
 		if object.R == nil {
 			object.R = &officeUserR{}
 		}
-		if !queries.IsNil(object.OfficeID) {
-			args = append(args, object.OfficeID)
-		}
+		args = append(args, object.OfficeID)
 
 	} else {
 	Outer:
@@ -438,14 +450,12 @@ func (officeUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singu
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.OfficeID) {
+				if a == obj.OfficeID {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.OfficeID) {
-				args = append(args, obj.OfficeID)
-			}
+			args = append(args, obj.OfficeID)
 
 		}
 	}
@@ -503,7 +513,7 @@ func (officeUserL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singu
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.OfficeID, foreign.ID) {
+			if local.OfficeID == foreign.ID {
 				local.R.Office = foreign
 				if foreign.R == nil {
 					foreign.R = &officeR{}
@@ -534,9 +544,7 @@ func (officeUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &officeUserR{}
 		}
-		if !queries.IsNil(object.UserID) {
-			args = append(args, object.UserID)
-		}
+		args = append(args, object.UserID)
 
 	} else {
 	Outer:
@@ -546,14 +554,12 @@ func (officeUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singula
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.UserID) {
+				if a == obj.UserID {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.UserID) {
-				args = append(args, obj.UserID)
-			}
+			args = append(args, obj.UserID)
 
 		}
 	}
@@ -611,7 +617,7 @@ func (officeUserL) LoadUser(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.UserID, foreign.ID) {
+			if local.UserID == foreign.ID {
 				local.R.User = foreign
 				if foreign.R == nil {
 					foreign.R = &userR{}
@@ -652,7 +658,7 @@ func (o *OfficeUser) SetOffice(ctx context.Context, exec boil.ContextExecutor, i
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.OfficeID, related.ID)
+	o.OfficeID = related.ID
 	if o.R == nil {
 		o.R = &officeUserR{
 			Office: related,
@@ -699,7 +705,7 @@ func (o *OfficeUser) SetUser(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.UserID, related.ID)
+	o.UserID = related.ID
 	if o.R == nil {
 		o.R = &officeUserR{
 			User: related,
@@ -727,7 +733,7 @@ func OfficeUsers(mods ...qm.QueryMod) officeUserQuery {
 
 // FindOfficeUser retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindOfficeUser(ctx context.Context, exec boil.ContextExecutor, iD []byte, selectCols ...string) (*OfficeUser, error) {
+func FindOfficeUser(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*OfficeUser, error) {
 	officeUserObj := &OfficeUser{}
 
 	sel := "*"
@@ -1264,7 +1270,7 @@ func (o *OfficeUserSlice) ReloadAll(ctx context.Context, exec boil.ContextExecut
 }
 
 // OfficeUserExists checks if the OfficeUser row exists.
-func OfficeUserExists(ctx context.Context, exec boil.ContextExecutor, iD []byte) (bool, error) {
+func OfficeUserExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from `office_users` where `id`=? limit 1)"
 
