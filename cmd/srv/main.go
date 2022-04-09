@@ -7,7 +7,7 @@ import (
 	ntfr "github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
-	"github.com/ktakenaka/gosample2022/cmd/internal/kafkaconsumer"
+	"github.com/ktakenaka/gosample2022/cmd/internal/kafkaclient"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
@@ -47,7 +47,7 @@ func main() {
 	}
 	tasks.Add(task)
 
-	provider.KafkaConsumer, task, err = kafkaconsumer.Init(ctx, cfg)
+	provider.Kafka, task, err = kafkaclient.Init(ctx, cfg)
 	if err != nil {
 		ntfr.Error(err)
 		panic(err)

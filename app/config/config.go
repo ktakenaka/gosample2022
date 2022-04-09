@@ -34,12 +34,11 @@ type Config struct {
 		URL    string `yaml:"url"`
 		DBName string `yaml:"db_name"`
 	}
-	KafkaConsumer struct {
-		BootStrapServer   string `yaml:"boot_strap_server"`
-		AutoOffsetReset   string `yaml:"auto_offset_reset"`
+	Kafka struct {
+		Address           string `yaml:"address"`
 		TopicSamples      string `yaml:"topic_samples"`
 		TopicTransactions string `yaml:"topic_transactions"`
-	} `yaml:"kafka_consumer"`
+	}
 	Rollbar *rollbar.Config
 }
 
