@@ -293,6 +293,31 @@ func AddOfficeHook(hookPoint boil.HookPoint, officeHook OfficeHook) {
 	}
 }
 
+// OneG returns a single office record from the query using the global executor.
+func (q officeQuery) OneG(ctx context.Context) (*Office, error) {
+	return q.One(ctx, boil.GetContextDB())
+}
+
+// OneGP returns a single office record from the query using the global executor, and panics on error.
+func (q officeQuery) OneGP(ctx context.Context) *Office {
+	o, err := q.One(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
+// OneP returns a single office record from the query, and panics on error.
+func (q officeQuery) OneP(ctx context.Context, exec boil.ContextExecutor) *Office {
+	o, err := q.One(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
 // One returns a single office record from the query.
 func (q officeQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Office, error) {
 	o := &Office{}
@@ -312,6 +337,31 @@ func (q officeQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Offic
 	}
 
 	return o, nil
+}
+
+// AllG returns all Office records from the query using the global executor.
+func (q officeQuery) AllG(ctx context.Context) (OfficeSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
+}
+
+// AllGP returns all Office records from the query using the global executor, and panics on error.
+func (q officeQuery) AllGP(ctx context.Context) OfficeSlice {
+	o, err := q.All(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
+// AllP returns all Office records from the query, and panics on error.
+func (q officeQuery) AllP(ctx context.Context, exec boil.ContextExecutor) OfficeSlice {
+	o, err := q.All(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
 }
 
 // All returns all Office records from the query.
@@ -334,6 +384,31 @@ func (q officeQuery) All(ctx context.Context, exec boil.ContextExecutor) (Office
 	return o, nil
 }
 
+// CountG returns the count of all Office records in the query using the global executor
+func (q officeQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
+}
+
+// CountGP returns the count of all Office records in the query using the global executor, and panics on error.
+func (q officeQuery) CountGP(ctx context.Context) int64 {
+	c, err := q.Count(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return c
+}
+
+// CountP returns the count of all Office records in the query, and panics on error.
+func (q officeQuery) CountP(ctx context.Context, exec boil.ContextExecutor) int64 {
+	c, err := q.Count(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return c
+}
+
 // Count returns the count of all Office records in the query.
 func (q officeQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
@@ -347,6 +422,31 @@ func (q officeQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int6
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table using the global executor.
+func (q officeQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
+}
+
+// ExistsGP checks if the row exists in the table using the global executor, and panics on error.
+func (q officeQuery) ExistsGP(ctx context.Context) bool {
+	e, err := q.Exists(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
+}
+
+// ExistsP checks if the row exists in the table, and panics on error.
+func (q officeQuery) ExistsP(ctx context.Context, exec boil.ContextExecutor) bool {
+	e, err := q.Exists(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
 }
 
 // Exists checks if the row exists in the table.
@@ -604,6 +704,37 @@ func (officeL) LoadSamples(ctx context.Context, e boil.ContextExecutor, singular
 	return nil
 }
 
+// AddOfficeUsersG adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.OfficeUsers.
+// Sets related.R.Office appropriately.
+// Uses the global database handle.
+func (o *Office) AddOfficeUsersG(ctx context.Context, insert bool, related ...*OfficeUser) error {
+	return o.AddOfficeUsers(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddOfficeUsersP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.OfficeUsers.
+// Sets related.R.Office appropriately.
+// Panics on error.
+func (o *Office) AddOfficeUsersP(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*OfficeUser) {
+	if err := o.AddOfficeUsers(ctx, exec, insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddOfficeUsersGP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.OfficeUsers.
+// Sets related.R.Office appropriately.
+// Uses the global database handle and panics on error.
+func (o *Office) AddOfficeUsersGP(ctx context.Context, insert bool, related ...*OfficeUser) {
+	if err := o.AddOfficeUsers(ctx, boil.GetContextDB(), insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
 // AddOfficeUsers adds the given related objects to the existing relationships
 // of the office, optionally inserting them as new records.
 // Appends related to o.R.OfficeUsers.
@@ -655,6 +786,37 @@ func (o *Office) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, 
 		}
 	}
 	return nil
+}
+
+// AddSamplesG adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.Samples.
+// Sets related.R.Office appropriately.
+// Uses the global database handle.
+func (o *Office) AddSamplesG(ctx context.Context, insert bool, related ...*Sample) error {
+	return o.AddSamples(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddSamplesP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.Samples.
+// Sets related.R.Office appropriately.
+// Panics on error.
+func (o *Office) AddSamplesP(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Sample) {
+	if err := o.AddSamples(ctx, exec, insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddSamplesGP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.Samples.
+// Sets related.R.Office appropriately.
+// Uses the global database handle and panics on error.
+func (o *Office) AddSamplesGP(ctx context.Context, insert bool, related ...*Sample) {
+	if err := o.AddSamples(ctx, boil.GetContextDB(), insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 // AddSamples adds the given related objects to the existing relationships
@@ -716,6 +878,31 @@ func Offices(mods ...qm.QueryMod) officeQuery {
 	return officeQuery{NewQuery(mods...)}
 }
 
+// FindOfficeG retrieves a single record by ID.
+func FindOfficeG(ctx context.Context, iD string, selectCols ...string) (*Office, error) {
+	return FindOffice(ctx, boil.GetContextDB(), iD, selectCols...)
+}
+
+// FindOfficeP retrieves a single record by ID with an executor, and panics on error.
+func FindOfficeP(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) *Office {
+	retobj, err := FindOffice(ctx, exec, iD, selectCols...)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return retobj
+}
+
+// FindOfficeGP retrieves a single record by ID, and panics on error.
+func FindOfficeGP(ctx context.Context, iD string, selectCols ...string) *Office {
+	retobj, err := FindOffice(ctx, boil.GetContextDB(), iD, selectCols...)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return retobj
+}
+
 // FindOffice retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
 func FindOffice(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*Office, error) {
@@ -744,6 +931,27 @@ func FindOffice(ctx context.Context, exec boil.ContextExecutor, iD string, selec
 	}
 
 	return officeObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *Office) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
+}
+
+// InsertP a single record using an executor, and panics on error. See Insert
+// for whitelist behavior description.
+func (o *Office) InsertP(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) {
+	if err := o.Insert(ctx, exec, columns); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// InsertGP a single record, and panics on error. See Insert for whitelist
+// behavior description.
+func (o *Office) InsertGP(ctx context.Context, columns boil.Columns) {
+	if err := o.Insert(ctx, boil.GetContextDB(), columns); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 // Insert a single record using an executor.
@@ -841,6 +1049,34 @@ CacheNoHooks:
 	return o.doAfterInsertHooks(ctx, exec)
 }
 
+// UpdateG a single Office record using the global executor.
+// See Update for more documentation.
+func (o *Office) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
+}
+
+// UpdateP uses an executor to update the Office, and panics on error.
+// See Update for more documentation.
+func (o *Office) UpdateP(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) int64 {
+	rowsAff, err := o.Update(ctx, exec, columns)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateGP a single Office record using the global executor. Panics on error.
+// See Update for more documentation.
+func (o *Office) UpdateGP(ctx context.Context, columns boil.Columns) int64 {
+	rowsAff, err := o.Update(ctx, boil.GetContextDB(), columns)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // Update uses an executor to update the Office.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -904,6 +1140,31 @@ func (o *Office) Update(ctx context.Context, exec boil.ContextExecutor, columns 
 	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
+// UpdateAllP updates all rows with matching column names, and panics on error.
+func (q officeQuery) UpdateAllP(ctx context.Context, exec boil.ContextExecutor, cols M) int64 {
+	rowsAff, err := q.UpdateAll(ctx, exec, cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (q officeQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
+}
+
+// UpdateAllGP updates all rows with the specified column values, and panics on error.
+func (q officeQuery) UpdateAllGP(ctx context.Context, cols M) int64 {
+	rowsAff, err := q.UpdateAll(ctx, boil.GetContextDB(), cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q officeQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -919,6 +1180,31 @@ func (q officeQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, c
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o OfficeSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
+}
+
+// UpdateAllGP updates all rows with the specified column values, and panics on error.
+func (o OfficeSlice) UpdateAllGP(ctx context.Context, cols M) int64 {
+	rowsAff, err := o.UpdateAll(ctx, boil.GetContextDB(), cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateAllP updates all rows with the specified column values, and panics on error.
+func (o OfficeSlice) UpdateAllP(ctx context.Context, exec boil.ContextExecutor, cols M) int64 {
+	rowsAff, err := o.UpdateAll(ctx, exec, cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -967,6 +1253,26 @@ func (o OfficeSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, c
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all office")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *Office) UpsertG(ctx context.Context, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns)
+}
+
+// UpsertGP attempts an insert, and does an update or ignore on conflict. Panics on error.
+func (o *Office) UpsertGP(ctx context.Context, updateColumns, insertColumns boil.Columns) {
+	if err := o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// UpsertP attempts an insert using an executor, and does an update or ignore on conflict.
+// UpsertP panics on error.
+func (o *Office) UpsertP(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) {
+	if err := o.Upsert(ctx, exec, updateColumns, insertColumns); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 var mySQLOfficeUniqueColumns = []string{
@@ -1107,6 +1413,36 @@ CacheNoHooks:
 	return o.doAfterUpsertHooks(ctx, exec)
 }
 
+// DeleteG deletes a single Office record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *Office) DeleteG(ctx context.Context) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB())
+}
+
+// DeleteP deletes a single Office record with an executor.
+// DeleteP will match against the primary key column to find the record to delete.
+// Panics on error.
+func (o *Office) DeleteP(ctx context.Context, exec boil.ContextExecutor) int64 {
+	rowsAff, err := o.Delete(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteGP deletes a single Office record.
+// DeleteGP will match against the primary key column to find the record to delete.
+// Panics on error.
+func (o *Office) DeleteGP(ctx context.Context) int64 {
+	rowsAff, err := o.Delete(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // Delete deletes a single Office record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *Office) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
@@ -1143,6 +1479,30 @@ func (o *Office) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, 
 	return rowsAff, nil
 }
 
+func (q officeQuery) DeleteAllG(ctx context.Context) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB())
+}
+
+// DeleteAllP deletes all rows, and panics on error.
+func (q officeQuery) DeleteAllP(ctx context.Context, exec boil.ContextExecutor) int64 {
+	rowsAff, err := q.DeleteAll(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteAllGP deletes all rows, and panics on error.
+func (q officeQuery) DeleteAllGP(ctx context.Context) int64 {
+	rowsAff, err := q.DeleteAll(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // DeleteAll deletes all matching rows.
 func (q officeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if q.Query == nil {
@@ -1162,6 +1522,31 @@ func (q officeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o OfficeSlice) DeleteAllG(ctx context.Context) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB())
+}
+
+// DeleteAllP deletes all rows in the slice, using an executor, and panics on error.
+func (o OfficeSlice) DeleteAllP(ctx context.Context, exec boil.ContextExecutor) int64 {
+	rowsAff, err := o.DeleteAll(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteAllGP deletes all rows in the slice, and panics on error.
+func (o OfficeSlice) DeleteAllGP(ctx context.Context) int64 {
+	rowsAff, err := o.DeleteAll(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -1213,6 +1598,29 @@ func (o OfficeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *Office) ReloadG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: no Office provided for reload")
+	}
+
+	return o.Reload(ctx, boil.GetContextDB())
+}
+
+// ReloadP refetches the object from the database with an executor. Panics on error.
+func (o *Office) ReloadP(ctx context.Context, exec boil.ContextExecutor) {
+	if err := o.Reload(ctx, exec); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// ReloadGP refetches the object from the database and panics on error.
+func (o *Office) ReloadGP(ctx context.Context) {
+	if err := o.Reload(ctx, boil.GetContextDB()); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Office) Reload(ctx context.Context, exec boil.ContextExecutor) error {
@@ -1223,6 +1631,34 @@ func (o *Office) Reload(ctx context.Context, exec boil.ContextExecutor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *OfficeSlice) ReloadAllG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: empty OfficeSlice provided for reload all")
+	}
+
+	return o.ReloadAll(ctx, boil.GetContextDB())
+}
+
+// ReloadAllP refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+// Panics on error.
+func (o *OfficeSlice) ReloadAllP(ctx context.Context, exec boil.ContextExecutor) {
+	if err := o.ReloadAll(ctx, exec); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// ReloadAllGP refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+// Panics on error.
+func (o *OfficeSlice) ReloadAllGP(ctx context.Context) {
+	if err := o.ReloadAll(ctx, boil.GetContextDB()); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -1252,6 +1688,31 @@ func (o *OfficeSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 	*o = slice
 
 	return nil
+}
+
+// OfficeExistsG checks if the Office row exists.
+func OfficeExistsG(ctx context.Context, iD string) (bool, error) {
+	return OfficeExists(ctx, boil.GetContextDB(), iD)
+}
+
+// OfficeExistsP checks if the Office row exists. Panics on error.
+func OfficeExistsP(ctx context.Context, exec boil.ContextExecutor, iD string) bool {
+	e, err := OfficeExists(ctx, exec, iD)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
+}
+
+// OfficeExistsGP checks if the Office row exists. Panics on error.
+func OfficeExistsGP(ctx context.Context, iD string) bool {
+	e, err := OfficeExists(ctx, boil.GetContextDB(), iD)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
 }
 
 // OfficeExists checks if the Office row exists.

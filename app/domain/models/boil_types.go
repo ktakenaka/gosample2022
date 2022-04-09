@@ -51,17 +51,32 @@ func makeCacheKey(cols boil.Columns, nzDefaults []string) string {
 	return str
 }
 
+type SamplesCategory string
+
 // Enum values for SamplesCategory
 const (
-	SamplesCategorySmall  string = "small"
-	SamplesCategoryMedium string = "medium"
-	SamplesCategoryLarge  string = "large"
+	SamplesCategorySmall  SamplesCategory = "small"
+	SamplesCategoryMedium SamplesCategory = "medium"
+	SamplesCategoryLarge  SamplesCategory = "large"
 )
 
-func AllSamplesCategory() []string {
-	return []string{
+func AllSamplesCategory() []SamplesCategory {
+	return []SamplesCategory{
 		SamplesCategorySmall,
 		SamplesCategoryMedium,
 		SamplesCategoryLarge,
 	}
+}
+
+func (e SamplesCategory) IsValid() error {
+	switch e {
+	case SamplesCategorySmall, SamplesCategoryMedium, SamplesCategoryLarge:
+		return nil
+	default:
+		return errors.New("enum is not valid")
+	}
+}
+
+func (e SamplesCategory) String() string {
+	return string(e)
 }

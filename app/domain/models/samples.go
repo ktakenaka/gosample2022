@@ -30,7 +30,7 @@ type Sample struct {
 	Biid      string          `boil:"biid" json:"biid" toml:"biid" yaml:"biid"`
 	OfficeID  string          `boil:"office_id" json:"office_id" toml:"office_id" yaml:"office_id"`
 	Code      string          `boil:"code" json:"code" toml:"code" yaml:"code"`
-	Category  string          `boil:"category" json:"category" toml:"category" yaml:"category"`
+	Category  SamplesCategory `boil:"category" json:"category" toml:"category" yaml:"category"`
 	Amount    decimal.Decimal `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	ValidFrom time.Time       `boil:"valid_from" json:"valid_from" toml:"valid_from" yaml:"valid_from"`
 	ValidTo   time.Time       `boil:"valid_to" json:"valid_to" toml:"valid_to" yaml:"valid_to"`
@@ -114,6 +114,27 @@ func (w whereHelperuint) NIN(slice []uint) qm.QueryMod {
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
+type whereHelperSamplesCategory struct{ field string }
+
+func (w whereHelperSamplesCategory) EQ(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelperSamplesCategory) NEQ(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelperSamplesCategory) LT(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelperSamplesCategory) LTE(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelperSamplesCategory) GT(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelperSamplesCategory) GTE(x SamplesCategory) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 type whereHelperdecimal_Decimal struct{ field string }
 
 func (w whereHelperdecimal_Decimal) EQ(x decimal.Decimal) qm.QueryMod {
@@ -185,7 +206,7 @@ var SampleWhere = struct {
 	Biid      whereHelperstring
 	OfficeID  whereHelperstring
 	Code      whereHelperstring
-	Category  whereHelperstring
+	Category  whereHelperSamplesCategory
 	Amount    whereHelperdecimal_Decimal
 	ValidFrom whereHelpertime_Time
 	ValidTo   whereHelpertime_Time
@@ -196,7 +217,7 @@ var SampleWhere = struct {
 	Biid:      whereHelperstring{field: "`samples`.`biid`"},
 	OfficeID:  whereHelperstring{field: "`samples`.`office_id`"},
 	Code:      whereHelperstring{field: "`samples`.`code`"},
-	Category:  whereHelperstring{field: "`samples`.`category`"},
+	Category:  whereHelperSamplesCategory{field: "`samples`.`category`"},
 	Amount:    whereHelperdecimal_Decimal{field: "`samples`.`amount`"},
 	ValidFrom: whereHelpertime_Time{field: "`samples`.`valid_from`"},
 	ValidTo:   whereHelpertime_Time{field: "`samples`.`valid_to`"},
@@ -438,6 +459,31 @@ func AddSampleHook(hookPoint boil.HookPoint, sampleHook SampleHook) {
 	}
 }
 
+// OneG returns a single sample record from the query using the global executor.
+func (q sampleQuery) OneG(ctx context.Context) (*Sample, error) {
+	return q.One(ctx, boil.GetContextDB())
+}
+
+// OneGP returns a single sample record from the query using the global executor, and panics on error.
+func (q sampleQuery) OneGP(ctx context.Context) *Sample {
+	o, err := q.One(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
+// OneP returns a single sample record from the query, and panics on error.
+func (q sampleQuery) OneP(ctx context.Context, exec boil.ContextExecutor) *Sample {
+	o, err := q.One(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
 // One returns a single sample record from the query.
 func (q sampleQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Sample, error) {
 	o := &Sample{}
@@ -457,6 +503,31 @@ func (q sampleQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Sampl
 	}
 
 	return o, nil
+}
+
+// AllG returns all Sample records from the query using the global executor.
+func (q sampleQuery) AllG(ctx context.Context) (SampleSlice, error) {
+	return q.All(ctx, boil.GetContextDB())
+}
+
+// AllGP returns all Sample records from the query using the global executor, and panics on error.
+func (q sampleQuery) AllGP(ctx context.Context) SampleSlice {
+	o, err := q.All(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
+}
+
+// AllP returns all Sample records from the query, and panics on error.
+func (q sampleQuery) AllP(ctx context.Context, exec boil.ContextExecutor) SampleSlice {
+	o, err := q.All(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return o
 }
 
 // All returns all Sample records from the query.
@@ -479,6 +550,31 @@ func (q sampleQuery) All(ctx context.Context, exec boil.ContextExecutor) (Sample
 	return o, nil
 }
 
+// CountG returns the count of all Sample records in the query using the global executor
+func (q sampleQuery) CountG(ctx context.Context) (int64, error) {
+	return q.Count(ctx, boil.GetContextDB())
+}
+
+// CountGP returns the count of all Sample records in the query using the global executor, and panics on error.
+func (q sampleQuery) CountGP(ctx context.Context) int64 {
+	c, err := q.Count(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return c
+}
+
+// CountP returns the count of all Sample records in the query, and panics on error.
+func (q sampleQuery) CountP(ctx context.Context, exec boil.ContextExecutor) int64 {
+	c, err := q.Count(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return c
+}
+
 // Count returns the count of all Sample records in the query.
 func (q sampleQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	var count int64
@@ -492,6 +588,31 @@ func (q sampleQuery) Count(ctx context.Context, exec boil.ContextExecutor) (int6
 	}
 
 	return count, nil
+}
+
+// ExistsG checks if the row exists in the table using the global executor.
+func (q sampleQuery) ExistsG(ctx context.Context) (bool, error) {
+	return q.Exists(ctx, boil.GetContextDB())
+}
+
+// ExistsGP checks if the row exists in the table using the global executor, and panics on error.
+func (q sampleQuery) ExistsGP(ctx context.Context) bool {
+	e, err := q.Exists(ctx, boil.GetContextDB())
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
+}
+
+// ExistsP checks if the row exists in the table, and panics on error.
+func (q sampleQuery) ExistsP(ctx context.Context, exec boil.ContextExecutor) bool {
+	e, err := q.Exists(ctx, exec)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
 }
 
 // Exists checks if the row exists in the table.
@@ -628,6 +749,34 @@ func (sampleL) LoadOffice(ctx context.Context, e boil.ContextExecutor, singular 
 	return nil
 }
 
+// SetOfficeG of the sample to the related item.
+// Sets o.R.Office to related.
+// Adds o to related.R.Samples.
+// Uses the global database handle.
+func (o *Sample) SetOfficeG(ctx context.Context, insert bool, related *Office) error {
+	return o.SetOffice(ctx, boil.GetContextDB(), insert, related)
+}
+
+// SetOfficeP of the sample to the related item.
+// Sets o.R.Office to related.
+// Adds o to related.R.Samples.
+// Panics on error.
+func (o *Sample) SetOfficeP(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Office) {
+	if err := o.SetOffice(ctx, exec, insert, related); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// SetOfficeGP of the sample to the related item.
+// Sets o.R.Office to related.
+// Adds o to related.R.Samples.
+// Uses the global database handle and panics on error.
+func (o *Sample) SetOfficeGP(ctx context.Context, insert bool, related *Office) {
+	if err := o.SetOffice(ctx, boil.GetContextDB(), insert, related); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
 // SetOffice of the sample to the related item.
 // Sets o.R.Office to related.
 // Adds o to related.R.Samples.
@@ -681,6 +830,31 @@ func Samples(mods ...qm.QueryMod) sampleQuery {
 	return sampleQuery{NewQuery(mods...)}
 }
 
+// FindSampleG retrieves a single record by ID.
+func FindSampleG(ctx context.Context, iD uint, selectCols ...string) (*Sample, error) {
+	return FindSample(ctx, boil.GetContextDB(), iD, selectCols...)
+}
+
+// FindSampleP retrieves a single record by ID with an executor, and panics on error.
+func FindSampleP(ctx context.Context, exec boil.ContextExecutor, iD uint, selectCols ...string) *Sample {
+	retobj, err := FindSample(ctx, exec, iD, selectCols...)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return retobj
+}
+
+// FindSampleGP retrieves a single record by ID, and panics on error.
+func FindSampleGP(ctx context.Context, iD uint, selectCols ...string) *Sample {
+	retobj, err := FindSample(ctx, boil.GetContextDB(), iD, selectCols...)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return retobj
+}
+
 // FindSample retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
 func FindSample(ctx context.Context, exec boil.ContextExecutor, iD uint, selectCols ...string) (*Sample, error) {
@@ -709,6 +883,27 @@ func FindSample(ctx context.Context, exec boil.ContextExecutor, iD uint, selectC
 	}
 
 	return sampleObj, nil
+}
+
+// InsertG a single record. See Insert for whitelist behavior description.
+func (o *Sample) InsertG(ctx context.Context, columns boil.Columns) error {
+	return o.Insert(ctx, boil.GetContextDB(), columns)
+}
+
+// InsertP a single record using an executor, and panics on error. See Insert
+// for whitelist behavior description.
+func (o *Sample) InsertP(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) {
+	if err := o.Insert(ctx, exec, columns); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// InsertGP a single record, and panics on error. See Insert for whitelist
+// behavior description.
+func (o *Sample) InsertGP(ctx context.Context, columns boil.Columns) {
+	if err := o.Insert(ctx, boil.GetContextDB(), columns); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 // Insert a single record using an executor.
@@ -824,6 +1019,34 @@ CacheNoHooks:
 	return o.doAfterInsertHooks(ctx, exec)
 }
 
+// UpdateG a single Sample record using the global executor.
+// See Update for more documentation.
+func (o *Sample) UpdateG(ctx context.Context, columns boil.Columns) (int64, error) {
+	return o.Update(ctx, boil.GetContextDB(), columns)
+}
+
+// UpdateP uses an executor to update the Sample, and panics on error.
+// See Update for more documentation.
+func (o *Sample) UpdateP(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) int64 {
+	rowsAff, err := o.Update(ctx, exec, columns)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateGP a single Sample record using the global executor. Panics on error.
+// See Update for more documentation.
+func (o *Sample) UpdateGP(ctx context.Context, columns boil.Columns) int64 {
+	rowsAff, err := o.Update(ctx, boil.GetContextDB(), columns)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // Update uses an executor to update the Sample.
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
@@ -887,6 +1110,31 @@ func (o *Sample) Update(ctx context.Context, exec boil.ContextExecutor, columns 
 	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
 }
 
+// UpdateAllP updates all rows with matching column names, and panics on error.
+func (q sampleQuery) UpdateAllP(ctx context.Context, exec boil.ContextExecutor, cols M) int64 {
+	rowsAff, err := q.UpdateAll(ctx, exec, cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (q sampleQuery) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return q.UpdateAll(ctx, boil.GetContextDB(), cols)
+}
+
+// UpdateAllGP updates all rows with the specified column values, and panics on error.
+func (q sampleQuery) UpdateAllGP(ctx context.Context, cols M) int64 {
+	rowsAff, err := q.UpdateAll(ctx, boil.GetContextDB(), cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // UpdateAll updates all rows with the specified column values.
 func (q sampleQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols M) (int64, error) {
 	queries.SetUpdate(q.Query, cols)
@@ -902,6 +1150,31 @@ func (q sampleQuery) UpdateAll(ctx context.Context, exec boil.ContextExecutor, c
 	}
 
 	return rowsAff, nil
+}
+
+// UpdateAllG updates all rows with the specified column values.
+func (o SampleSlice) UpdateAllG(ctx context.Context, cols M) (int64, error) {
+	return o.UpdateAll(ctx, boil.GetContextDB(), cols)
+}
+
+// UpdateAllGP updates all rows with the specified column values, and panics on error.
+func (o SampleSlice) UpdateAllGP(ctx context.Context, cols M) int64 {
+	rowsAff, err := o.UpdateAll(ctx, boil.GetContextDB(), cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// UpdateAllP updates all rows with the specified column values, and panics on error.
+func (o SampleSlice) UpdateAllP(ctx context.Context, exec boil.ContextExecutor, cols M) int64 {
+	rowsAff, err := o.UpdateAll(ctx, exec, cols)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
 }
 
 // UpdateAll updates all rows with the specified column values, using an executor.
@@ -950,6 +1223,26 @@ func (o SampleSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, c
 		return 0, errors.Wrap(err, "models: unable to retrieve rows affected all in update all sample")
 	}
 	return rowsAff, nil
+}
+
+// UpsertG attempts an insert, and does an update or ignore on conflict.
+func (o *Sample) UpsertG(ctx context.Context, updateColumns, insertColumns boil.Columns) error {
+	return o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns)
+}
+
+// UpsertGP attempts an insert, and does an update or ignore on conflict. Panics on error.
+func (o *Sample) UpsertGP(ctx context.Context, updateColumns, insertColumns boil.Columns) {
+	if err := o.Upsert(ctx, boil.GetContextDB(), updateColumns, insertColumns); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// UpsertP attempts an insert using an executor, and does an update or ignore on conflict.
+// UpsertP panics on error.
+func (o *Sample) UpsertP(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) {
+	if err := o.Upsert(ctx, exec, updateColumns, insertColumns); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 var mySQLSampleUniqueColumns = []string{
@@ -1108,6 +1401,36 @@ CacheNoHooks:
 	return o.doAfterUpsertHooks(ctx, exec)
 }
 
+// DeleteG deletes a single Sample record.
+// DeleteG will match against the primary key column to find the record to delete.
+func (o *Sample) DeleteG(ctx context.Context, hardDelete bool) (int64, error) {
+	return o.Delete(ctx, boil.GetContextDB(), hardDelete)
+}
+
+// DeleteP deletes a single Sample record with an executor.
+// DeleteP will match against the primary key column to find the record to delete.
+// Panics on error.
+func (o *Sample) DeleteP(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) int64 {
+	rowsAff, err := o.Delete(ctx, exec, hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteGP deletes a single Sample record.
+// DeleteGP will match against the primary key column to find the record to delete.
+// Panics on error.
+func (o *Sample) DeleteGP(ctx context.Context, hardDelete bool) int64 {
+	rowsAff, err := o.Delete(ctx, boil.GetContextDB(), hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // Delete deletes a single Sample record with an executor.
 // Delete will match against the primary key column to find the record to delete.
 func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
@@ -1162,6 +1485,30 @@ func (o *Sample) Delete(ctx context.Context, exec boil.ContextExecutor, hardDele
 	return rowsAff, nil
 }
 
+func (q sampleQuery) DeleteAllG(ctx context.Context, hardDelete bool) (int64, error) {
+	return q.DeleteAll(ctx, boil.GetContextDB(), hardDelete)
+}
+
+// DeleteAllP deletes all rows, and panics on error.
+func (q sampleQuery) DeleteAllP(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) int64 {
+	rowsAff, err := q.DeleteAll(ctx, exec, hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteAllGP deletes all rows, and panics on error.
+func (q sampleQuery) DeleteAllGP(ctx context.Context, hardDelete bool) int64 {
+	rowsAff, err := q.DeleteAll(ctx, boil.GetContextDB(), hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
 // DeleteAll deletes all matching rows.
 func (q sampleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if q.Query == nil {
@@ -1186,6 +1533,31 @@ func (q sampleQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor, h
 	}
 
 	return rowsAff, nil
+}
+
+// DeleteAllG deletes all rows in the slice.
+func (o SampleSlice) DeleteAllG(ctx context.Context, hardDelete bool) (int64, error) {
+	return o.DeleteAll(ctx, boil.GetContextDB(), hardDelete)
+}
+
+// DeleteAllP deletes all rows in the slice, using an executor, and panics on error.
+func (o SampleSlice) DeleteAllP(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) int64 {
+	rowsAff, err := o.DeleteAll(ctx, exec, hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
+}
+
+// DeleteAllGP deletes all rows in the slice, and panics on error.
+func (o SampleSlice) DeleteAllGP(ctx context.Context, hardDelete bool) int64 {
+	rowsAff, err := o.DeleteAll(ctx, boil.GetContextDB(), hardDelete)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return rowsAff
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
@@ -1254,6 +1626,29 @@ func (o SampleSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor, h
 	return rowsAff, nil
 }
 
+// ReloadG refetches the object from the database using the primary keys.
+func (o *Sample) ReloadG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: no Sample provided for reload")
+	}
+
+	return o.Reload(ctx, boil.GetContextDB())
+}
+
+// ReloadP refetches the object from the database with an executor. Panics on error.
+func (o *Sample) ReloadP(ctx context.Context, exec boil.ContextExecutor) {
+	if err := o.Reload(ctx, exec); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// ReloadGP refetches the object from the database and panics on error.
+func (o *Sample) ReloadGP(ctx context.Context) {
+	if err := o.Reload(ctx, boil.GetContextDB()); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Sample) Reload(ctx context.Context, exec boil.ContextExecutor) error {
@@ -1264,6 +1659,34 @@ func (o *Sample) Reload(ctx context.Context, exec boil.ContextExecutor) error {
 
 	*o = *ret
 	return nil
+}
+
+// ReloadAllG refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+func (o *SampleSlice) ReloadAllG(ctx context.Context) error {
+	if o == nil {
+		return errors.New("models: empty SampleSlice provided for reload all")
+	}
+
+	return o.ReloadAll(ctx, boil.GetContextDB())
+}
+
+// ReloadAllP refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+// Panics on error.
+func (o *SampleSlice) ReloadAllP(ctx context.Context, exec boil.ContextExecutor) {
+	if err := o.ReloadAll(ctx, exec); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// ReloadAllGP refetches every row with matching primary key column values
+// and overwrites the original object slice with the newly updated slice.
+// Panics on error.
+func (o *SampleSlice) ReloadAllGP(ctx context.Context) {
+	if err := o.ReloadAll(ctx, boil.GetContextDB()); err != nil {
+		panic(boil.WrapErr(err))
+	}
 }
 
 // ReloadAll refetches every row with matching primary key column values
@@ -1294,6 +1717,31 @@ func (o *SampleSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 	*o = slice
 
 	return nil
+}
+
+// SampleExistsG checks if the Sample row exists.
+func SampleExistsG(ctx context.Context, iD uint) (bool, error) {
+	return SampleExists(ctx, boil.GetContextDB(), iD)
+}
+
+// SampleExistsP checks if the Sample row exists. Panics on error.
+func SampleExistsP(ctx context.Context, exec boil.ContextExecutor, iD uint) bool {
+	e, err := SampleExists(ctx, exec, iD)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
+}
+
+// SampleExistsGP checks if the Sample row exists. Panics on error.
+func SampleExistsGP(ctx context.Context, iD uint) bool {
+	e, err := SampleExists(ctx, boil.GetContextDB(), iD)
+	if err != nil {
+		panic(boil.WrapErr(err))
+	}
+
+	return e
 }
 
 // SampleExists checks if the Sample row exists.

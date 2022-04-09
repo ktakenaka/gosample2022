@@ -26,7 +26,7 @@ lint:
 		golangci-lint run --fix
 
 boil:
-	docker-compose exec app sqlboiler mysql -c db/sqlboiler.toml --add-soft-deletes
+	docker-compose exec app sqlboiler mysql -c db/sqlboiler.toml --add-soft-deletes --add-enum-types --add-global-variants --add-panic-variants
 
 protoc:
 	docker-compose exec app protoc --go_out=./app/interface/grpc --go-grpc_out=./app/interface/grpc protos/${name}.proto
