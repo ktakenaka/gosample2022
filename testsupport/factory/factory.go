@@ -43,3 +43,35 @@ func MustBuildOffice(attrs Attributes) *models.Office {
 
 	return office
 }
+
+func MustBuildUser(attrs Attributes) *models.User {
+	user := &models.User{
+		ID:    ulid.MustNew(),
+		Email: "example@dummy.com",
+	}
+
+	if err := attrs.overWrite(reflect.ValueOf(user)); err != nil {
+		panic(err)
+	}
+
+	return user
+}
+
+func MustBuildOfficeUser(attrs Attributes) (
+	*models.User, *models.Office, *models.OfficeUser,
+) {
+	user := MustBuildUser(nil)
+	office := MustBuildOffice(nil)
+
+	ou := &models.OfficeUser{
+		ID:       ulid.MustNew(),
+		UserID:   user.ID,
+		OfficeID: office.ID,
+	}
+
+	if err := attrs.overWrite(reflect.ValueOf(user)); err != nil {
+		panic(err)
+	}
+
+	return user, office, ou
+}
