@@ -29,5 +29,4 @@ type Provider struct {
 	DB    DB
 	Redis Redis
 	Mongo Mongo
-	Kafka Kafka
 }

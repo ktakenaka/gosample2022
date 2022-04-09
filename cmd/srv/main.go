@@ -47,13 +47,6 @@ func main() {
 	}
 	tasks.Add(task)
 
-	provider.Kafka, task, err = kafkaclient.Init(ctx, cfg)
-	if err != nil {
-		ntfr.Error(err)
-		panic(err)
-	}
-	tasks.Add(task)
-
 	task, err = grpc.New(cfg, provider)
 	if err != nil {
 		ntfr.Error(err)
