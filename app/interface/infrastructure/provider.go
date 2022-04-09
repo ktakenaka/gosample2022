@@ -1,9 +1,7 @@
 package infrastructure
 
 import (
-	"time"
-
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/Shopify/sarama"
 	"github.com/go-redis/redis/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
@@ -23,13 +21,13 @@ type Redis interface {
 type Mongo interface {
 }
 
-type KafkaConsumer interface {
-	ReadMessage(timeout time.Duration) (*kafka.Message, error)
+type Kafka interface {
+	sarama.Client
 }
 
 type Provider struct {
-	DB            DB
-	Redis         Redis
-	Mongo         Mongo
-	KafkaConsumer KafkaConsumer
+	DB    DB
+	Redis Redis
+	Mongo Mongo
+	Kafka Kafka
 }

@@ -34,23 +34,17 @@ type Config struct {
 		URL    string `yaml:"url"`
 		DBName string `yaml:"db_name"`
 	}
-	KafkaConsumer struct {
-		BootStrapServer   string `yaml:"boot_strap_server"`
-		AutoOffsetReset   string `yaml:"auto_offset_reset"`
+	Kafka struct {
+		Address           string `yaml:"address"`
 		TopicSamples      string `yaml:"topic_samples"`
 		TopicTransactions string `yaml:"topic_transactions"`
-	} `yaml:"kafka_consumer"`
+	}
 	Rollbar *rollbar.Config
 }
 
-func New(configFilePath string) (*Config, error) {
-	cfgByte, err := os.ReadFile(configFilePath)
-	if err != nil {
-		return nil, err
-	}
-
+func New(cfgByte []byte) (*Config, error) {
 	cfgByte = []byte(os.ExpandEnv(string(cfgByte)))
 	cfg := &Config{}
-	err = yaml.Unmarshal(cfgByte, &cfg)
+	err := yaml.Unmarshal(cfgByte, &cfg)
 	return cfg, err
 }

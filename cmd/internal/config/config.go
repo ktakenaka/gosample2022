@@ -1,17 +1,17 @@
 package config
 
 import (
-	"flag"
+	"os"
 
 	"github.com/ktakenaka/gosample2022/app/config"
+	"github.com/ktakenaka/gosample2022/environment"
 )
 
 func Initialize() (*config.Config, error) {
-	configFilePath := flag.String("c", "", "config file path for app")
-	flag.Parse()
-	if *configFilePath == "" {
-		*configFilePath = "environment/local.yml"
+	file, err := environment.GetConfig(os.Getenv("ENV"))
+	if err != nil {
+		panic(err)
 	}
 
-	return config.New(*configFilePath)
+	return config.New(file)
 }
