@@ -17,7 +17,8 @@ curl --location --request POST 'http://localhost:8083/connectors' \
         "database.server.name": "gosample2022_dbserver",
         "database.history.kafka.bootstrap.servers": "kafka:29092",
         "database.history.kafka.topic": "schema-changes.gosample2022",
-        "provide.transaction.metadata": true
+        "provide.transaction.metadata": true,
+        "transaction.topic": "gosample2022_development.transactions"
     }
 }'
 ```

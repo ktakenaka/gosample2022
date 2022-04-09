@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
@@ -16,22 +15,33 @@ import (
 var (
 	cfg, _ = config.Initialize()
 	ctx    = context.Background()
-
-	officeID = ulid.MustNew()
 )
+
+func init() {
+	boil.DebugMode = true
+}
 
 func main() {
 	db, task, _ := mysql.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
-	office := &models.Office{ID: officeID, Name: "sample"}
-	office.Upsert(ctx, db, boil.Infer(), boil.Infer())
-	err := office.AddSamples(ctx, db, true, &models.Sample{
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		panic(err)
+	}
+	defer tx.Commit()
+
+	office := &models.Office{ID: ulid.MustNew(), Name: "debezium sample"}
+	if err := office.Insert(ctx, tx, boil.Infer()); err != nil {
+		panic(err)
+	}
+	if err := office.AddSamples(ctx, tx, true, &models.Sample{
 		Biid:      ulid.MustNew(),
 		Code:      "code",
 		Category:  models.SamplesCategorySmall,
 		Amount:    decimal.NewFromFloat(1.2),
 		ValidFrom: time.Now(),
-	})
-	fmt.Println(err)
+	}); err != nil {
+		panic(err)
+	}
 }
