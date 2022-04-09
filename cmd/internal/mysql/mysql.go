@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/ktakenaka/gosample2022/app/config"
-	"github.com/ktakenaka/gosample2022/app/domain/repository"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/pkg/dbresolver"
 	"github.com/ktakenaka/gosample2022/cmd/internal/shutdown"
 	infraDB "github.com/ktakenaka/gosample2022/infra/database"
@@ -32,7 +32,7 @@ func (t *task) Shutdown(ctx context.Context) (err error) {
 	return err
 }
 
-func Init(ctx context.Context, cfg *config.Config) (repository.DB, shutdown.Task, error) {
+func Init(ctx context.Context, cfg *config.Config) (infrastructure.DB, shutdown.Task, error) {
 	write, err := infraDB.New(cfg.DB.Write)
 	if err != nil {
 		return nil, nil, err

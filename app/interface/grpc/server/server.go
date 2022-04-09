@@ -5,7 +5,7 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
-	"github.com/ktakenaka/gosample2022/app/registry"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,8 +17,8 @@ type server struct {
 	interactor usecase.Interactor
 }
 
-func NewServer(provider *registry.Provider) *server {
-	srv := &server{interactor: usecase.NewInteractor(provider.DB, provider.Redis)}
+func NewServer(provider *infrastructure.Provider) *server {
+	srv := &server{interactor: usecase.NewInteractor(provider)}
 	return srv
 }
 
