@@ -43,14 +43,9 @@ type Config struct {
 	Rollbar *rollbar.Config
 }
 
-func New(configFilePath string) (*Config, error) {
-	cfgByte, err := os.ReadFile(configFilePath)
-	if err != nil {
-		return nil, err
-	}
-
+func New(cfgByte []byte) (*Config, error) {
 	cfgByte = []byte(os.ExpandEnv(string(cfgByte)))
 	cfg := &Config{}
-	err = yaml.Unmarshal(cfgByte, &cfg)
+	err := yaml.Unmarshal(cfgByte, &cfg)
 	return cfg, err
 }

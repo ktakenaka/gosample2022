@@ -24,7 +24,7 @@ mongo:
   url: mongodb://root:password@mongodb:27017
   db_name: gosample2022_development
 kafka_consumer:
-  boot_strap_server: localhost
+  boot_strap_server: localhost:9092
   auto_offset_reset: earliest
   topic_samples: gosample2022_dbserver.gosample2022_development.sample
   topic_transactions: gosample2022_dbserver.transaction
