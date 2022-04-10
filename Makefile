@@ -23,7 +23,7 @@ lint:
 	@docker run --rm \
 		--volume "$(PWD):/app" \
 		-w /app golangci/golangci-lint:v1.43.0 \
-		golangci-lint run --fix
+		golangci-lint run ./app/... --fix
 
 boil:
 	docker-compose exec app sqlboiler mysql -c db/sqlboiler.toml --add-soft-deletes --add-enum-types --add-global-variants --add-panic-variants
