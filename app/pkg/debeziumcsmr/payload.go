@@ -21,7 +21,7 @@ type SamplePayload struct {
 type Sample struct {
 	ID        uint     `json:"id"`
 	Biid      string   `json:"biid"`
-	OfficeId  string   `json:"office_id"`
+	OfficeID  string   `json:"office_id"`
 	Code      string   `json:"code"`
 	Category  string   `json:"category"`
 	Amount    Decimal  `json:"amount"`
@@ -42,17 +42,3 @@ type TransactionPayload struct {
 		} `json:"data_collections"`
 	} `json:"payload"`
 }
-
-/*
-  "payload": {
-    "status": "END",
-    "id": "f64b158e-b7fb-11ec-89da-0242ac150004:49",
-    "event_count": 1,
-    "data_collections": [
-      {
-        "data_collection": "gosample2022_development.samples",
-        "event_count": 1
-      }
-    ]
-  }
-*/
