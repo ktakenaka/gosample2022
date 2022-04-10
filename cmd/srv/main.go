@@ -7,7 +7,6 @@ import (
 	ntfr "github.com/ktakenaka/gosample2022/app/pkg/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/grpc"
-	"github.com/ktakenaka/gosample2022/cmd/internal/kafkaclient"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
 	"github.com/ktakenaka/gosample2022/cmd/internal/notifier"
 	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
