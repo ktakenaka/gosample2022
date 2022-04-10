@@ -30,3 +30,29 @@ type Sample struct {
 	CreatedAt Time     `json:"created_at"`
 	DeletedAt NullTime `json:"deleted_at"`
 }
+
+type TransactionPayload struct {
+	Payload struct {
+		Status          string `json:"status"`
+		ID              string `json:"id"`
+		EventCount      uint   `json:"event_count"`
+		DataCollections []struct {
+			DataCollection string `json:"data_collection"`
+			EventCount     uint   `json:"event_count"`
+		} `json:"data_collections"`
+	} `json:"payload"`
+}
+
+/*
+  "payload": {
+    "status": "END",
+    "id": "f64b158e-b7fb-11ec-89da-0242ac150004:49",
+    "event_count": 1,
+    "data_collections": [
+      {
+        "data_collection": "gosample2022_development.samples",
+        "event_count": 1
+      }
+    ]
+  }
+*/
