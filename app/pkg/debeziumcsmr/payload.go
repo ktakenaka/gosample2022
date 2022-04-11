@@ -42,6 +42,7 @@ type Sample struct {
 	ValidTo   Date     `json:"valid_to"`
 	CreatedAt Time     `json:"created_at"`
 	DeletedAt NullTime `json:"deleted_at"`
+	Version   uint8    `json:"version"`
 }
 
 type TransactionPayload struct {

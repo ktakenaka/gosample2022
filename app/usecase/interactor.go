@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ktakenaka/gosample2022/app/domain/models"
@@ -10,6 +11,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/pkg/debeziumcsmr"
 	"github.com/ktakenaka/gosample2022/app/pkg/transaction"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
@@ -58,6 +60,7 @@ func (i *interactor) SampleCreate(ctx context.Context, office *Office, req *BiTe
 			Amount:    req.Amount,
 			ValidFrom: req.ValidFrom.ToTime(),
 			ValidTo:   req.ValidTo.ToTime(), // TODO: When validTo is nil, make it max date.
+			Version:   1,
 		},
 	)
 	if err != nil {
@@ -78,41 +81,35 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *Office, req *Bi
 		TODO: validation
 	*/
 
-	tx, err := i.p.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-			return
+	err = transaction.TxExecute(ctx, i.p.DB, func(tx *sql.Tx) error {
+		latest.DeletedAt = null.TimeFrom(time.Now())
+		latest.Version += 1
+		if _, err := latest.Update(ctx, tx, boil.Whitelist(models.SampleCopyColumns.DeletedAt, models.SampleCopyColumns.Version)); err != nil {
+			return err
 		}
-		_ = tx.Commit()
-	}()
 
-	if _, err := latest.Delete(ctx, tx, false); err != nil {
+		new := latest
+		new.ID = 0
+		new.DeletedAt.Valid = false
+		new.ValidTo = req.ValidFrom.ToTime().AddDate(0, 0, -1)
+		new.Version = 1
+		err = office.AddSamples(
+			ctx, tx, true,
+			new,
+			&models.Sample{
+				Biid:      new.Biid,
+				Code:      new.Code,
+				Category:  req.Category,
+				Amount:    req.Amount,
+				ValidFrom: req.ValidFrom.ToTime(),
+				ValidTo:   req.ValidTo.ToTime(),
+				Version:   1,
+			},
+		)
 		return err
-	}
+	})
 
-	latest.ID = 0
-	latest.DeletedAt.Valid = false
-	latest.ValidTo = req.ValidFrom.ToTime().AddDate(0, 0, -1)
-	if err := office.AddSamples(
-		ctx, tx, true,
-		latest,
-		&models.Sample{
-			Biid:      latest.Biid,
-			Code:      latest.Code,
-			Category:  req.Category,
-			Amount:    req.Amount,
-			ValidFrom: req.ValidFrom.ToTime(),
-			ValidTo:   req.ValidTo.ToTime(),
-		},
-	); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*SampleCopy) (err error) {
@@ -141,7 +138,7 @@ func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sam
 
 		existingSamplesMap := make(map[uint]*models.SampleCopy)
 		for i := range existingSamples {
-			existingSamples[existingSamples[i].ID] = existingSamples[i]
+			existingSamplesMap[existingSamples[i].ID] = existingSamples[i]
 		}
 
 		var upsertingList models.SampleCopySlice
@@ -152,8 +149,7 @@ func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sam
 				continue
 			}
 
-			// TODO: Use version column to judge if we should update
-			if existing.DeletedAt.Valid {
+			if existing.Version >= samples[i].Version {
 				continue
 			}
 

@@ -1,6 +1,6 @@
 # Debezium Setup
 Register a connector
-```
+```json
 curl --location --request POST 'http://localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data-raw '{

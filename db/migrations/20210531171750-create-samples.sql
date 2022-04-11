@@ -12,6 +12,8 @@ CREATE TABLE samples (
   created_at TIMESTAMP NOT NULL,
   deleted_at TIMESTAMP,
 
+  version TINYINT UNSIGNED NOT NULL,
+
   CONSTRAINT `fk_samples_office_id` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
 );
 

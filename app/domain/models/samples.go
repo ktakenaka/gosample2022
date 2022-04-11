@@ -36,6 +36,7 @@ type Sample struct {
 	ValidTo   time.Time       `boil:"valid_to" json:"valid_to" toml:"valid_to" yaml:"valid_to"`
 	CreatedAt time.Time       `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	DeletedAt null.Time       `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	Version   uint8           `boil:"version" json:"version" toml:"version" yaml:"version"`
 
 	R *sampleR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L sampleL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -52,6 +53,7 @@ var SampleColumns = struct {
 	ValidTo   string
 	CreatedAt string
 	DeletedAt string
+	Version   string
 }{
 	ID:        "id",
 	Biid:      "biid",
@@ -63,6 +65,7 @@ var SampleColumns = struct {
 	ValidTo:   "valid_to",
 	CreatedAt: "created_at",
 	DeletedAt: "deleted_at",
+	Version:   "version",
 }
 
 var SampleTableColumns = struct {
@@ -76,6 +79,7 @@ var SampleTableColumns = struct {
 	ValidTo   string
 	CreatedAt string
 	DeletedAt string
+	Version   string
 }{
 	ID:        "samples.id",
 	Biid:      "samples.biid",
@@ -87,6 +91,7 @@ var SampleTableColumns = struct {
 	ValidTo:   "samples.valid_to",
 	CreatedAt: "samples.created_at",
 	DeletedAt: "samples.deleted_at",
+	Version:   "samples.version",
 }
 
 // Generated where
@@ -123,6 +128,7 @@ var SampleWhere = struct {
 	ValidTo   whereHelpertime_Time
 	CreatedAt whereHelpertime_Time
 	DeletedAt whereHelpernull_Time
+	Version   whereHelperuint8
 }{
 	ID:        whereHelperuint{field: "`samples`.`id`"},
 	Biid:      whereHelperstring{field: "`samples`.`biid`"},
@@ -134,6 +140,7 @@ var SampleWhere = struct {
 	ValidTo:   whereHelpertime_Time{field: "`samples`.`valid_to`"},
 	CreatedAt: whereHelpertime_Time{field: "`samples`.`created_at`"},
 	DeletedAt: whereHelpernull_Time{field: "`samples`.`deleted_at`"},
+	Version:   whereHelperuint8{field: "`samples`.`version`"},
 }
 
 // SampleRels is where relationship names are stored.
@@ -157,8 +164,8 @@ func (*sampleR) NewStruct() *sampleR {
 type sampleL struct{}
 
 var (
-	sampleAllColumns            = []string{"id", "biid", "office_id", "code", "category", "amount", "valid_from", "valid_to", "created_at", "deleted_at"}
-	sampleColumnsWithoutDefault = []string{"biid", "office_id", "code", "category", "amount", "valid_from", "created_at", "deleted_at"}
+	sampleAllColumns            = []string{"id", "biid", "office_id", "code", "category", "amount", "valid_from", "valid_to", "created_at", "deleted_at", "version"}
+	sampleColumnsWithoutDefault = []string{"biid", "office_id", "code", "category", "amount", "valid_from", "created_at", "deleted_at", "version"}
 	sampleColumnsWithDefault    = []string{"id", "valid_to"}
 	samplePrimaryKeyColumns     = []string{"id"}
 	sampleGeneratedColumns      = []string{}
