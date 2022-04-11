@@ -11,7 +11,11 @@ import (
 type Decimal decimal.Decimal
 
 // TODO: Enable to handle numbers with values with non-2 digits aftere the decimal point
-const digitsAfterDecimalPoint = -2
+const (
+	digitsAfterDecimalPoint = -2
+	baseNumBit              = 2
+	bitSize64               = 64
+)
 
 func (d *Decimal) UnmarshalJSON(in []byte) error {
 	// decimal is based64 encoded by Debezium connector
@@ -30,7 +34,7 @@ func (d *Decimal) UnmarshalJSON(in []byte) error {
 	}
 
 	// Convert binary with string format to decimal number
-	v, err := strconv.ParseInt(valStr, 2, 64)
+	v, err := strconv.ParseInt(valStr, baseNumBit, bitSize64)
 	if err != nil {
 		return err
 	}
