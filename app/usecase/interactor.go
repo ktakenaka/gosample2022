@@ -9,6 +9,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/pkg/debeziumcsmr"
+	"github.com/ktakenaka/gosample2022/app/pkg/transaction"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -124,49 +125,47 @@ func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sam
 		return nil
 	}
 
-	tx, _ := i.p.DB.BeginTx(ctx, nil)
-	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
-			return
-		}
-		_ = tx.Commit()
-	}()
+	err = transaction.TxExecute(ctx, i.p.DB, func(tx *sql.Tx) error {
+		var upsertingList models.SampleCopySlice
+		for i := range samples {
+			// TODO: あーーこれ一斉にロック取らんとデッドロックするやん。
+			// ちゃんと楽観的ロック実装しよう
+			existing, err := models.SampleCopies(
+				models.SampleCopyWhere.ID.EQ(samples[i].ID),
+				qm.WithDeleted(),
+				qm.For("UPDATE"),
+			).One(ctx, tx)
+			if err != nil && errors.Is(err, sql.ErrNoRows) {
+				upsertingList = append(upsertingList, samples[i].SampleCopy)
+				continue
+			}
+			if err != nil {
+				return err
+			}
 
-	var upsertingList models.SampleCopySlice
-	for i := range samples {
-		existing, err := models.SampleCopies(
-			models.SampleCopyWhere.ID.EQ(samples[i].ID),
-			qm.WithDeleted(),
-			qm.For("UPDATE"),
-		).One(ctx, tx)
-		if err != nil && errors.Is(err, sql.ErrNoRows) {
+			// TODO: Use version column to judge if we should update
+			if existing.DeletedAt.Valid {
+				continue
+			}
+
+			if diff := cmp.Diff(samples[i].SampleCopy, existing); diff == "" {
+				continue
+			}
+
 			upsertingList = append(upsertingList, samples[i].SampleCopy)
-			continue
-		}
-		if err != nil {
-			return err
 		}
 
-		// TODO: Use version column to judge if we should update
-		if existing.DeletedAt.Valid {
-			continue
+		// TODO: Use UpsertAll
+		for i := range upsertingList {
+			if err := upsertingList[i].Upsert(ctx, tx, boil.Infer(), boil.Infer()); err != nil {
+				return err
+			}
 		}
-
-		if diff := cmp.Diff(samples[i].SampleCopy, existing); diff == "" {
-			continue
-		}
-		println(cmp.Diff(samples[i].SampleCopy, existing))
-
-		upsertingList = append(upsertingList, samples[i].SampleCopy)
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
-	// TODO: Use UpsertAll
-	for i := range upsertingList {
-		if err := upsertingList[i].Upsert(ctx, tx, boil.Infer(), boil.Infer()); err != nil {
-			return err
-		}
-	}
-	err = i.p.Redis.Del(ctx, debeziumcsmr.RedisKeyCount(tID), debeziumcsmr.RedisKeyRecords(tID)).Err()
-	return err
+	return i.p.Redis.Del(ctx, debeziumcsmr.RedisKeyCount(tID), debeziumcsmr.RedisKeyRecords(tID)).Err()
 }
