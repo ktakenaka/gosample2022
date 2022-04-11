@@ -13,6 +13,8 @@ type Interactor interface {
 	OfficeOne(ctx context.Context, officeID string) (*models.Office, error)
 
 	SampleList(ctx context.Context, office *models.Office) (models.SampleSlice, error)
+	SampleCreate(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) (*models.Sample, error)
+	SampleAddFirst(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) error
 }
 
 type interactor struct {
@@ -34,7 +36,7 @@ func (i *interactor) SampleList(ctx context.Context, office *models.Office) (mod
 /*
 TODO: Implement BiTemporalDataModel logics seriously
 */
-func (i *interactor) SampleCreate(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) error {
+func (i *interactor) SampleCreate(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) (*models.Sample, error) {
 	err := office.AddSamples(
 		ctx, i.p.DB, true,
 		&models.Sample{
@@ -43,15 +45,18 @@ func (i *interactor) SampleCreate(ctx context.Context, office *models.Office, re
 			Category:  req.Category,
 			Amount:    req.Amount,
 			ValidFrom: req.ValidFrom.ToTime(),
-			ValidTo:   req.ValidTo.ToTime(),
+			ValidTo:   req.ValidTo.ToTime(), // TODO: When validTo is nil, make it max date.
 		},
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return office.R.Samples[0], nil
 }
 func (i *interactor) SampleAddFirst(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) error {
 	latest, err := office.Samples(
 		models.SampleWhere.Biid.EQ(req.Biid),
-		qm.OrderBy(models.SampleTableColumns.ValidTo, "DESC"),
+		qm.OrderBy(models.SampleTableColumns.ValidTo+" DESC"),
 	).One(ctx, i.p.DB)
 	if err != nil {
 		return err
@@ -84,8 +89,8 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *models.Office, 
 		ctx, tx, true,
 		latest,
 		&models.Sample{
-			Biid:      req.Biid,
-			Code:      req.Code,
+			Biid:      latest.Biid,
+			Code:      latest.Code,
 			Category:  req.Category,
 			Amount:    req.Amount,
 			ValidFrom: req.ValidFrom.ToTime(),

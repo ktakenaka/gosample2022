@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
-	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
-	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
+	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
+	"github.com/ktakenaka/gosample2022/app/pkg/historydate"
+	"github.com/ktakenaka/gosample2022/app/usecase"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
 	"github.com/shopspring/decimal"
@@ -13,8 +16,10 @@ import (
 )
 
 var (
-	cfg, _ = config.Initialize()
-	ctx    = context.Background()
+	cfg, _       = config.Initialize()
+	ctx          = context.Background()
+	validFrom, _ = historydate.ParseDate("2021-08-02")
+	maxDate, _   = historydate.ParseDate("9999-12-31")
 )
 
 func init() {
@@ -25,23 +30,29 @@ func main() {
 	db, task, _ := mysql.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
-	tx, err := db.BeginTx(ctx, nil)
+	office := models.Offices().OneP(ctx, db)
+
+	i := usecase.NewInteractor(&infrastructure.Provider{DB: db})
+	sample, err := i.SampleCreate(ctx, office, &usecase.BiTemporalSampleRequest{
+		Code:      uuid.New().String()[:9],
+		Category:  models.SamplesCategoryMedium,
+		Amount:    decimal.New(1234, -2),
+		ValidFrom: validFrom,
+		ValidTo:   maxDate,
+	})
 	if err != nil {
 		panic(err)
 	}
-	defer tx.Commit()
 
-	office := &models.Office{ID: ulid.MustNew(), Name: "debezium sample"}
-	if err := office.Insert(ctx, tx, boil.Infer()); err != nil {
-		panic(err)
-	}
-	if err := office.AddSamples(ctx, tx, true, &models.Sample{
-		Biid:      ulid.MustNew(),
-		Code:      "code1",
-		Category:  models.SamplesCategoryLarge,
-		Amount:    decimal.NewFromFloat(1.2),
-		ValidFrom: time.Now(),
-	}); err != nil {
+	err = i.SampleAddFirst(ctx, office, &usecase.BiTemporalSampleRequest{
+		Biid:      sample.Biid,
+		Code:      sample.Code,
+		Category:  sample.Category,
+		Amount:    decimal.New(12345, -3),
+		ValidFrom: validFrom,
+		ValidTo:   maxDate,
+	})
+	if err != nil {
 		panic(err)
 	}
 }
