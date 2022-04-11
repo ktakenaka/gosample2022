@@ -18,14 +18,13 @@ func main() {
 
 	kafkaClient, task, _ := kafkaclient.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
+
 	redisClient, task, _ := redis.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
 	csmer, _ := kafka.NewConsumer(kafkaClient)
 	pcsmer, err := csmer.ConsumePartition(
-		"gosample2022_dbserver.transaction",
-		0,
-		0,
+		"gosample2022_dbserver.transaction", 0, 0,
 	)
 	if err != nil {
 		panic(err)
@@ -37,9 +36,10 @@ func main() {
 			continue
 		}
 
-		fmt.Println("=== ID", payload.Payload.ID)
-		fmt.Println("Status", payload.Payload.Status)
-		fmt.Println("EventCount", payload.Payload.EventCount)
-		fmt.Println(payload.Payload.DataCollections)
+		if payload.Payload.Status != debeziumcsmr.TransactionStatusEnd {
+			continue
+		}
+		fmt.Println("===", payload.Payload.ID)
+		fmt.Println(redisClient.Set(ctx, payload.Payload.ID+"-count", payload.Payload.EventCount, 0).Result())
 	}
 }
