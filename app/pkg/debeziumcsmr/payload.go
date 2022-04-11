@@ -1,9 +1,17 @@
 package debeziumcsmr
 
+import "encoding/json"
+
 /*
 Following Debezium spec
 https://debezium.io/documentation/reference/stable/connectors/mysql.html
 */
+
+const (
+	TransactionStatusBegin = "BEGIN"
+	TransactionStatusEnd   = "END"
+)
+
 type Transaction struct {
 	ID                  string `json:"id"`
 	TotalOrder          uint   `json:"total_order"`
@@ -29,6 +37,14 @@ type Sample struct {
 	ValidTo   Date     `json:"valid_to"`
 	CreatedAt Time     `json:"created_at"`
 	DeletedAt NullTime `json:"deleted_at"`
+}
+
+func (s *Sample) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(s)
+}
+
+func (s *Sample) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, s)
 }
 
 type TransactionPayload struct {
