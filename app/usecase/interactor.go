@@ -17,7 +17,7 @@ type Interactor interface {
 	SampleCreate(ctx context.Context, office *Office, req *BiTemporalSampleRequest) (*Sample, error)
 	SampleAddFirst(ctx context.Context, office *Office, req *BiTemporalSampleRequest) error
 
-	SyncSamples(ctx context.Context, tID string, samples []*Sample) error
+	SyncSamples(ctx context.Context, tID string, samples []*SampleCopy) error
 }
 
 type interactor struct {
@@ -111,6 +111,6 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *Office, req *Bi
 	return nil
 }
 
-func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sample) error {
+func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*SampleCopy) error {
 	return i.p.Redis.Del(ctx, debeziumcsmr.RedisKeyCount(tID), debeziumcsmr.RedisKeyRecords(tID)).Err()
 }

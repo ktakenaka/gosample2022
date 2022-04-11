@@ -51,7 +51,7 @@ func main() {
 			continue
 		}
 
-		samples := []*usecase.Sample{}
+		samples := []*usecase.SampleCopy{}
 		if err := redisClient.SMembers(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.ID)).ScanSlice(&samples); err != nil {
 			fmt.Println(err)
 			continue

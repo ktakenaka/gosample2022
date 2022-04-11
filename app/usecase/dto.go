@@ -26,10 +26,14 @@ type Sample struct {
 	*models.Sample
 }
 
-func (s *Sample) MarshalBinary() (data []byte, err error) {
+type SampleCopy struct {
+	*models.SampleCopy
+}
+
+func (s *SampleCopy) MarshalBinary() (data []byte, err error) {
 	return json.Marshal(s)
 }
 
-func (s *Sample) UnmarshalBinary(data []byte) error {
+func (s *SampleCopy) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, s)
 }
