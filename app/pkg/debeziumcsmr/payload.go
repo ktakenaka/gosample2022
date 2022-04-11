@@ -1,7 +1,5 @@
 package debeziumcsmr
 
-import "encoding/json"
-
 /*
 Following Debezium spec
 https://debezium.io/documentation/reference/stable/connectors/mysql.html
@@ -19,6 +17,13 @@ type Transaction struct {
 }
 
 // TODO: Move to proper place. It's not natural to define this in pkg.
+func RedisKeyCount(tID string) string {
+	return tID + "-count"
+}
+func RedisKeyRecords(tID string) string {
+	return tID + "-records"
+}
+
 type SamplePayload struct {
 	Payload struct {
 		Before      Sample      `json:"before"`
@@ -37,14 +42,6 @@ type Sample struct {
 	ValidTo   Date     `json:"valid_to"`
 	CreatedAt Time     `json:"created_at"`
 	DeletedAt NullTime `json:"deleted_at"`
-}
-
-func (s *Sample) MarshalBinary() (data []byte, err error) {
-	return json.Marshal(s)
-}
-
-func (s *Sample) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, s)
 }
 
 type TransactionPayload struct {

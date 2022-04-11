@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"time"
 	"unsafe"
+
+	"github.com/volatiletech/null/v8"
 )
 
 type Time time.Time
@@ -25,22 +27,17 @@ func (t Time) String() string {
 	return time.Time(t).Format(time.RFC3339)
 }
 
-type NullTime struct {
-	Time  Time
-	Valid bool
-}
+type NullTime null.Time
 
 // UnmarshalJSON implements encoding.UnmarshalJSON interface
 func (t *NullTime) UnmarshalJSON(in []byte) error {
 	if bytes.Equal(in, []byte("null")) {
-		*t = NullTime{Valid: false, Time: Time{}}
+		*t = NullTime(null.NewTime(time.Time{}, false))
 		return nil
 	}
-
 	if err := t.Time.UnmarshalJSON(in); err != nil {
 		return err
 	}
-
 	t.Valid = true
 	return nil
 }
@@ -50,5 +47,5 @@ func (t NullTime) String() string {
 	if !t.Valid {
 		return "null"
 	}
-	return time.Time(t.Time).Format(time.RFC3339)
+	return t.Time.Format(time.RFC3339)
 }

@@ -5,16 +5,19 @@ import (
 
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
+	"github.com/ktakenaka/gosample2022/app/pkg/debeziumcsmr"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type Interactor interface {
-	OfficeOne(ctx context.Context, officeID string) (*models.Office, error)
+	OfficeOne(ctx context.Context, officeID string) (*Office, error)
 
-	SampleList(ctx context.Context, office *models.Office) (models.SampleSlice, error)
-	SampleCreate(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) (*models.Sample, error)
-	SampleAddFirst(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) error
+	SampleList(ctx context.Context, office *Office) (models.SampleSlice, error)
+	SampleCreate(ctx context.Context, office *Office, req *BiTemporalSampleRequest) (*Sample, error)
+	SampleAddFirst(ctx context.Context, office *Office, req *BiTemporalSampleRequest) error
+
+	SyncSamples(ctx context.Context, tID string, samples []*Sample) error
 }
 
 type interactor struct {
@@ -25,18 +28,23 @@ func NewInteractor(p *infrastructure.Provider) Interactor {
 	return &interactor{p: p}
 }
 
-func (i *interactor) OfficeOne(ctx context.Context, officeID string) (*models.Office, error) {
-	return models.Offices(models.OfficeWhere.ID.EQ(officeID)).One(ctx, i.p.DB)
+func (i *interactor) OfficeOne(ctx context.Context, officeID string) (*Office, error) {
+	office, err := models.FindOffice(ctx, i.p.DB, officeID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Office{Office: office}, nil
 }
 
-func (i *interactor) SampleList(ctx context.Context, office *models.Office) (models.SampleSlice, error) {
+func (i *interactor) SampleList(ctx context.Context, office *Office) (models.SampleSlice, error) {
 	return office.Samples().All(ctx, i.p.DB)
 }
 
 /*
 TODO: Implement BiTemporalDataModel logics seriously
 */
-func (i *interactor) SampleCreate(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) (*models.Sample, error) {
+func (i *interactor) SampleCreate(ctx context.Context, office *Office, req *BiTemporalSampleRequest) (*Sample, error) {
 	err := office.AddSamples(
 		ctx, i.p.DB, true,
 		&models.Sample{
@@ -51,9 +59,9 @@ func (i *interactor) SampleCreate(ctx context.Context, office *models.Office, re
 	if err != nil {
 		return nil, err
 	}
-	return office.R.Samples[0], nil
+	return &Sample{Sample: office.R.Samples[0]}, nil
 }
-func (i *interactor) SampleAddFirst(ctx context.Context, office *models.Office, req *BiTemporalSampleRequest) error {
+func (i *interactor) SampleAddFirst(ctx context.Context, office *Office, req *BiTemporalSampleRequest) error {
 	latest, err := office.Samples(
 		models.SampleWhere.Biid.EQ(req.Biid),
 		qm.OrderBy(models.SampleTableColumns.ValidTo+" DESC"),
@@ -102,9 +110,7 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *models.Office, 
 
 	return nil
 }
-func (i *interactor) SampleAddMiddle(ctx context.Context, office *models.Office) error {
-	return nil
-}
-func (i *interactor) SampleAbolish(ctx context.Context, office *models.Office) error {
-	return nil
+
+func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sample) error {
+	return i.p.Redis.Del(ctx, debeziumcsmr.RedisKeyCount(tID), debeziumcsmr.RedisKeyRecords(tID)).Err()
 }
