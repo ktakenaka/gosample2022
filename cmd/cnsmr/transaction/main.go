@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/google/go-cmp/cmp"
-
 	"github.com/ktakenaka/gosample2022/app/pkg/debeziumcsmr"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/kafkaclient"
+	"github.com/ktakenaka/gosample2022/cmd/internal/redis"
 	"github.com/ktakenaka/gosample2022/infra/kafka"
 )
 
@@ -18,6 +17,8 @@ func main() {
 	cfg, _ := config.Initialize()
 
 	kafkaClient, task, _ := kafkaclient.Init(ctx, cfg)
+	defer task.Shutdown(ctx)
+	redisClient, task, _ := redis.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
 	csmer, _ := kafka.NewConsumer(kafkaClient)
@@ -36,6 +37,9 @@ func main() {
 			continue
 		}
 
-		fmt.Println(cmp.Diff(payload.Payload, &debeziumcsmr.TransactionPayload{}))
+		fmt.Println("=== ID", payload.Payload.ID)
+		fmt.Println("Status", payload.Payload.Status)
+		fmt.Println("EventCount", payload.Payload.EventCount)
+		fmt.Println(payload.Payload.DataCollections)
 	}
 }
