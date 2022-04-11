@@ -36,6 +36,7 @@ type SampleCopy struct {
 	ValidTo   time.Time            `boil:"valid_to" json:"valid_to" toml:"valid_to" yaml:"valid_to"`
 	CreatedAt time.Time            `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	DeletedAt null.Time            `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	Version   uint8                `boil:"version" json:"version" toml:"version" yaml:"version"`
 
 	R *sampleCopyR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L sampleCopyL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -52,6 +53,7 @@ var SampleCopyColumns = struct {
 	ValidTo   string
 	CreatedAt string
 	DeletedAt string
+	Version   string
 }{
 	ID:        "id",
 	Biid:      "biid",
@@ -63,6 +65,7 @@ var SampleCopyColumns = struct {
 	ValidTo:   "valid_to",
 	CreatedAt: "created_at",
 	DeletedAt: "deleted_at",
+	Version:   "version",
 }
 
 var SampleCopyTableColumns = struct {
@@ -76,6 +79,7 @@ var SampleCopyTableColumns = struct {
 	ValidTo   string
 	CreatedAt string
 	DeletedAt string
+	Version   string
 }{
 	ID:        "sample_copies.id",
 	Biid:      "sample_copies.biid",
@@ -87,6 +91,7 @@ var SampleCopyTableColumns = struct {
 	ValidTo:   "sample_copies.valid_to",
 	CreatedAt: "sample_copies.created_at",
 	DeletedAt: "sample_copies.deleted_at",
+	Version:   "sample_copies.version",
 }
 
 // Generated where
@@ -201,6 +206,29 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
+type whereHelperuint8 struct{ field string }
+
+func (w whereHelperuint8) EQ(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperuint8) NEQ(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperuint8) LT(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperuint8) LTE(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperuint8) GT(x uint8) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperuint8) GTE(x uint8) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperuint8) IN(slice []uint8) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperuint8) NIN(slice []uint8) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
 var SampleCopyWhere = struct {
 	ID        whereHelperuint
 	Biid      whereHelperstring
@@ -212,6 +240,7 @@ var SampleCopyWhere = struct {
 	ValidTo   whereHelpertime_Time
 	CreatedAt whereHelpertime_Time
 	DeletedAt whereHelpernull_Time
+	Version   whereHelperuint8
 }{
 	ID:        whereHelperuint{field: "`sample_copies`.`id`"},
 	Biid:      whereHelperstring{field: "`sample_copies`.`biid`"},
@@ -223,6 +252,7 @@ var SampleCopyWhere = struct {
 	ValidTo:   whereHelpertime_Time{field: "`sample_copies`.`valid_to`"},
 	CreatedAt: whereHelpertime_Time{field: "`sample_copies`.`created_at`"},
 	DeletedAt: whereHelpernull_Time{field: "`sample_copies`.`deleted_at`"},
+	Version:   whereHelperuint8{field: "`sample_copies`.`version`"},
 }
 
 // SampleCopyRels is where relationship names are stored.
@@ -246,8 +276,8 @@ func (*sampleCopyR) NewStruct() *sampleCopyR {
 type sampleCopyL struct{}
 
 var (
-	sampleCopyAllColumns            = []string{"id", "biid", "office_id", "code", "category", "amount", "valid_from", "valid_to", "created_at", "deleted_at"}
-	sampleCopyColumnsWithoutDefault = []string{"biid", "office_id", "code", "category", "amount", "valid_from", "created_at", "deleted_at"}
+	sampleCopyAllColumns            = []string{"id", "biid", "office_id", "code", "category", "amount", "valid_from", "valid_to", "created_at", "deleted_at", "version"}
+	sampleCopyColumnsWithoutDefault = []string{"biid", "office_id", "code", "category", "amount", "valid_from", "created_at", "deleted_at", "version"}
 	sampleCopyColumnsWithDefault    = []string{"id", "valid_to"}
 	sampleCopyPrimaryKeyColumns     = []string{"id"}
 	sampleCopyGeneratedColumns      = []string{}
