@@ -33,7 +33,7 @@ func main() {
 	office := models.Offices().OneP(ctx, db)
 
 	i := usecase.NewInteractor(&infrastructure.Provider{DB: db})
-	sample, err := i.SampleCreate(ctx, office, &usecase.BiTemporalSampleRequest{
+	sample, err := i.SampleCreate(ctx, &usecase.Office{Office: office}, &usecase.BiTemporalSampleRequest{
 		Code:      uuid.New().String()[:9],
 		Category:  models.SamplesCategoryMedium,
 		Amount:    decimal.New(1234, -2),
@@ -44,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	err = i.SampleAddFirst(ctx, office, &usecase.BiTemporalSampleRequest{
+	err = i.SampleAddFirst(ctx, &usecase.Office{Office: office}, &usecase.BiTemporalSampleRequest{
 		Biid:      sample.Biid,
 		Code:      sample.Code,
 		Category:  sample.Category,

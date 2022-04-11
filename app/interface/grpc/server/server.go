@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 
-	"github.com/ktakenaka/gosample2022/app/domain/models"
 	samplePb "github.com/ktakenaka/gosample2022/app/interface/grpc/protos/sample"
 	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/usecase"
@@ -22,7 +21,7 @@ func NewServer(provider *infrastructure.Provider) *server {
 	return srv
 }
 
-func (s *server) getCurrentOffice(ctx context.Context) (*models.Office, error) {
+func (s *server) getCurrentOffice(ctx context.Context) (*usecase.Office, error) {
 	// TODO: Implement authN logic
 	currentOffice, err := s.interactor.OfficeOne(ctx, "")
 	if err != nil {
