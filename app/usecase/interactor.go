@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/ktakenaka/gosample2022/app/domain/models"
@@ -125,22 +124,32 @@ func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sam
 		return nil
 	}
 
+	sampleIDs := make([]uint, len(samples))
+	for i := range samples {
+		sampleIDs[i] = samples[i].ID
+	}
+
 	err = transaction.TxExecute(ctx, i.p.DB, func(tx *sql.Tx) error {
+		existingSamples, err := models.SampleCopies(
+			models.SampleCopyWhere.ID.IN(sampleIDs),
+			qm.WithDeleted(),
+			qm.For("UPDATE"),
+		).All(ctx, tx)
+		if err != nil {
+			return err
+		}
+
+		existingSamplesMap := make(map[uint]*models.SampleCopy)
+		for i := range existingSamples {
+			existingSamples[existingSamples[i].ID] = existingSamples[i]
+		}
+
 		var upsertingList models.SampleCopySlice
 		for i := range samples {
-			// TODO: あーーこれ一斉にロック取らんとデッドロックするやん。
-			// ちゃんと楽観的ロック実装しよう
-			existing, err := models.SampleCopies(
-				models.SampleCopyWhere.ID.EQ(samples[i].ID),
-				qm.WithDeleted(),
-				qm.For("UPDATE"),
-			).One(ctx, tx)
-			if err != nil && errors.Is(err, sql.ErrNoRows) {
+			existing, ok := existingSamplesMap[samples[i].ID]
+			if !ok {
 				upsertingList = append(upsertingList, samples[i].SampleCopy)
 				continue
-			}
-			if err != nil {
-				return err
 			}
 
 			// TODO: Use version column to judge if we should update
