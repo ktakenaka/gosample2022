@@ -60,6 +60,7 @@ func main() {
 			ValidTo:   time.Time(payload.Payload.After.ValidTo),
 			CreatedAt: time.Time(payload.Payload.After.CreatedAt),
 			DeletedAt: null.Time(payload.Payload.After.DeletedAt),
+			Version:   payload.Payload.After.Version,
 		}
 
 		if err := redisClient.SAdd(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.Transaction.ID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
