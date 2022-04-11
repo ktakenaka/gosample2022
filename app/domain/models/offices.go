@@ -58,17 +58,20 @@ var OfficeWhere = struct {
 
 // OfficeRels is where relationship names are stored.
 var OfficeRels = struct {
-	OfficeUsers string
-	Samples     string
+	OfficeUsers  string
+	SampleCopies string
+	Samples      string
 }{
-	OfficeUsers: "OfficeUsers",
-	Samples:     "Samples",
+	OfficeUsers:  "OfficeUsers",
+	SampleCopies: "SampleCopies",
+	Samples:      "Samples",
 }
 
 // officeR is where relationships are stored.
 type officeR struct {
-	OfficeUsers OfficeUserSlice `boil:"OfficeUsers" json:"OfficeUsers" toml:"OfficeUsers" yaml:"OfficeUsers"`
-	Samples     SampleSlice     `boil:"Samples" json:"Samples" toml:"Samples" yaml:"Samples"`
+	OfficeUsers  OfficeUserSlice `boil:"OfficeUsers" json:"OfficeUsers" toml:"OfficeUsers" yaml:"OfficeUsers"`
+	SampleCopies SampleCopySlice `boil:"SampleCopies" json:"SampleCopies" toml:"SampleCopies" yaml:"SampleCopies"`
+	Samples      SampleSlice     `boil:"Samples" json:"Samples" toml:"Samples" yaml:"Samples"`
 }
 
 // NewStruct creates a new relationship struct
@@ -486,6 +489,27 @@ func (o *Office) OfficeUsers(mods ...qm.QueryMod) officeUserQuery {
 	return query
 }
 
+// SampleCopies retrieves all the sample_copy's SampleCopies with an executor.
+func (o *Office) SampleCopies(mods ...qm.QueryMod) sampleCopyQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`sample_copies`.`office_id`=?", o.ID),
+	)
+
+	query := SampleCopies(queryMods...)
+	queries.SetFrom(query.Query, "`sample_copies`")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"`sample_copies`.*"})
+	}
+
+	return query
+}
+
 // Samples retrieves all the sample's Samples with an executor.
 func (o *Office) Samples(mods ...qm.QueryMod) sampleQuery {
 	var queryMods []qm.QueryMod
@@ -595,6 +619,105 @@ func (officeL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, sing
 				local.R.OfficeUsers = append(local.R.OfficeUsers, foreign)
 				if foreign.R == nil {
 					foreign.R = &officeUserR{}
+				}
+				foreign.R.Office = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadSampleCopies allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (officeL) LoadSampleCopies(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOffice interface{}, mods queries.Applicator) error {
+	var slice []*Office
+	var object *Office
+
+	if singular {
+		object = maybeOffice.(*Office)
+	} else {
+		slice = *maybeOffice.(*[]*Office)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &officeR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &officeR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`sample_copies`),
+		qm.WhereIn(`sample_copies.office_id in ?`, args...),
+		qmhelper.WhereIsNull(`sample_copies.deleted_at`),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load sample_copies")
+	}
+
+	var resultSlice []*SampleCopy
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice sample_copies")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on sample_copies")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for sample_copies")
+	}
+
+	if len(sampleCopyAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.SampleCopies = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &sampleCopyR{}
+			}
+			foreign.R.Office = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.OfficeID {
+				local.R.SampleCopies = append(local.R.SampleCopies, foreign)
+				if foreign.R == nil {
+					foreign.R = &sampleCopyR{}
 				}
 				foreign.R.Office = local
 				break
@@ -779,6 +902,90 @@ func (o *Office) AddOfficeUsers(ctx context.Context, exec boil.ContextExecutor, 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &officeUserR{
+				Office: o,
+			}
+		} else {
+			rel.R.Office = o
+		}
+	}
+	return nil
+}
+
+// AddSampleCopiesG adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.SampleCopies.
+// Sets related.R.Office appropriately.
+// Uses the global database handle.
+func (o *Office) AddSampleCopiesG(ctx context.Context, insert bool, related ...*SampleCopy) error {
+	return o.AddSampleCopies(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddSampleCopiesP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.SampleCopies.
+// Sets related.R.Office appropriately.
+// Panics on error.
+func (o *Office) AddSampleCopiesP(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*SampleCopy) {
+	if err := o.AddSampleCopies(ctx, exec, insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddSampleCopiesGP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.SampleCopies.
+// Sets related.R.Office appropriately.
+// Uses the global database handle and panics on error.
+func (o *Office) AddSampleCopiesGP(ctx context.Context, insert bool, related ...*SampleCopy) {
+	if err := o.AddSampleCopies(ctx, boil.GetContextDB(), insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddSampleCopies adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.SampleCopies.
+// Sets related.R.Office appropriately.
+func (o *Office) AddSampleCopies(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*SampleCopy) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.OfficeID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `sample_copies` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"office_id"}),
+				strmangle.WhereClause("`", "`", 0, sampleCopyPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.OfficeID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &officeR{
+			SampleCopies: related,
+		}
+	} else {
+		o.R.SampleCopies = append(o.R.SampleCopies, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &sampleCopyR{
 				Office: o,
 			}
 		} else {

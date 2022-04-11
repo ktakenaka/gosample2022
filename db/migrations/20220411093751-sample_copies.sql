@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE samples (
+CREATE TABLE sample_copies (
   id         INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   biid       VARCHAR(26) CHARACTER SET ASCII NOT NULL COMMENT "use ulid",
   office_id  VARCHAR(26) CHARACTER SET ASCII NOT NULL,
@@ -12,8 +12,8 @@ CREATE TABLE samples (
   created_at TIMESTAMP NOT NULL,
   deleted_at TIMESTAMP,
 
-  CONSTRAINT `fk_samples_office_id` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
+  CONSTRAINT `fk_sample_copies_office_id` FOREIGN KEY (`office_id`) REFERENCES `offices` (`id`)
 );
 
 -- +migrate Down
-DROP TABLE IF EXISTS samples;
+DROP TABLE IF EXISTS sample_copies;

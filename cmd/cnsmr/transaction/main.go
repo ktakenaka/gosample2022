@@ -45,13 +45,16 @@ func main() {
 		if payload.Payload.Status != debeziumcsmr.TransactionStatusEnd {
 			continue
 		}
+		if payload.Payload.EventCount == 0 {
+			continue
+		}
 
 		if err := redisClient.Set(ctx, debeziumcsmr.RedisKeyCount(payload.Payload.ID), payload.Payload.EventCount, 0).Err(); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
-		samples := []*usecase.Sample{}
+		samples := []*usecase.SampleCopy{}
 		if err := redisClient.SMembers(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.ID)).ScanSlice(&samples); err != nil {
 			fmt.Println(err)
 			continue

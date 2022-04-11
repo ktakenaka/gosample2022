@@ -49,12 +49,12 @@ func main() {
 			continue
 		}
 
-		sample := &models.Sample{
+		sample := &models.SampleCopy{
 			ID:        payload.Payload.After.ID,
 			Biid:      payload.Payload.After.Biid,
 			OfficeID:  payload.Payload.After.OfficeID,
 			Code:      payload.Payload.After.Code,
-			Category:  models.SamplesCategory(payload.Payload.After.Category),
+			Category:  models.SampleCopiesCategory(payload.Payload.After.Category),
 			Amount:    decimal.Decimal(payload.Payload.After.Amount),
 			ValidFrom: time.Time(payload.Payload.After.ValidFrom),
 			ValidTo:   time.Time(payload.Payload.After.ValidTo),
@@ -62,12 +62,12 @@ func main() {
 			DeletedAt: null.Time(payload.Payload.After.DeletedAt),
 		}
 
-		if err := redisClient.SAdd(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.Transaction.ID), &usecase.Sample{Sample: sample}).Err(); err != nil {
+		if err := redisClient.SAdd(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.Transaction.ID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
 			fmt.Println(err)
 			continue
 		}
 
-		samples := []*usecase.Sample{}
+		samples := []*usecase.SampleCopy{}
 		if err := redisClient.SMembers(ctx, debeziumcsmr.RedisKeyRecords(payload.Payload.Transaction.ID)).ScanSlice(&samples); err != nil {
 			fmt.Println(err)
 			continue
