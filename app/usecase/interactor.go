@@ -8,7 +8,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
-	"github.com/ktakenaka/gosample2022/app/pkg/debeziumcsmr"
 	"github.com/ktakenaka/gosample2022/app/pkg/transaction"
 	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/volatiletech/null/v8"
@@ -112,7 +111,7 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *Office, req *Bi
 	return err
 }
 
-func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*SampleCopy) (err error) {
+func (i *interactor) SyncSamples(ctx context.Context, cacheKey string, samples []*SampleCopy) (err error) {
 	isExist, err := models.Offices(models.OfficeWhere.ID.EQ(samples[0].OfficeID)).Exists(ctx, i.p.DB)
 	if err != nil {
 		return err
@@ -172,5 +171,5 @@ func (i *interactor) SyncSamples(ctx context.Context, tID string, samples []*Sam
 		return err
 	}
 
-	return i.p.Redis.Del(ctx, debeziumcsmr.RedisKeyCount(tID), debeziumcsmr.RedisKeyRecords(tID)).Err()
+	return i.p.Redis.Del(ctx, cacheKey).Err()
 }
