@@ -105,17 +105,3 @@ services:
       KAFKA_HOST: kafka
       KAFKA_PORT: 29092
       MAXWELL_OPTIONS: --kafka_topic=gosample2022_maxwell
-
-  connect:
-    image: debezium/connect
-    ports:
-      - 8083:8083
-    depends_on:
-      - kafka
-      - mysql
-    environment:
-     BOOTSTRAP_SERVERS: kafka:29092
-     GROUP_ID: 1
-     CONFIG_STORAGE_TOPIC: gosample2022_connect_config
-     OFFSET_STORAGE_TOPIC: gosample2022_connect_offset
-     STATUS_STORAGE_TOPIC: gosample2022_connect_status
