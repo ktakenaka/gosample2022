@@ -1,19 +1,13 @@
 SQLMIGRATE_NAME=sqlmigrate:gosample2022
 
 up:
-	docker-compose up -d --scale mongodb=0 --scale connect=0
+	docker-compose up -d --scale mongodb=0
 
 down:
 	docker-compose down
 
 run:
 	docker-compose exec app go run cmd/srv/main.go
-
-cnsmr-samples:
-	docker-compose exec app go run cmd/cnsmr/samples/main.go
-
-cnsmr-transaction:
-	docker-compose exec app go run cmd/cnsmr/transaction/main.go
 
 mod:
 	docker-compose exec app go mod tidy
