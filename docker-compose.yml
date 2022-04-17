@@ -93,6 +93,19 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  maxwell:
+    image: zendesk/maxwell
+    depends_on:
+      - kafka
+      - mysql
+    environment:
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: root
+      MYSQL_HOST: mysql
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 29092
+      MAXWELL_OPTIONS: --kafka_topic=gosample2022_maxwell
+
   connect:
     image: debezium/connect
     ports:

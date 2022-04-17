@@ -1,7 +1,7 @@
 SQLMIGRATE_NAME=sqlmigrate:gosample2022
 
 up:
-	docker-compose up -d --scale mongodb=0
+	docker-compose up -d --scale mongodb=0 --scale connect=0
 
 down:
 	docker-compose down
