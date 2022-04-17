@@ -72,11 +72,10 @@ func main() {
 			Version:   event.Data.Version,
 		}
 
-		if err := redisClient.SAdd(ctx, maxwellcsmr.CacheKey(event.XID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
-			panic(err)
-		}
-
 		if !event.Commit {
+			if err := redisClient.SAdd(ctx, maxwellcsmr.CacheKey(event.XID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
+				panic(err)
+			}
 			continue
 		}
 
@@ -84,8 +83,9 @@ func main() {
 		if err := redisClient.SMembers(ctx, maxwellcsmr.CacheKey(event.XID)).ScanSlice(&samples); err != nil {
 			panic(err)
 		}
+		samples = append(samples, &usecase.SampleCopy{SampleCopy: sample})
 
-		if err := interactor.SyncSamples(ctx, samples); err != nil {
+		if err := interactor.SyncSamples(ctx, msg.Offset, samples); err != nil {
 			panic(err)
 		}
 
