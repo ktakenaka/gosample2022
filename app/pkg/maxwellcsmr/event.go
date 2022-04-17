@@ -10,15 +10,18 @@ type Event struct {
 	XID      uint   `json:"xid"`
 	XOffset  uint   `json:"xoffset"`
 	Commit   bool   `json:"commit"`
+	Data     Data   `json:"data"`
+	Old      Data   `json:"old"`
+}
+
+type Data []byte
+
+func (d *Data) UnmarshalJSON(in []byte) error {
+	*d = in
+	return nil
 }
 
 // TODO: Move to proper place
-type SampleEvent struct {
-	*Event
-	Data Sample  `json:"data"`
-	Old  *Sample `json:"old"`
-}
-
 type Sample struct {
 	ID        uint     `json:"id"`
 	Biid      string   `json:"biid"`
