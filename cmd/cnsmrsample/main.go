@@ -85,8 +85,10 @@ func main() {
 			panic(err)
 		}
 
-		if err := interactor.SyncSamples(ctx, maxwellcsmr.CacheKey(event.XID), samples); err != nil {
+		if err := interactor.SyncSamples(ctx, samples); err != nil {
 			panic(err)
 		}
+
+		redisClient.Del(ctx, maxwellcsmr.CacheKey(event.XID)).Err()
 	}
 }
