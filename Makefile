@@ -9,12 +9,6 @@ down:
 run:
 	docker-compose exec app go run cmd/srv/main.go
 
-cnsmr-samples:
-	docker-compose exec app go run cmd/cnsmr/samples/main.go
-
-cnsmr-transaction:
-	docker-compose exec app go run cmd/cnsmr/transaction/main.go
-
 mod:
 	docker-compose exec app go mod tidy
 	docker-compose exec app go mod vendor
