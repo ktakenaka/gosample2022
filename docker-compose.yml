@@ -24,7 +24,6 @@ services:
     depends_on:
       - mysql
       - redis
-      - mongodb
       - kafka
     logging:
       driver: "json-file"
@@ -33,7 +32,6 @@ services:
         max-size: "5m"
 
   mysql:
-    tty: true
     platform: linux/x86_64
     image: mysql:8
     ports:
