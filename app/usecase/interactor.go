@@ -22,7 +22,7 @@ type Interactor interface {
 	SampleCreate(ctx context.Context, office *Office, req *BiTemporalSampleRequest) (*Sample, error)
 	SampleAddFirst(ctx context.Context, office *Office, req *BiTemporalSampleRequest) error
 
-	SyncSamples(ctx context.Context, tID string, samples []*SampleCopy) error
+	SyncSamples(ctx context.Context, offset uint, samples []*SampleCopy) error
 }
 
 type interactor struct {
@@ -111,7 +111,7 @@ func (i *interactor) SampleAddFirst(ctx context.Context, office *Office, req *Bi
 	return err
 }
 
-func (i *interactor) SyncSamples(ctx context.Context, cacheKey string, samples []*SampleCopy) (err error) {
+func (i *interactor) SyncSamples(ctx context.Context, offset uint, samples []*SampleCopy) (err error) {
 	isExist, err := models.Offices(models.OfficeWhere.ID.EQ(samples[0].OfficeID)).Exists(ctx, i.p.DB)
 	if err != nil {
 		return err
@@ -165,11 +165,13 @@ func (i *interactor) SyncSamples(ctx context.Context, cacheKey string, samples [
 				return err
 			}
 		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
 
-	return i.p.Redis.Del(ctx, cacheKey).Err()
+		_, err = models.OffsetSamples(
+			models.OffsetSampleWhere.Offset.LTE(offset),
+			qm.Limit(1),
+		).UpdateAll(ctx, tx, models.M{models.OffsetSampleColumns.Offset: offset})
+		return err
+	})
+
+	return err
 }

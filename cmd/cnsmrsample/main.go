@@ -49,34 +49,37 @@ func main() {
 		panic(err)
 	}
 	for msg := range pcsmer.Messages() {
-		event := &maxwellcsmr.SampleEvent{}
+		event := &maxwellcsmr.Event{}
 		if err := json.Unmarshal(msg.Value, event); err != nil {
 			panic(err)
 		}
-
 		if event.Database != targetDB || event.Table != targetTable {
 			continue
 		}
 
-		sample := &models.SampleCopy{
-			ID:        event.Data.ID,
-			Biid:      event.Data.Biid,
-			OfficeID:  event.Data.OfficeID,
-			Code:      event.Data.Code,
-			Category:  models.SampleCopiesCategory(event.Data.Category),
-			Amount:    decimal.Decimal(event.Data.Amount),
-			ValidFrom: time.Time(event.Data.ValidFrom),
-			ValidTo:   time.Time(event.Data.ValidTo),
-			CreatedAt: time.Time(event.Data.CreatedAt),
-			DeletedAt: null.Time(event.Data.DeletedAt),
-			Version:   event.Data.Version,
-		}
-
-		if err := redisClient.SAdd(ctx, maxwellcsmr.CacheKey(event.XID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
+		eventSample := &maxwellcsmr.Sample{}
+		if err := json.Unmarshal(event.Data, eventSample); err != nil {
 			panic(err)
 		}
 
+		sample := &models.SampleCopy{
+			ID:        eventSample.ID,
+			Biid:      eventSample.Biid,
+			OfficeID:  eventSample.OfficeID,
+			Code:      eventSample.Code,
+			Category:  models.SampleCopiesCategory(eventSample.Category),
+			Amount:    decimal.Decimal(eventSample.Amount),
+			ValidFrom: time.Time(eventSample.ValidFrom),
+			ValidTo:   time.Time(eventSample.ValidTo),
+			CreatedAt: time.Time(eventSample.CreatedAt),
+			DeletedAt: null.Time(eventSample.DeletedAt),
+			Version:   eventSample.Version,
+		}
+
 		if !event.Commit {
+			if err := redisClient.SAdd(ctx, maxwellcsmr.CacheKey(event.XID), &usecase.SampleCopy{SampleCopy: sample}).Err(); err != nil {
+				panic(err)
+			}
 			continue
 		}
 
@@ -84,9 +87,12 @@ func main() {
 		if err := redisClient.SMembers(ctx, maxwellcsmr.CacheKey(event.XID)).ScanSlice(&samples); err != nil {
 			panic(err)
 		}
+		samples = append(samples, &usecase.SampleCopy{SampleCopy: sample})
 
-		if err := interactor.SyncSamples(ctx, maxwellcsmr.CacheKey(event.XID), samples); err != nil {
+		if err := interactor.SyncSamples(ctx, uint(msg.Offset), samples); err != nil {
 			panic(err)
 		}
+
+		redisClient.Del(ctx, maxwellcsmr.CacheKey(event.XID)).Err()
 	}
 }
