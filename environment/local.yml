@@ -29,3 +29,5 @@ kafka:
   topic_transactions: gosample2022_dbserver.transaction
 rollbar:
   token: ${ROLLBAR_TOKEN}
+kms:
+  region: ap-northeast-1
