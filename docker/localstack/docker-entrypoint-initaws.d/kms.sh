@@ -20,4 +20,6 @@ awslocal kms import-key-material --key-id ${KeyId} --encrypted-key-material file
 
 # Make key alias
 awslocal kms create-alias --target-key-id ${KeyId} --alias-name 'alias/local-kms-key'
-awslocal kms describe-key --key-id 'alias/local-kms-key'
+
+# You can confirm if the alias is made by this command
+# awslocal kms describe-key --key-id 'alias/local-kms-key'

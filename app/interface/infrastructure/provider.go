@@ -25,8 +25,12 @@ type Kafka interface {
 	sarama.Client
 }
 
+type KMS interface {
+}
+
 type Provider struct {
 	DB    DB
 	Redis Redis
 	Mongo Mongo
+	KMS   KMS
 }
