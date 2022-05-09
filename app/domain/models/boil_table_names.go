@@ -9,6 +9,7 @@ var TableNames = struct {
 	OffsetSamples string
 	SampleCopies  string
 	Samples       string
+	TreeSamples   string
 	Users         string
 }{
 	OfficeUsers:   "office_users",
@@ -16,5 +17,6 @@ var TableNames = struct {
 	OffsetSamples: "offset_samples",
 	SampleCopies:  "sample_copies",
 	Samples:       "samples",
+	TreeSamples:   "tree_samples",
 	Users:         "users",
 }
