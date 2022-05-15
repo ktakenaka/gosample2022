@@ -17,12 +17,11 @@ import (
 )
 
 var (
-	cfg, _       = config.Initialize()
-	ctx          = context.Background()
-	validFrom, _ = historydate.ParseDate("2021-08-02")
-	maxDate, _   = historydate.ParseDate("9999-12-31")
-
-	blackList = boil.Blacklist(models.TreeSampleColumns.ID, models.TreeSampleColumns.ValidTo, models.TreeSampleColumns.TransactionTo)
+	cfg, _         = config.Initialize()
+	ctx            = context.Background()
+	validFrom, _   = historydate.ParseDate("2021-08-02")
+	maxDate, _     = historydate.ParseDate("9999-12-31")
+	maxDateTime, _ = time.Parse("2006-01-02 15:04:05", "9999-12-31 23:59:59")
 )
 
 func init() {
@@ -41,26 +40,29 @@ func main() {
 		OfficeID:        office.ID,
 		Name:            "name",
 		ValidFrom:       time.Now(),
+		ValidTo:         maxDate.ToTime(),
 		TransactionFrom: time.Now(),
+		TransactionTo:   maxDateTime,
 	}
-	sample.InsertP(ctx, db, blackList)
+	sample.InsertP(ctx, db, boil.Infer())
 
 	child1 := addTo(db, sample, &models.TreeSample{Biid: ulid.MustNew(), Name: "name2"})
 	_ = addTo(db, child1, &models.TreeSample{Biid: ulid.MustNew(), Name: "name3"})
 
 	show(db, biid)
-	delete(db, child1)
+	delete(db, sample)
 }
 
 func addTo(db infrastructure.DB, parent, newChild *models.TreeSample) *models.TreeSample {
 	fmt.Println("=== addTo ===")
-	newChild.Path = constractPath(parent.Biid, newChild.Biid)
+	newChild.Path = constractPath(parent.Path, newChild.Biid)
 	newChild.OfficeID = parent.OfficeID
 
-	// FIXME: Assign appropriate value
-	newChild.ValidFrom = parent.ValidFrom
-	newChild.TransactionFrom = time.Now()
-	newChild.InsertP(ctx, db, blackList)
+	// TODO: Assign appropriate value
+	newChild.ValidTo, newChild.ValidFrom = maxDate.ToTime(), parent.ValidFrom
+	newChild.TransactionFrom, newChild.TransactionTo = time.Now(), maxDateTime
+
+	newChild.InsertP(ctx, db, boil.Infer())
 	return newChild
 }
 
@@ -72,38 +74,59 @@ func show(db infrastructure.DB, biid string) {
 	).OneP(ctx, db)
 	children := models.TreeSamples(
 		// TODO: Add `ValidAt` and `TransactionAt`
-		qm.Where("path LIKE ", "%"+biid),
+		qm.Where("path LIKE ?", sample.Path+"%"),
 	).AllP(ctx, db)
 
 	fmt.Printf("sample: %v\n", sample)
-	fmt.Printf("children: %v\n", children)
+	for i, child := range children {
+		fmt.Printf("child%d: %v\n", i, child)
+	}
 }
 
 func delete(db infrastructure.DB, sample *models.TreeSample) {
 	fmt.Println("=== delete ===")
 	children := models.TreeSamples(
 		// TODO: Add `ValidAt` and `TransactionAt`
-		qm.Where("path LIKE ", "%"+sample.Biid),
+		qm.Where("path LIKE ?", sample.Path+"%"),
 	).AllP(ctx, db)
 
-	validTo := sample.ValidFrom.AddDate(0, 0, 10) // TODO: correct one
-	transactionTo := time.Now()
-	var upserting models.TreeSampleSlice
+	var (
+		validTo       = sample.ValidFrom.AddDate(0, 0, 10) // TODO: Use correct one
+		transactionTo = time.Now()
+	)
+
+	var inserting, updating models.TreeSampleSlice
+
+	// Copy and assign new values
 	newSample := *sample
-	sample.TransactionTo = transactionTo
 	newSample.ID = 0
 	newSample.ValidTo = validTo
-	upserting = append(upserting, sample, &newSample)
+	newSample.TransactionTo = maxDateTime
+	inserting = append(inserting, &newSample)
+
+	// Revoke out-dated record
+	sample.TransactionTo = transactionTo
+	updating = append(updating, sample)
 
 	for _, s := range children {
+		// Copy and assign new values
 		new := *s
-		s.TransactionTo = transactionTo
 		new.ID = 0
 		new.ValidTo = validTo
-		upserting = append(upserting, s, &new)
+		new.TransactionTo = maxDateTime
+		inserting = append(inserting, &new)
+
+		// Revoke out-dated record
+		s.TransactionTo = transactionTo
+		updating = append(updating, s)
 	}
 
-	// upserting.UpsertAll
+	for _, s := range inserting {
+		s.InsertP(ctx, db, boil.Infer())
+	}
+	for _, s := range updating {
+		s.UpdateP(ctx, db, boil.Infer())
+	}
 }
 
 func constractPath(path ...string) string {
