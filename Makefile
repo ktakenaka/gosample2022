@@ -25,7 +25,7 @@ build-tools:
 lint:
 	@docker run --rm \
 		--volume "$(PWD):/app" \
-		-w /app golangci/golangci-lint:v1.43.0 \
+		-w /app golangci/golangci-lint:v1.44.0 \
 		golangci-lint run ./app/... --fix
 
 boil:

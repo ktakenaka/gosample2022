@@ -61,10 +61,12 @@ var OfficeRels = struct {
 	OfficeUsers  string
 	SampleCopies string
 	Samples      string
+	TreeSamples  string
 }{
 	OfficeUsers:  "OfficeUsers",
 	SampleCopies: "SampleCopies",
 	Samples:      "Samples",
+	TreeSamples:  "TreeSamples",
 }
 
 // officeR is where relationships are stored.
@@ -72,6 +74,7 @@ type officeR struct {
 	OfficeUsers  OfficeUserSlice `boil:"OfficeUsers" json:"OfficeUsers" toml:"OfficeUsers" yaml:"OfficeUsers"`
 	SampleCopies SampleCopySlice `boil:"SampleCopies" json:"SampleCopies" toml:"SampleCopies" yaml:"SampleCopies"`
 	Samples      SampleSlice     `boil:"Samples" json:"Samples" toml:"Samples" yaml:"Samples"`
+	TreeSamples  TreeSampleSlice `boil:"TreeSamples" json:"TreeSamples" toml:"TreeSamples" yaml:"TreeSamples"`
 }
 
 // NewStruct creates a new relationship struct
@@ -531,6 +534,27 @@ func (o *Office) Samples(mods ...qm.QueryMod) sampleQuery {
 	return query
 }
 
+// TreeSamples retrieves all the tree_sample's TreeSamples with an executor.
+func (o *Office) TreeSamples(mods ...qm.QueryMod) treeSampleQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`tree_samples`.`office_id`=?", o.ID),
+	)
+
+	query := TreeSamples(queryMods...)
+	queries.SetFrom(query.Query, "`tree_samples`")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"`tree_samples`.*"})
+	}
+
+	return query
+}
+
 // LoadOfficeUsers allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
 func (officeL) LoadOfficeUsers(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOffice interface{}, mods queries.Applicator) error {
@@ -827,6 +851,104 @@ func (officeL) LoadSamples(ctx context.Context, e boil.ContextExecutor, singular
 	return nil
 }
 
+// LoadTreeSamples allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (officeL) LoadTreeSamples(ctx context.Context, e boil.ContextExecutor, singular bool, maybeOffice interface{}, mods queries.Applicator) error {
+	var slice []*Office
+	var object *Office
+
+	if singular {
+		object = maybeOffice.(*Office)
+	} else {
+		slice = *maybeOffice.(*[]*Office)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &officeR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &officeR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`tree_samples`),
+		qm.WhereIn(`tree_samples.office_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load tree_samples")
+	}
+
+	var resultSlice []*TreeSample
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice tree_samples")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on tree_samples")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for tree_samples")
+	}
+
+	if len(treeSampleAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.TreeSamples = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &treeSampleR{}
+			}
+			foreign.R.Office = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.OfficeID {
+				local.R.TreeSamples = append(local.R.TreeSamples, foreign)
+				if foreign.R == nil {
+					foreign.R = &treeSampleR{}
+				}
+				foreign.R.Office = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // AddOfficeUsersG adds the given related objects to the existing relationships
 // of the office, optionally inserting them as new records.
 // Appends related to o.R.OfficeUsers.
@@ -1070,6 +1192,90 @@ func (o *Office) AddSamples(ctx context.Context, exec boil.ContextExecutor, inse
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &sampleR{
+				Office: o,
+			}
+		} else {
+			rel.R.Office = o
+		}
+	}
+	return nil
+}
+
+// AddTreeSamplesG adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.TreeSamples.
+// Sets related.R.Office appropriately.
+// Uses the global database handle.
+func (o *Office) AddTreeSamplesG(ctx context.Context, insert bool, related ...*TreeSample) error {
+	return o.AddTreeSamples(ctx, boil.GetContextDB(), insert, related...)
+}
+
+// AddTreeSamplesP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.TreeSamples.
+// Sets related.R.Office appropriately.
+// Panics on error.
+func (o *Office) AddTreeSamplesP(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*TreeSample) {
+	if err := o.AddTreeSamples(ctx, exec, insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddTreeSamplesGP adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.TreeSamples.
+// Sets related.R.Office appropriately.
+// Uses the global database handle and panics on error.
+func (o *Office) AddTreeSamplesGP(ctx context.Context, insert bool, related ...*TreeSample) {
+	if err := o.AddTreeSamples(ctx, boil.GetContextDB(), insert, related...); err != nil {
+		panic(boil.WrapErr(err))
+	}
+}
+
+// AddTreeSamples adds the given related objects to the existing relationships
+// of the office, optionally inserting them as new records.
+// Appends related to o.R.TreeSamples.
+// Sets related.R.Office appropriately.
+func (o *Office) AddTreeSamples(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*TreeSample) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.OfficeID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `tree_samples` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"office_id"}),
+				strmangle.WhereClause("`", "`", 0, treeSamplePrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.OfficeID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &officeR{
+			TreeSamples: related,
+		}
+	} else {
+		o.R.TreeSamples = append(o.R.TreeSamples, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &treeSampleR{
 				Office: o,
 			}
 		} else {

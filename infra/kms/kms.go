@@ -27,7 +27,7 @@ func New(cfg *Config) *Conn {
 		config.WithDefaultRegion(cfg.Region),
 		config.WithEndpointResolverWithOptions(aws.EndpointResolverWithOptionsFunc(fResolver)),
 		config.WithCredentialsProvider(aws.CredentialsProviderFunc(fCred)),
-		//config.WithClientLogMode(aws.LogSigning),
+		// config.WithClientLogMode(aws.LogSigning),
 	)
 	if err != nil {
 		panic("configuration error, " + err.Error())
