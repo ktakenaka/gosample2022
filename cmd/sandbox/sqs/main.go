@@ -30,4 +30,20 @@ func main() {
 	for _, url := range out.QueueUrls {
 		fmt.Println(*url)
 	}
+
+	result, err := client.ReceiveMessage(&sqs.ReceiveMessageInput{
+		QueueUrl: aws.String("http://localhost:4566/000000000000/sandbox"),
+		AttributeNames: aws.StringSlice([]string{
+			"SentTimestamp",
+		}),
+		MaxNumberOfMessages: aws.Int64(1),
+		MessageAttributeNames: aws.StringSlice([]string{
+			"All",
+		}),
+		WaitTimeSeconds: aws.Int64(20),
+	})
+
+	for _, msg := range result.Messages {
+		fmt.Println(*msg.MessageId, ":", *msg.Body)
+	}
 }
