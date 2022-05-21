@@ -7,9 +7,6 @@ require (
 	github.com/RichardKnop/machinery v1.10.6
 	github.com/Shopify/sarama v1.32.0
 	github.com/aws/aws-sdk-go v1.37.16
-	github.com/aws/aws-sdk-go-v2 v1.16.3
-	github.com/aws/aws-sdk-go-v2/config v1.15.4
-	github.com/aws/aws-sdk-go-v2/service/kms v1.17.1
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.5.0
@@ -36,15 +33,6 @@ require (
 	cloud.google.com/go/kms v1.4.0 // indirect
 	cloud.google.com/go/pubsub v1.10.0 // indirect
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.12.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.10 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.11 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.16.4 // indirect
-	github.com/aws/smithy-go v1.11.2 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -6,6 +6,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+
+	"github.com/aws/aws-sdk-go/service/kms"
+	"github.com/aws/aws-sdk-go/service/kms/kmsiface"
 )
 
 type Config struct {
@@ -17,6 +20,10 @@ type Config struct {
 
 type SQS interface {
 	sqsiface.SQSAPI
+}
+
+type KMS interface {
+	kmsiface.KMSAPI
 }
 
 func NewSession(cfg *Config) (*session.Session, error) {
@@ -33,4 +40,8 @@ func NewSession(cfg *Config) (*session.Session, error) {
 
 func NewSQS(sess *session.Session) SQS {
 	return sqs.New(sess)
+}
+
+func NewKMS(sess *session.Session) KMS {
+	return kms.New(sess)
 }
