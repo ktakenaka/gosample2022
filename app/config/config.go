@@ -40,6 +40,12 @@ type Config struct {
 		TopicTransactions string `yaml:"topic_transactions"`
 	}
 	Rollbar *rollbar.Config
+	AWS     struct {
+		ID       string `yaml:"id"`
+		Secret   string `yaml:"secret"`
+		Region   string `yaml:"region"`
+		Endpoint string `yaml:"endpoint"`
+	} `yaml:"aws"`
 }
 
 func New(cfgByte []byte) (*Config, error) {
