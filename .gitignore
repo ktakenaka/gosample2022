@@ -2,3 +2,4 @@
 vendor
 data
 cmd/sandbox/test
+.vscode
