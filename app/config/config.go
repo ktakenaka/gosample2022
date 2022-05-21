@@ -46,6 +46,9 @@ type Config struct {
 		Region   string `yaml:"region"`
 		Endpoint string `yaml:"endpoint"`
 	} `yaml:"aws"`
+	KMS struct {
+		MasterKeyID string `yaml:"master_key_id"`
+	} `yaml:"kms"`
 }
 
 func New(cfgByte []byte) (*Config, error) {

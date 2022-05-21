@@ -21,7 +21,7 @@ func main() {
 	client := infraAWS.NewKMS(sess)
 
 	out, err := client.Encrypt(&kms.EncryptInput{
-		KeyId:     aws.String("alias/local-kms-key"),
+		KeyId:     aws.String(cfg.KMS.MasterKeyID),
 		Plaintext: []byte("hoge"),
 	})
 	if err != nil {
