@@ -2,48 +2,63 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/ktakenaka/gosample2022/cmd/internal/config"
+	infraAWS "github.com/ktakenaka/gosample2022/infra/aws"
+)
+
+const (
+	queueName = "sandbox"
+)
+
+var (
+	cfg, _ = config.Initialize()
 )
 
 func main() {
-	sess := session.Must(session.NewSessionWithOptions(
-		session.Options{
-			Config: aws.Config{
-				Credentials:      credentials.NewStaticCredentials("gosample2022", "gosample2022", ""),
-				Region:           aws.String("ap-northeast-1"),
-				Endpoint:         aws.String("http://localstack:4566"),
-				S3ForcePathStyle: aws.Bool(true),
-			},
-		},
-	))
-	var client sqsiface.SQSAPI = sqs.New(sess)
-	out, err := client.ListQueues(&sqs.ListQueuesInput{})
+	sess, _ := infraAWS.NewSession(&infraAWS.Config{
+		ID: cfg.AWS.ID, Secret: cfg.AWS.Secret, Region: cfg.AWS.Region, Endpoint: cfg.AWS.Endpoint,
+	})
+	client := infraAWS.NewSQS(sess)
+
+	queueURL, err := client.GetQueueUrl(&sqs.GetQueueUrlInput{
+		QueueName: aws.String(queueName),
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	for _, url := range out.QueueUrls {
-		fmt.Println(*url)
-	}
+	go func() {
+		body := aws.String(time.Now().Format(time.RFC3339) + "hello")
+		client.SendMessage(&sqs.SendMessageInput{
+			DelaySeconds: aws.Int64(0),
+			MessageBody:  body,
+			QueueUrl:     queueURL.QueueUrl,
+		})
+	}()
 
 	result, err := client.ReceiveMessage(&sqs.ReceiveMessageInput{
-		QueueUrl: aws.String("http://localhost:4566/000000000000/sandbox"),
-		AttributeNames: aws.StringSlice([]string{
-			"SentTimestamp",
-		}),
-		MaxNumberOfMessages: aws.Int64(1),
-		MessageAttributeNames: aws.StringSlice([]string{
-			"All",
-		}),
-		WaitTimeSeconds: aws.Int64(20),
+		QueueUrl:              queueURL.QueueUrl,
+		AttributeNames:        aws.StringSlice([]string{"SentTimestamp"}),
+		MaxNumberOfMessages:   aws.Int64(1),
+		MessageAttributeNames: aws.StringSlice([]string{sqs.QueueAttributeNameAll}),
+		WaitTimeSeconds:       aws.Int64(20),
 	})
+	if err != nil {
+		panic(err)
+	}
 
 	for _, msg := range result.Messages {
 		fmt.Println(*msg.MessageId, ":", *msg.Body)
+		_, err := client.DeleteMessage(&sqs.DeleteMessageInput{
+			QueueUrl:      queueURL.QueueUrl,
+			ReceiptHandle: msg.ReceiptHandle,
+		})
+		if err != nil {
+			panic(err)
+		}
 	}
 }

@@ -29,3 +29,8 @@ kafka:
   topic_transactions: gosample2022_dbserver.transaction
 rollbar:
   token: ${ROLLBAR_TOKEN}
+aws:
+  id: gosample2022
+  secret: gosample2022
+  region: ap-northeast-1
+  endpoint: http://localstack:4566
