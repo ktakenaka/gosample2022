@@ -2,6 +2,7 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -18,6 +19,10 @@ type Config struct {
 	Endpoint string
 }
 
+type Session interface {
+	client.ConfigProvider
+}
+
 type SQS interface {
 	sqsiface.SQSAPI
 }
@@ -26,7 +31,7 @@ type KMS interface {
 	kmsiface.KMSAPI
 }
 
-func NewSession(cfg *Config) (*session.Session, error) {
+func NewSession(cfg *Config) (Session, error) {
 	return session.NewSessionWithOptions(
 		session.Options{
 			Config: aws.Config{
@@ -38,10 +43,10 @@ func NewSession(cfg *Config) (*session.Session, error) {
 	)
 }
 
-func NewSQS(sess *session.Session) SQS {
+func NewSQS(sess Session) SQS {
 	return sqs.New(sess)
 }
 
-func NewKMS(sess *session.Session) KMS {
+func NewKMS(sess Session) KMS {
 	return kms.New(sess)
 }
