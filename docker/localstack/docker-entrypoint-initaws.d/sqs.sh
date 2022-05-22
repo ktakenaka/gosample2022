@@ -1,1 +1,1 @@
- awslocal sqs create-queue --queue-name sandbox
+ awslocal sqs create-queue --queue-name sqssample

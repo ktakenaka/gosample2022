@@ -8,7 +8,11 @@ import (
 )
 
 func Initialize() (*config.Config, error) {
-	file, err := environment.GetConfig(os.Getenv("ENV"))
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "local"
+	}
+	file, err := environment.GetConfig(env)
 	if err != nil {
 		panic(err)
 	}

@@ -3,3 +3,6 @@ vendor
 data
 cmd/sandbox/test
 .vscode
+.envrc
+main*
+response.json

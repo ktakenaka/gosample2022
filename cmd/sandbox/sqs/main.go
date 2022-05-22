@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	queueName = "sandbox"
+	queueName = "sqssample"
 )
 
 var (
@@ -31,34 +31,15 @@ func main() {
 		panic(err)
 	}
 
-	go func() {
-		body := aws.String(time.Now().Format(time.RFC3339) + "hello")
-		client.SendMessage(&sqs.SendMessageInput{
-			DelaySeconds: aws.Int64(0),
-			MessageBody:  body,
-			QueueUrl:     queueURL.QueueUrl,
-		})
-	}()
-
-	result, err := client.ReceiveMessage(&sqs.ReceiveMessageInput{
-		QueueUrl:              queueURL.QueueUrl,
-		AttributeNames:        aws.StringSlice([]string{"SentTimestamp"}),
-		MaxNumberOfMessages:   aws.Int64(1),
-		MessageAttributeNames: aws.StringSlice([]string{sqs.QueueAttributeNameAll}),
-		WaitTimeSeconds:       aws.Int64(20),
+	body := aws.String(time.Now().Format(time.RFC3339) + "hello")
+	out, err := client.SendMessage(&sqs.SendMessageInput{
+		DelaySeconds: aws.Int64(0),
+		MessageBody:  body,
+		QueueUrl:     queueURL.QueueUrl,
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	for _, msg := range result.Messages {
-		fmt.Println(*msg.MessageId, ":", *msg.Body)
-		_, err := client.DeleteMessage(&sqs.DeleteMessageInput{
-			QueueUrl:      queueURL.QueueUrl,
-			ReceiptHandle: msg.ReceiptHandle,
-		})
-		if err != nil {
-			panic(err)
-		}
-	}
+	fmt.Println(out.GoString())
 }
