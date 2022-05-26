@@ -54,3 +54,11 @@ $ aws sqs send-message \
   --message-body '{"name":"hello"}' \
   --endpoint-url=http://localhost:4566
 ```
+
+## Setup S3
+```
+$ aws s3api create-bucket \
+  --endpoint-url=http://localhost:4566 \
+  --bucket s3sample
+$ aws s3api list-buckets --endpoint-url=http://localhost:4566
+```
