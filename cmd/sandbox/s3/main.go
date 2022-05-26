@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 
@@ -33,6 +34,7 @@ func main() {
 	}
 
 	f, err := os.Open("go.mod")
+	defer f.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,4 +47,14 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println(out2.ETag)
+
+	out3, err := client.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String("example"),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	filebytes, _ := io.ReadAll(out3.Body)
+	log.Println(string(filebytes))
 }
