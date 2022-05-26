@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	infraAWS "github.com/ktakenaka/gosample2022/infra/aws"
@@ -26,8 +28,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for _, b := range out.Buckets {
 		log.Println(*b.Name)
 	}
+
+	f, err := os.Open("go.mod")
+	if err != nil {
+		log.Fatal(err)
+	}
+	out2, err := client.PutObject(&s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String("example"),
+		Body:   f,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(out2.ETag)
 }
