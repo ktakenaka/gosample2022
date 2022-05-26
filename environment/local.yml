@@ -33,6 +33,6 @@ aws:
   id: gosample2022
   secret: gosample2022
   region: ap-northeast-1
-  endpoint: http://localhost:4566
+  endpoint: http://localhost.localstack.cloud:4566
 kms:
   master_key_id: alias/local-kms-key

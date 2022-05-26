@@ -20,7 +20,7 @@ var (
 
 func main() {
 	sess, _ := infraAWS.NewSession(&infraAWS.Config{
-		ID: cfg.AWS.ID, Secret: cfg.AWS.Secret, Region: cfg.AWS.Region, Endpoint: "http://host.docker.internal:4566",
+		ID: cfg.AWS.ID, Secret: cfg.AWS.Secret, Region: cfg.AWS.Region, Endpoint: cfg.AWS.Endpoint,
 	})
 	client := infraAWS.NewS3(sess)
 
