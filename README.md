@@ -60,5 +60,10 @@ $ aws sqs send-message \
 $ aws s3api create-bucket \
   --endpoint-url=http://localhost:4566 \
   --bucket s3sample
+$ aws s3api put-object \
+  --endpoint-url=http://localhost:4566 \
+  --bucket s3sample \
+  --key sample \
+  --body go.mod
 $ aws s3api list-buckets --endpoint-url=http://localhost:4566
 ```
