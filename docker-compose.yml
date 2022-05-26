@@ -67,6 +67,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - ./data/mongo:/data/db
+    profiles:
+      - mongo
   localstack:
     image: localstack/localstack
     restart: always
@@ -91,6 +93,8 @@ services:
     volumes:
       - ./data/zookeeper/data:/var/lib/zookeeper/data
       - ./data/zookeeper/log:/var/lib/zookeeper/log
+    profiles:
+      - cdc
 
   kafka:
     image: confluentinc/cp-kafka:7.0.1
@@ -108,6 +112,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    profiles:
+      - cdc
   maxwell:
     image: zendesk/maxwell
     depends_on:
@@ -120,3 +126,5 @@ services:
       KAFKA_HOST: kafka
       KAFKA_PORT: 29092
       MAXWELL_OPTIONS: --kafka_topic=gosample2022_maxwell
+    profiles:
+      - cdc
