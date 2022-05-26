@@ -7,17 +7,17 @@ down:
 	docker-compose down
 
 run:
-	docker-compose exec app go run cmd/srv/main.go
+	ENV=local go run cmd/srv/main.go
 
 cnsmrsample:
-	docker-compose exec app go run cmd/cnsmrsample/main.go
+	go run cmd/cnsmrsample/main.go
 
 mod:
-	docker-compose exec app go mod tidy
-	docker-compose exec app go mod vendor
+	go mod tidy
+	go mod vendor
 
 fmt:
-	docker-compose exec app go fmt ./...
+	go fmt ./...
 
 build-tools:
 	docker build --file ./tools/sqlmigrate/Dockerfile --tag $(SQLMIGRATE_NAME) .

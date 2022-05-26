@@ -13,25 +13,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile-dev
-    ports:
-      - 8080:8080
     volumes:
       - .:/go/src
-    environment:
-      ENV: "local"
-      ROLLBAR_TOKEN: ${ROLLBAR_TOKEN}
-      <<: *dbenv
-    depends_on:
-      - mysql
-      - redis
-      - kafka
-      - localstack
-    logging:
-      driver: "json-file"
-      options:
-        max-file: "3"
-        max-size: "5m"
-
   mysql:
     platform: linux/x86_64
     image: mysql:8
@@ -95,7 +78,6 @@ services:
       - ./data/zookeeper/log:/var/lib/zookeeper/log
     profiles:
       - cdc
-
   kafka:
     image: confluentinc/cp-kafka:7.0.1
     ports:
