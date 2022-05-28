@@ -22,6 +22,7 @@ require (
 	github.com/volatiletech/strmangle v0.0.1
 	go.mongodb.org/mongo-driver v1.8.4
 	go.uber.org/multierr v1.6.0
+	go.uber.org/zap v1.17.0
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
