@@ -4,5 +4,5 @@ data
 cmd/sandbox/test
 .vscode
 .envrc
-^main*
+/main*
 response.json
