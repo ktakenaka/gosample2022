@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -28,6 +30,13 @@ func handler() func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, er
 			results = append(results, Result{ID: msg.MessageId, EventSource: msg.EventSource, Body: msg.Body})
 		}
 		// No need to delete message by ourselves in the case of SQS + Lambda
+
+		fmt.Printf("%+v\n", sqsEvent)
+
+		files, _ := ioutil.ReadDir("./")
+		for _, f := range files {
+				fmt.Println(f.Name())
+		}
 
 		// Check if the function can connect to DB
 		id := ulid.MustNew()
