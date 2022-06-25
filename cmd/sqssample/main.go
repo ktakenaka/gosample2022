@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -21,7 +22,10 @@ type Result struct {
 }
 
 func handler() func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, error) {
-	cfg, _ := config.Initialize()
+	cfg, err := config.Initialize()
+	if err != nil {
+		panic(err)
+	}
 	db, _, _ := mysql.Init(context.TODO(), cfg)
 
 	return func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, error) {
@@ -33,11 +37,6 @@ func handler() func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, er
 
 		fmt.Printf("%+v\n", sqsEvent)
 
-		files, _ := ioutil.ReadDir("./")
-		for _, f := range files {
-				fmt.Println(f.Name())
-		}
-
 		// Check if the function can connect to DB
 		id := ulid.MustNew()
 		user := models.User{ID: id, Email: id + "@hoge.com"}
@@ -46,5 +45,13 @@ func handler() func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, er
 }
 
 func main() {
+	dir, _ := os.Getwd()
+	fmt.Println("===== current dir", dir)
+
+	files, _ := ioutil.ReadDir("./")
+	for i, f := range files {
+		fmt.Println("file", i, ":", f.Name())
+	}
+
 	lambda.Start(handler())
 }
