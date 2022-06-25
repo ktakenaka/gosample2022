@@ -1,7 +1,0 @@
-FROM golang:1.18-alpine3.15
-
-RUN apk update && apk upgrade
-COPY ./sqssample sqssample
-COPY ./Makefile makefile
-
-CMD ["sh", "-c", "/sqssample"]

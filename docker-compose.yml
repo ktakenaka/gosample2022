@@ -58,20 +58,14 @@ services:
     environment:
       SERVICES: s3,sqs,kms,lambda
       DEFAULT_REGION: ap-northeast-1
-      DATA_DIR: /tmp/localstack/data # Same as default
+      DATA_DIR: /data/localstack
       DOCKER_HOST: unix:///var/run/docker.sock
       INIT_SCRIPTS_PATH: /docker-entrypoint-initaws.d
       KMS_PROVIDER: local-kms
-      LAMBDA_EXECUTOR: docker
-      DEBUG: 1
-      LS_LOG: debug
-      HOST_TMP_FOLDER: ./data/lambda
-      LAMBDA_REMOTE_DOCKER: false
     volumes:
-      - "./data/localstack:/tmp/localstack"
+      - "./data/localstack:/data/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./docker/localstack/docker-entrypoint-initaws.d:/docker-entrypoint-initaws.d"
-    privileged: true # So that localstack can use host docker
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     environment:

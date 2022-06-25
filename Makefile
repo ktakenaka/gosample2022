@@ -57,9 +57,3 @@ local-migrate-%:
 
 test-seed:
 	docker-compose exec mysql mysql -uroot -proot gosample2022_test < ./testsupport/seed/seed.sql
-
-lmd-sqssample:
-	GOOS=linux CGO_ENABLED=0 go build -o sqssample ./cmd/sqssample/main.go
-	docker build -f docker/Dockerfile-lmd -t sqssample:gosample2022 .
-	aws --endpoint-url http://localhost:4566 lambda delete-function --function-name sqssample
-	aws --endpoint-url http://localhost:4566 lambda create-function --function-name sqssample --package-type Image --code ImageUri=sqssample:gosample2022 --role sqssample
