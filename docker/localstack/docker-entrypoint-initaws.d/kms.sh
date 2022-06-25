@@ -1,7 +1,7 @@
 #!/bin/bash
 apt update -y && apt install jq -y
 
-cd /data/localstack
+cd /tmp/localstack
 
 # https://docs.aws.amazon.com/kms/latest/developerguide/importing-keys-create-cmk.html
 KeyId=`jq -r '.KeyMetadata.KeyId' <<< $(awslocal kms create-key --origin EXTERNAL)`

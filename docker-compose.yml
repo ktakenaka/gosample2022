@@ -58,12 +58,15 @@ services:
     environment:
       SERVICES: s3,sqs,kms,lambda
       DEFAULT_REGION: ap-northeast-1
-      DATA_DIR: /data/localstack
+      DATA_DIR: /tmp/localstack/data # default
       DOCKER_HOST: unix:///var/run/docker.sock
       INIT_SCRIPTS_PATH: /docker-entrypoint-initaws.d
+      DEBUG: 1
+      LS_LOG: debug
       KMS_PROVIDER: local-kms
+      LAMBDA_EXECUTOR: local
     volumes:
-      - "./data/localstack:/data/localstack"
+      - "./data/localstack:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./docker/localstack/docker-entrypoint-initaws.d:/docker-entrypoint-initaws.d"
   zookeeper:
