@@ -14,7 +14,7 @@ func Initialize() (*config.Config, error) {
 	}
 	file, err := environment.GetConfig(env)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return config.New(file)

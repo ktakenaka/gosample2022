@@ -21,7 +21,10 @@ type Result struct {
 }
 
 func handler() func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, error) {
-	cfg, _ := config.Initialize()
+	cfg, err := config.Initialize()
+	if err != nil {
+		panic(err)
+	}
 	db, _, _ := mysql.Init(context.TODO(), cfg)
 
 	return func(ctx context.Context, sqsEvent events.SQSEvent) ([]Result, error) {
