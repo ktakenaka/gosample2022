@@ -42,7 +42,6 @@ services:
       - "./data/redis:/data"
   mongodb:
     image: mongo
-    restart: always
     ports:
       - 27017:27017
     environment:
@@ -54,7 +53,6 @@ services:
       - mongo
   localstack:
     image: localstack/localstack
-    restart: always
     ports:
       - 4566:4566
     environment:
