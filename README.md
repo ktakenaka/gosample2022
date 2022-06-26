@@ -7,6 +7,7 @@ export AWS_PROFILE=gosample
 ```
 
 Create executable and create a function in lambda
+(When you need other files on runtime, you can add more files/directories in zip)
 ```
 $ make lmd-sassample
 ```
