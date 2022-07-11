@@ -8,6 +8,7 @@ import (
 	"github.com/ktakenaka/gosample2022/app/domain/models"
 	"github.com/ktakenaka/gosample2022/app/interface/infrastructure"
 	"github.com/ktakenaka/gosample2022/app/pkg/historydate"
+	"github.com/ktakenaka/gosample2022/app/pkg/ulid"
 	"github.com/ktakenaka/gosample2022/app/usecase"
 	"github.com/ktakenaka/gosample2022/cmd/internal/config"
 	"github.com/ktakenaka/gosample2022/cmd/internal/mysql"
@@ -30,7 +31,9 @@ func main() {
 	db, task, _ := mysql.Init(ctx, cfg)
 	defer task.Shutdown(ctx)
 
-	office := models.Offices().OneP(ctx, db)
+	id := ulid.MustNew()
+	office := &models.Office{ID: id, Name: id}
+	office.InsertP(ctx, db, boil.Infer())
 
 	i := usecase.NewInteractor(&infrastructure.Provider{DB: db})
 	sample, err := i.SampleCreate(ctx, &usecase.Office{Office: office}, &usecase.BiTemporalSampleRequest{
