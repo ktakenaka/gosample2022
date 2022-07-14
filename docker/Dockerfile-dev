@@ -1,6 +1,8 @@
-FROM golang:1.18-alpine3.15
+FROM golang:1.18
 
-RUN apk update && apk upgrade && apk add --update alpine-sdk protoc git
+RUN apt-get update && apt-get install -y \
+  protobuf-compiler \
+  libprotobuf-dev
 
 # On local development (local), we just use 1 image for more convenience.
 RUN go install github.com/volatiletech/sqlboiler/v4@latest &&\

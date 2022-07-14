@@ -1,0 +1,13 @@
+syntax = "proto3";
+option go_package = "protos/common";
+import "google/protobuf/any.proto";
+
+message Common {
+  string id = 1;
+  
+  map<string, google.protobuf.Any> custom_fields = 5;
+}
+
+enum ProductType {
+  PJC = 0;
+}
