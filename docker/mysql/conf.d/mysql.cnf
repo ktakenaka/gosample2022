@@ -1,7 +1,6 @@
 # For advice on how to change settings please see
 
 [mysqld]
-
 # ----------------------------------------------
 # Enable the binlog for replication & CDC
 # https://debezium.io/documentation/reference/0.10/connectors/mysql.html#setting-up-mysql
@@ -11,6 +10,7 @@ log_bin           = mysql-bin
 binlog_format     = row
 binlog_row_image  = full
 binlog_expire_logs_seconds = 81920
+binlog_transaction_compression = on
 
 # ----------------------------------------------
 # Enable GTID
